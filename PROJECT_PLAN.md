@@ -61,12 +61,12 @@ Calm, trustworthy, a little playful. Money apps should feel *reassuring*, not co
 Dark mode: invert neutrals (`neutral-900` → background, `surface` → `#22271F`), keep `positive`/`negative`/`primary` roughly as-is with slightly reduced saturation.
 
 ### 3.3 Typography
-- **Font:** Inter (or system font fallback: `-apple-system`, `Roboto`) — free, geometric, reads well at small sizes for numbers.
+- **Font:** Poppins (web-wide, all weights via `next/font/google`), with JetBrains Mono kept specifically for tabular currency figures. Switched from an earlier Inter placeholder per explicit direction on 2026-08-25.
 - **Scale:** 32/24/18/16/14/12 px — display / h1 / h2 / body / caption / micro.
 - Numbers (currency amounts) use tabular figures and slightly bolder weight than surrounding text so balances scan quickly.
 
 ### 3.4 Component principles
-- Rounded corners (12–16px), soft shadows, no harsh borders.
+- Rounded corners, tightened on 2026-08-25 from an overly bubbly base (was scaling up to ~42px at the largest tier). Web base `--radius` is now `0.5rem` (8px), cascading to a `--radius-lg` of ~8px for cards/inputs and ~14px for the largest tier; interactive pills (primary CTAs) stay fully rounded as a documented exception. Soft shadows, no harsh borders.
 - Amounts owed = red-leaning, amounts you're owed = green-leaning, consistently everywhere (list rows, group cards, detail screens).
 - Primary CTA is always a single, unmistakable button per screen (e.g. "Add Expense," "Settle Up").
 
@@ -362,6 +362,7 @@ Check items off as completed. Each phase should end with something runnable/demo
 
 ## Progress Log
 
+- **2026-08-25** — Redesigned the web landing page per Sej's direction (too generic, too rounded, wants Poppins). Design read: consumer fintech landing page for roommates/trip groups, friendly-modern language, Tailwind + shadcn/ui + Poppins, asymmetric split hero with a real product-preview card (not a fake screenshot) instead of the old centered-hero-plus-three-equal-cards pattern. Changes: (1) swapped `Inter` for `Poppins` site-wide in `apps/web/src/app/layout.tsx` (kept JetBrains Mono for tabular currency figures); (2) fixed the global corner-radius scale in `globals.css` (base `--radius` 1rem to 0.5rem — the old scale ballooned to ~42px at its largest tier, now tops out around 21px, with cards/buttons at a crisp ~8px; pill-shaped CTAs kept as a documented exception); (3) rebuilt `apps/web/src/app/page.tsx`: asymmetric split hero with a real balance-card preview mirroring the actual `GroupCard` component's visual language, an asymmetric 3-cell bento for features (was 3 identical cards), a split-type chip row, and a closing CTA band, unifying all signup CTAs under one "Get started" label (was "Get started"/"Start splitting" duplicated intent) and removing every em-dash from visible copy. Verified: `tsc --noEmit` clean, dev server rendered correctly (checked via `get_page_text`, console errors, and computed styles for font-family/border-radius), mobile viewport (375px) has no horizontal overflow. Not yet pushed as of this entry (see next).
 - **2026-08-25** — Closed 2 of the 4 remaining gaps from the handoff doc directly via Supabase MCP (no build agent needed for this pass):
   - **Recurring-expense cron scheduling — done.** Enabled `pg_cron` + `pg_net` extensions (migration `0007`) and scheduled `materialize-recurring-expenses-daily` (migration `0008`) to POST to the existing `materialize-recurring-expenses` Edge Function daily at 00:15 UTC. Confirmed live and active via `select * from cron.job`.
   - **Cross-device push notification delivery — done.** Deployed a new `notify-group-members` Edge Function (`supabase/functions/notify-group-members/index.ts`) that looks up a group's other members' `push_tokens` and sends via the Expo push API. Wired it in with two Postgres triggers, `on_expense_created_notify` and `on_settlement_created_notify` (migration `0009`), that fire an async `pg_net` call on every new expense/settlement insert. Re-ran `get_advisors` after — no new security warnings, only the pre-existing expected ones (`is_group_member`/`is_group_owner` intentionally public per RLS policy needs) plus one unrelated, pre-existing finding (`auth_leaked_password_protection` disabled — a one-toggle fix in the Supabase dashboard under Authentication → Providers → Password, not part of this session's scope but worth flagging to Sej).
