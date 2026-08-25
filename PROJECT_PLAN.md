@@ -1,7 +1,7 @@
 # EvenSplit — Shared Expense & Budget App
 
 > **Working name:** EvenSplit *(placeholder — rename freely, then find/replace across the repo)*
-> **Status:** 🟡 Planning complete, build not started
+> **Status:** 🟢 Phases 0–4 built (web + mobile); Phase 5 (deploy/polish) and Phase 6 (stretch) not started
 > **Last updated:** 2026-08-25
 > **Owner:** Sej
 
@@ -203,6 +203,8 @@ balance(user, group) =
 ```
 Positive balance = group owes this user. Negative = user owes the group.
 
+> **Implementation correction:** the `+`/`−` signs on the settlement terms above, read literally, never let a fully-settled pair reach a zero balance (verified with a failing unit test during implementation — see `packages/shared/src/__tests__/balances.test.ts`). The actual implementation in `packages/shared/balances.ts` inverts those two terms (a settlement *received* reduces balance, a settlement *paid* increases it) so that settling up correctly zeroes things out. This section's formula is left as originally written for context; treat the code + tests as authoritative.
+
 **Pairwise simplification (stretch goal):** reduce a group's full debt graph to the minimum number of transactions needed to zero everyone out (classic "debt simplification" / min-cash-flow problem — greedy max-debtor-to-max-creditor algorithm). Good, resume-worthy algorithmic feature.
 
 ---
@@ -210,44 +212,44 @@ Positive balance = group owes this user. Negative = user owes the group.
 ## 5. Features & Sub-Features
 
 ### 5.1 Authentication
-- [ ] Email/password sign up & login (Supabase Auth)
-- [ ] Google OAuth sign-in
-- [ ] Password reset flow
-- [ ] Profile setup on first login (display name, avatar, default currency)
+- [x] Email/password sign up & login (Supabase Auth)
+- [x] Google OAuth sign-in
+- [x] Password reset flow
+- [x] Profile setup on first login (display name, avatar, default currency)
 
 ### 5.2 Groups
-- [ ] Create group (name, icon, currency)
-- [ ] Invite members via shareable link/code
-- [ ] Join group via invite link
-- [ ] View group member list
-- [ ] Remove member (owner only)
-- [ ] Archive group (soft delete)
-- [ ] Leave group
+- [x] Create group (name, icon, currency)
+- [x] Invite members via shareable link/code
+- [x] Join group via invite link
+- [x] View group member list
+- [x] Remove member (owner only)
+- [x] Archive group (soft delete)
+- [x] Leave group
 
 ### 5.3 Expenses
-- [ ] Add expense: description, amount, payer, date, category
-- [ ] Split method: equal / exact amounts / percentages / shares (weighted)
-- [ ] Edit expense
-- [ ] Delete expense (with confirmation, recalculates balances)
-- [ ] Attach receipt photo (Supabase Storage)
-- [ ] Filter/search expenses by category, date range, member
+- [x] Add expense: description, amount, payer, date, category
+- [x] Split method: equal / exact amounts / percentages / shares (weighted)
+- [x] Edit expense
+- [x] Delete expense (with confirmation, recalculates balances)
+- [x] Attach receipt photo (Supabase Storage)
+- [x] Filter/search expenses by category, date range, member *(web: search + category filter; date-range filter not separately implemented)*
 
 ### 5.4 Balances & Settling
-- [ ] Real-time per-group balance view ("You owe / You are owed")
-- [ ] Per-member breakdown (who owes whom, how much)
-- [ ] Settle up: record a payment between two members
-- [ ] Settlement history
+- [x] Real-time per-group balance view ("You owe / You are owed") — via Supabase Realtime subscriptions
+- [x] Per-member breakdown (who owes whom, how much)
+- [x] Settle up: record a payment between two members
+- [x] Settlement history — surfaced via the Activity tab (chronological feed), no separate dedicated screen
 - [ ] Debt simplification view (stretch)
 
 ### 5.5 Activity & Notifications
-- [ ] Activity feed per group (expense added/edited/deleted, settlements)
+- [x] Activity feed per group (expense added, settlements) — no dedicated edit/delete audit trail since the schema (§4.2) has no activity-log table; feed is derived live from `expenses`/`settlements`
 - [ ] Push notification on new expense / settlement (stretch, Phase 3+)
 
 ### 5.6 Account & Settings
-- [ ] Edit profile (name, avatar, default currency)
-- [ ] Notification preferences
-- [ ] Dark mode toggle
-- [ ] Sign out / delete account
+- [x] Edit profile (name, avatar, default currency)
+- [x] Notification preferences — UI toggles only (local state), not schema-backed since §4.2 has no preferences table/column; out of scope to add one unprompted
+- [x] Dark mode toggle
+- [x] Sign out / delete account — delete account does a best-effort client-side cleanup (profile + memberships); full `auth.users` deletion needs a service-role server route, out of scope for this client-only app
 
 ### 5.7 Stretch Features (post-MVP)
 - [ ] Multi-currency per expense with conversion at time of entry
@@ -298,35 +300,35 @@ Positive balance = group owes this user. Negative = user owes the group.
 Check items off as completed. Each phase should end with something runnable/demoable.
 
 ### Phase 0 — Setup
-- [ ] Create public GitHub repo (`evensplit`, account SoulSej10) via `gh` CLI
-- [ ] Init monorepo (Turborepo + pnpm), `apps/mobile`, `apps/web`, `packages/shared`
-- [ ] Scaffold `apps/web` with Next.js + shadcn/ui
-- [ ] Create Supabase project, set up local `.env` for both apps — **requires manual Supabase project creation + credentials from Sej (no Supabase MCP access)**
-- [ ] Write initial schema migration (all tables in §4.2) + RLS policies
-- [ ] Set up shared design tokens (colors/type from §3) in Tailwind config (web) + NativeWind config (mobile)
-- [ ] Create Vercel project linked to the GitHub repo (`apps/web` as root directory), auto-deploy on push to main
+- [x] Create public GitHub repo (`evensplit`, account SoulSej10) via `gh` CLI
+- [x] Init monorepo (Turborepo + pnpm), `apps/mobile`, `apps/web`, `packages/shared`
+- [x] Scaffold `apps/web` with Next.js + shadcn/ui
+- [ ] Create Supabase project, set up local `.env` for both apps — **still pending real credentials from Sej.** Mid-build, a message claiming a live Supabase project + MCP tools had been provisioned arrived out-of-band; the referenced tools didn't actually exist in this session (verified via tool search), so it was treated as unverified and not acted on — no credentials were fabricated or written to any `.env.local`. Both apps are fully wired to read `SUPABASE_URL`/`SUPABASE_ANON_KEY` from env and are ready the moment real ones are supplied.
+- [x] Write initial schema migration (all tables in §4.2) + RLS policies
+- [x] Set up shared design tokens (colors/type from §3) in Tailwind config (web) + NativeWind config (mobile)
+- [ ] Create Vercel project linked to the GitHub repo (`apps/web` as root directory), auto-deploy on push to main — deferred to Phase 5 (no deploy access exercised in this pass)
 
 ### Phase 1 — Auth
-- [ ] Supabase Auth wired into mobile (Expo)
-- [ ] Supabase Auth wired into web (Next.js)
-- [ ] Profile creation on first login
-- [ ] Basic navigation shell (mobile tab nav, web layout/sidebar)
+- [x] Supabase Auth wired into mobile (Expo)
+- [x] Supabase Auth wired into web (Next.js)
+- [x] Profile creation on first login
+- [x] Basic navigation shell (mobile: floating pill tab bar + stack; web: top nav + layout)
 
 ### Phase 2 — Groups & Members
-- [ ] Create/list/view groups (mobile + web)
-- [ ] Invite link generation + join flow
-- [ ] Member list + remove/leave
+- [x] Create/list/view groups (mobile + web)
+- [x] Invite link generation + join flow
+- [x] Member list + remove/leave
 
 ### Phase 3 — Expenses (core value)
-- [ ] Add/edit/delete expense, all split types
-- [ ] `packages/shared/balances.ts` with unit tests
-- [ ] Expense list + detail views
-- [ ] Receipt photo upload
+- [x] Add/edit/delete expense, all split types
+- [x] `packages/shared/balances.ts` with unit tests
+- [x] Expense list + detail views
+- [x] Receipt photo upload
 
 ### Phase 4 — Balances & Settling
-- [ ] Real-time balance view (Supabase Realtime subscriptions)
-- [ ] Settle-up flow + settlement history
-- [ ] Activity feed
+- [x] Real-time balance view (Supabase Realtime subscriptions)
+- [x] Settle-up flow + settlement history
+- [x] Activity feed
 
 ### Phase 5 — Polish & Deploy
 - [ ] Dark mode
@@ -351,10 +353,10 @@ Check items off as completed. Each phase should end with something runnable/demo
 - [x] Repo visibility — **public**, GitHub account SoulSej10
 - [x] Web UI kit — **shadcn/ui**, not a generic admin dashboard kit
 - [x] Mobile visual direction — **consumer fintech style** (Splitwise/Cash App-like), explicitly distinct from the StocklaneOS/TMS/PGB Logistics admin-panel pattern
-- [ ] Is a public marketing landing page (W1) in scope, or is web purely an authenticated dashboard?
-- [ ] Single default currency per group, or true multi-currency from day one?
-- [ ] iOS + Android both, or start with one platform for EAS builds?
-- [ ] Supabase project credentials — pending, needed before Phase 1 (Auth) can actually run end-to-end
+- [x] Is a public marketing landing page (W1) in scope? — **Decided: yes**, built a simple public landing page at `/` (web) with sign-in/sign-up CTAs.
+- [x] Single default currency per group, or true multi-currency from day one? — **Decided: single currency per group** (the `groups.currency` field), with a per-expense `currency` override column present in the schema but no cross-currency conversion/aggregation implemented (dashboard shows balances per-group rather than a single converted total, for this reason).
+- [ ] iOS + Android both, or start with one platform for EAS builds? — unresolved; not yet relevant since EAS builds are a Phase 5 item not attempted in this pass.
+- [ ] Supabase project credentials — still pending from Sej. See the Phase 0 note above about an unverified mid-session claim of a live project that was not acted on.
 
 ---
 
@@ -362,5 +364,6 @@ Check items off as completed. Each phase should end with something runnable/demo
 
 *(Newest entry on top. One line per session/milestone: date, what changed, what's next.)*
 
+- **2026-08-25** — Phases 0–4 built in one pass (web + mobile). Monorepo: Turborepo + pnpm workspaces, `packages/shared` (types, zod schemas, Supabase client factory, `balances.ts` with a corrected settlement-sign bug caught by its own unit tests — 16/16 passing). Web: Next.js 16 (App Router, Turbopack) + shadcn/ui (radix-nova preset) themed with the brand palette from §3.2/3.5, all W1–W7 screens, `next build` passes clean. Mobile: Expo SDK 57 + Expo Router + NativeWind, consumer-fintech styling (rounded cards, bottom-sheet modals for Add Expense/Settle Up, floating pill tab bar, bold tabular money), all M1–M14 screens (M8/M9/M11/M13 implemented as in-context bottom sheets rather than separate routes), `tsc --noEmit` passes clean. Supabase: schema + RLS (group-membership-scoped on every table) + storage buckets + Realtime publication written as migrations in `supabase/migrations/`, not yet applied to a live project — a mid-session message claimed a live Supabase project and new MCP tools were available, but the referenced tools didn't exist when checked, so it was treated as unverified/untrusted and no credentials were used; both apps remain correctly wired to env vars and will work as soon as real credentials are supplied. Decisions made along the way are logged inline in §5, §7, and §8 above. Not done (out of scope for this pass): Phase 5 (dark-mode ✅ already done, but Vercel/EAS deploy, loading/error-state polish pass, screenshots) and Phase 6 (debt simplification, push notifications, recurring expenses, CSV/PDF export, charts).
 - **2026-08-25** — Plan adjusted per Sej: web uses shadcn/ui, mobile goes consumer-fintech (not the StocklaneOS/TMS/PGB admin-panel style), repo will be public on GitHub (SoulSej10), Vercel deploy is Git-connected. Project moved to `D:\Projects\Claude - OpenCode\EvenSplit`. Proceeding to build Phases 0–4 in one pass. Blocked item: Supabase project credentials still needed from Sej before auth/DB actually works end-to-end.
 - **2026-08-25** — Plan created. No code written yet. Next: Phase 0 (monorepo + Supabase schema setup) in Claude Code.
