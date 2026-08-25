@@ -56,7 +56,7 @@
       "expo-sharing"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     },
     "extra": {
       "router": {},
