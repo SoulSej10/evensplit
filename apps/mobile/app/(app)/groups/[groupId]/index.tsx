@@ -4,8 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
-import { ArrowLeft, MoreVertical, Plus, UserPlus } from "lucide-react-native";
+import { ArrowLeft, ArrowLeftRight, MoreVertical, Plus, UserPlus } from "lucide-react-native";
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { BottomActionBar } from "@/components/ui/BottomActionBar";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ExpensesTabView } from "@/components/expenses/ExpensesTabView";
@@ -152,7 +154,7 @@ export default function GroupDetailScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerClassName="px-5 pb-32 pt-3" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-40 pt-3" showsVerticalScrollIndicator={false}>
         <View className="mb-5 items-center gap-2">
           <Text className="text-3xl">{group.icon || "👥"}</Text>
           <Text className="text-xl font-bold text-neutral-900 dark:text-neutral-100">{group.name}</Text>
@@ -207,21 +209,22 @@ export default function GroupDetailScreen() {
         )}
       </ScrollView>
 
-      {tab === "expenses" && (
-        <Pressable
-          onPress={() => setAddExpenseOpen(true)}
-          className="absolute bottom-8 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary shadow-lg active:opacity-90"
-          style={{
-            shadowColor: "#2F6F5E",
-            shadowOpacity: 0.35,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 6 },
-            elevation: 8,
-          }}
+      <BottomActionBar>
+        <Button
+          variant="secondary"
+          size="lg"
+          className="flex-1 flex-row gap-2"
+          disabled={Math.abs(myBalance) < 0.005}
+          onPress={() => setTab("balances")}
         >
-          <Plus color="white" size={28} />
-        </Pressable>
-      )}
+          <ArrowLeftRight color="#2F6F5E" size={18} />
+          <Text className="font-semibold text-primary">Settle up</Text>
+        </Button>
+        <Button size="lg" className="flex-1 flex-row gap-2" onPress={() => setAddExpenseOpen(true)}>
+          <Plus color="white" size={18} />
+          <Text className="font-semibold text-white">Add expense</Text>
+        </Button>
+      </BottomActionBar>
 
       <ExpenseFormSheet
         visible={addExpenseOpen}

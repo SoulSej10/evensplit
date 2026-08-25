@@ -24,13 +24,13 @@ module.exports = {
         "surface-dark": "#22271F",
       },
       fontFamily: {
-        sans: ["Inter_400Regular"],
-        medium: ["Inter_500Medium"],
-        semibold: ["Inter_600SemiBold"],
-        bold: ["Inter_700Bold"],
+        sans: ["Poppins_400Regular"],
+        medium: ["Poppins_500Medium"],
+        semibold: ["Poppins_600SemiBold"],
+        bold: ["Poppins_700Bold"],
       },
       borderRadius: {
-        card: "20px",
+        card: "14px",
         pill: "999px",
       },
     },

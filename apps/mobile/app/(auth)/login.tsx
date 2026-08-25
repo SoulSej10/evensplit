@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { logInSchema, type LogInInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { BottomActionBar } from "@/components/ui/BottomActionBar";
 import { GoogleButton } from "@/components/GoogleButton";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
@@ -36,7 +37,10 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       className="flex-1 bg-neutral-100 dark:bg-neutral-900"
     >
-      <ScrollView contentContainerClassName="flex-1 justify-center px-6 py-10" keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerClassName="flex-1 justify-center px-6 py-10 pb-40"
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="mb-10 items-center gap-3">
           <View className="h-16 w-16 items-center justify-center rounded-3xl bg-primary">
             <Wallet color="white" size={28} />
@@ -65,18 +69,6 @@ export default function LoginScreen() {
             <Text className="text-sm font-medium text-primary">Forgot password?</Text>
           </Pressable>
 
-          <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg">
-            Log in
-          </Button>
-
-          <View className="flex-row items-center gap-3 py-1">
-            <View className="h-px flex-1 bg-neutral-500/20" />
-            <Text className="text-xs text-neutral-500">or</Text>
-            <View className="h-px flex-1 bg-neutral-500/20" />
-          </View>
-
-          <GoogleButton />
-
           <View className="mt-2 flex-row items-center justify-center gap-1">
             <Text className="text-neutral-500">Don't have an account?</Text>
             <Link href="/(auth)/signup" asChild>
@@ -87,6 +79,18 @@ export default function LoginScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <BottomActionBar className="flex-col gap-3">
+        <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg">
+          Log in
+        </Button>
+        <View className="flex-row items-center gap-3">
+          <View className="h-px flex-1 bg-neutral-500/20" />
+          <Text className="text-xs text-neutral-500">or</Text>
+          <View className="h-px flex-1 bg-neutral-500/20" />
+        </View>
+        <GoogleButton />
+      </BottomActionBar>
     </KeyboardAvoidingView>
   );
 }

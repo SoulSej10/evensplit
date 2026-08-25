@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { profileSetupSchema, type ProfileSetupInput } from "@evensplit/shared";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { BottomActionBar } from "@/components/ui/BottomActionBar";
 import { useAuth } from "@/hooks/use-auth";
 import { upsertProfile, uploadAvatar } from "@/lib/api/profile";
 import { CURRENCIES } from "@/lib/format";
@@ -52,10 +53,11 @@ export default function ProfileSetupScreen() {
   }
 
   return (
-    <ScrollView
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       className="flex-1 bg-neutral-100 dark:bg-neutral-900"
-      contentContainerClassName="flex-1 justify-center px-6 py-10"
     >
+      <ScrollView contentContainerClassName="flex-1 justify-center px-6 py-10 pb-32">
       <View className="mb-8 items-center gap-2">
         <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Set up your profile
@@ -104,11 +106,14 @@ export default function ProfileSetupScreen() {
             })}
           </View>
         </View>
+      </View>
+      </ScrollView>
 
-        <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg" className="mt-2">
+      <BottomActionBar>
+        <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg" className="flex-1">
           Continue
         </Button>
-      </View>
-    </ScrollView>
+      </BottomActionBar>
+    </KeyboardAvoidingView>
   );
 }
