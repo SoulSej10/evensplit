@@ -303,7 +303,7 @@ Check items off as completed. Each phase should end with something runnable/demo
 - [x] Create public GitHub repo (`evensplit`, account SoulSej10) via `gh` CLI
 - [x] Init monorepo (Turborepo + pnpm), `apps/mobile`, `apps/web`, `packages/shared`
 - [x] Scaffold `apps/web` with Next.js + shadcn/ui
-- [ ] Create Supabase project, set up local `.env` for both apps — **still pending real credentials from Sej.** Mid-build, a message claiming a live Supabase project + MCP tools had been provisioned arrived out-of-band; the referenced tools didn't actually exist in this session (verified via tool search), so it was treated as unverified and not acted on — no credentials were fabricated or written to any `.env.local`. Both apps are fully wired to read `SUPABASE_URL`/`SUPABASE_ANON_KEY` from env and are ready the moment real ones are supplied.
+- [x] Create Supabase project, set up local `.env` for both apps — **done.** Live project `evensplit` (`opwiuqodrnhkysmbukme`, `ap-southeast-1`, free tier) created via Supabase MCP after Sej connected the connector. Real `SUPABASE_URL`/`SUPABASE_ANON_KEY` written to `apps/web/.env.local` and `apps/mobile/.env.local` (both gitignored, verified not tracked). The earlier out-of-band claim mid-build was legitimate after all — just not yet available in that subagent's own tool session.
 - [x] Write initial schema migration (all tables in §4.2) + RLS policies
 - [x] Set up shared design tokens (colors/type from §3) in Tailwind config (web) + NativeWind config (mobile)
 - [ ] Create Vercel project linked to the GitHub repo (`apps/web` as root directory), auto-deploy on push to main — deferred to Phase 5 (no deploy access exercised in this pass)
@@ -356,11 +356,13 @@ Check items off as completed. Each phase should end with something runnable/demo
 - [x] Is a public marketing landing page (W1) in scope? — **Decided: yes**, built a simple public landing page at `/` (web) with sign-in/sign-up CTAs.
 - [x] Single default currency per group, or true multi-currency from day one? — **Decided: single currency per group** (the `groups.currency` field), with a per-expense `currency` override column present in the schema but no cross-currency conversion/aggregation implemented (dashboard shows balances per-group rather than a single converted total, for this reason).
 - [ ] iOS + Android both, or start with one platform for EAS builds? — unresolved; not yet relevant since EAS builds are a Phase 5 item not attempted in this pass.
-- [ ] Supabase project credentials — still pending from Sej. See the Phase 0 note above about an unverified mid-session claim of a live project that was not acted on.
+- [x] Supabase project credentials — live project created, schema + RLS applied, env vars wired into both apps.
 
 ---
 
 ## Progress Log
+
+- **2026-08-25** — Live Supabase project provisioned (`evensplit`, `opwiuqodrnhkysmbukme`, `ap-southeast-1`, free/$0 tier) after Sej connected the Supabase connector. All 4 schema migrations applied directly to the live project (init schema, RLS policies, storage buckets, realtime), plus a 5th migration locking down direct RPC access to two trigger-only functions (`handle_new_auth_user`, `handle_new_group`) that `get_advisors` flagged as publicly callable — `is_group_member`/`is_group_owner` were left callable since RLS policies depend on that grant. All 7 tables confirmed live with RLS enabled via `list_tables`. Generated TypeScript types from the live schema (`packages/shared/src/database.types.ts`) and wired them into `createEvenSplitClient` for a fully typed Supabase client; hand-written types in `types.ts` cross-checked against the live schema with no drift. Real credentials written to `apps/web/.env.local` / `apps/mobile/.env.local` (gitignored, confirmed untracked via `git check-ignore`). Re-verified after wiring: `next build` succeeds against the live project, web+mobile typecheck clean, all 16 shared unit tests still pass. Next: Phase 5 (Vercel deploy, EAS build, polish pass).
 
 *(Newest entry on top. One line per session/milestone: date, what changed, what's next.)*
 

@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
 /**
  * Minimal, platform-agnostic Supabase client factory shared by web and
@@ -25,7 +26,9 @@ export interface CreateEvenSplitClientOptions {
   detectSessionInUrl?: boolean;
 }
 
-export function createEvenSplitClient(options: CreateEvenSplitClientOptions): SupabaseClient {
+export function createEvenSplitClient(
+  options: CreateEvenSplitClientOptions
+): SupabaseClient<Database> {
   const { supabaseUrl, supabaseAnonKey, storage, autoRefreshToken = true, detectSessionInUrl } =
     options;
 
@@ -36,7 +39,7 @@ export function createEvenSplitClient(options: CreateEvenSplitClientOptions): Su
     );
   }
 
-  return createClient(supabaseUrl, supabaseAnonKey, {
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken,
