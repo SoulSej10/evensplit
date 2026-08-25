@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,32 @@ const SPLIT_LABELS: Record<SplitType, string> = {
 };
 
 const CATEGORIES = ["food", "transport", "lodging", "utilities", "entertainment", "other"];
+
+type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
+const FREQUENCIES: { value: Frequency; label: string }[] = [
+  { value: "DAILY", label: "Daily" },
+  { value: "WEEKLY", label: "Weekly" },
+  { value: "MONTHLY", label: "Monthly" },
+];
+
+/** Parses a simple "FREQ=WEEKLY;INTERVAL=2" style rule back to its parts. */
+function parseRecurrenceRule(rule: string | null | undefined): { freq: Frequency; interval: number } {
+  const defaults = { freq: "MONTHLY" as Frequency, interval: 1 };
+  if (!rule) return defaults;
+  const parts = Object.fromEntries(
+    rule.split(";").map((p) => {
+      const [k, v] = p.split("=");
+      return [k, v];
+    })
+  );
+  const freq = (parts.FREQ as Frequency) ?? defaults.freq;
+  const interval = Number(parts.INTERVAL) || 1;
+  return { freq, interval };
+}
+
+function buildRecurrenceRule(freq: Frequency, interval: number): string {
+  return interval > 1 ? `FREQ=${freq};INTERVAL=${interval}` : `FREQ=${freq}`;
+}
 
 interface Props {
   trigger: ReactNode;
@@ -63,6 +90,10 @@ export function ExpenseFormDialog({
     existingExpense?.expense_date ?? new Date().toISOString().slice(0, 10)
   );
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const initialRecurrence = parseRecurrenceRule(existingExpense?.recurrence_rule);
+  const [isRecurring, setIsRecurring] = useState(existingExpense?.is_recurring ?? false);
+  const [frequency, setFrequency] = useState<Frequency>(initialRecurrence.freq);
+  const [interval, setIntervalValue] = useState(initialRecurrence.interval);
 
   const initialParticipants = existingExpense?.expense_shares.map((s) => s.user_id) ??
     members.map((m) => m.user_id);
@@ -86,6 +117,10 @@ export function ExpenseFormDialog({
     setCategory(existingExpense?.category ?? "other");
     setExpenseDate(existingExpense?.expense_date ?? new Date().toISOString().slice(0, 10));
     setReceiptFile(null);
+    const recurrence = parseRecurrenceRule(existingExpense?.recurrence_rule);
+    setIsRecurring(existingExpense?.is_recurring ?? false);
+    setFrequency(recurrence.freq);
+    setIntervalValue(recurrence.interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -140,6 +175,8 @@ export function ExpenseFormDialog({
         expense_date: expenseDate,
         receipt_url: existingExpense?.receipt_url ?? null,
         participants,
+        is_recurring: isRecurring,
+        recurrence_rule: isRecurring ? buildRecurrenceRule(frequency, interval) : null,
       };
 
       const expense = isEdit
@@ -299,6 +336,46 @@ export function ExpenseFormDialog({
                 );
               })}
             </div>
+          </div>
+
+          <div className="space-y-2 rounded-xl border border-border p-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="recurring">Recurring expense</Label>
+                <p className="text-xs text-muted-foreground">Repeats automatically on a schedule.</p>
+              </div>
+              <Switch id="recurring" checked={isRecurring} onCheckedChange={setIsRecurring} />
+            </div>
+            {isRecurring && (
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="space-y-1.5">
+                  <Label>Frequency</Label>
+                  <Select value={frequency} onValueChange={(v) => setFrequency(v as Frequency)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FREQUENCIES.map((f) => (
+                        <SelectItem key={f.value} value={f.value}>
+                          {f.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="interval">Every N</Label>
+                  <Input
+                    id="interval"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={interval}
+                    onChange={(e) => setIntervalValue(Math.max(1, Number(e.target.value) || 1))}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
