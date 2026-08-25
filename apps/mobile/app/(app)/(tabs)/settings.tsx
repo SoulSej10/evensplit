@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/use-auth";
 import { getSupabaseClient } from "@/lib/supabase/client";
-import { ensureNotificationPermission } from "@/lib/notifications";
+import { ensureNotificationPermission, registerForPushTokenAsync } from "@/lib/notifications";
 
 export default function SettingsScreen() {
   const { authUser, profile, signOut } = useAuth();
@@ -18,9 +18,17 @@ export default function SettingsScreen() {
   const [notifSettlements, setNotifSettlements] = useState(true);
 
   // Request notification permission once, the first time the user visits
-  // Settings — not on app load, so it isn't intrusive on first launch.
+  // Settings — not on app load, so it isn't intrusive on first launch. If
+  // granted (and on a physical device), also fetch an Expo push token —
+  // it's not persisted anywhere yet (no backend to send it to), this just
+  // exercises the registration path for a future push-infra pass.
   useEffect(() => {
-    void ensureNotificationPermission();
+    void ensureNotificationPermission().then((granted) => {
+      if (!granted) return;
+      void registerForPushTokenAsync().then((token) => {
+        if (token) console.log("EvenSplit: Expo push token (not yet persisted):", token);
+      });
+    });
   }, []);
 
   async function onSignOut() {

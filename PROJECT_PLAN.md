@@ -1,7 +1,7 @@
 # EvenSplit — Shared Expense & Budget App
 
 > **Working name:** EvenSplit *(placeholder — rename freely, then find/replace across the repo)*
-> **Status:** 🟢 Phases 0–4 built (web + mobile); Phase 5 (deploy/polish) and Phase 6 (stretch) not started
+> **Status:** 🟢 Phases 0–4 built and live; Phase 5 done except EAS build execution + screenshots; Phase 6 built except live cron scheduling and mobile charts — see Progress Log for exact stub/blocker list
 > **Last updated:** 2026-08-25
 > **Owner:** Sej
 
@@ -239,11 +239,11 @@ Positive balance = group owes this user. Negative = user owes the group.
 - [x] Per-member breakdown (who owes whom, how much)
 - [x] Settle up: record a payment between two members
 - [x] Settlement history — surfaced via the Activity tab (chronological feed), no separate dedicated screen
-- [ ] Debt simplification view (stretch)
+- [x] Debt simplification view (stretch) — "All debts"/"Simplified" toggle on the Balances tab, web + mobile, backed by `simplifyDebts()` in `packages/shared`
 
 ### 5.5 Activity & Notifications
 - [x] Activity feed per group (expense added, settlements) — no dedicated edit/delete audit trail since the schema (§4.2) has no activity-log table; feed is derived live from `expenses`/`settlements`
-- [ ] Push notification on new expense / settlement (stretch, Phase 3+)
+- [~] Push notification on new expense / settlement (stretch, Phase 3+) — **local-only stub**: mobile fires an immediate local notification on the *current user's own* add-expense/settle-up actions (`apps/mobile/src/lib/notifications.ts`). Real cross-device push (notifying *other* group members) needs a backend function reading the new `push_tokens` table and calling the Expo push API — schema is in place, function is not built (out of scope without more time; documented in the module's header comment)
 
 ### 5.6 Account & Settings
 - [x] Edit profile (name, avatar, default currency)
@@ -252,11 +252,11 @@ Positive balance = group owes this user. Negative = user owes the group.
 - [x] Sign out / delete account — delete account does a best-effort client-side cleanup (profile + memberships); full `auth.users` deletion needs a service-role server route, out of scope for this client-only app
 
 ### 5.7 Stretch Features (post-MVP)
-- [ ] Multi-currency per expense with conversion at time of entry
-- [ ] Recurring expenses (rent, subscriptions)
-- [ ] Export group ledger to CSV/PDF
-- [ ] Debt-simplification algorithm (minimize transactions)
-- [ ] Charts: spending by category, by member, over time
+- [ ] Multi-currency per expense with conversion at time of entry — not attempted, out of scope for this pass
+- [~] Recurring expenses (rent, subscriptions) — UI done (web + mobile Add/Edit Expense has a Recurring toggle + Daily/Weekly/Monthly picker, persisted via `is_recurring`/`recurrence_rule`); materialization logic exists as a deployed Supabase Edge Function (`materialize-recurring-expenses`) but is **not wired to a scheduler** — see Progress Log
+- [x] Export group ledger to CSV/PDF — CSV done on both platforms (web: Blob download; mobile: Expo file-system + sharing). PDF scoped out per the original brief's "nice to have" allowance
+- [x] Debt-simplification algorithm (minimize transactions) — `simplifyDebts()` in `packages/shared/src/balances.ts`, unit tested, surfaced in the Balances tab UI on both platforms
+- [~] Charts: spending by category, by member, over time — **web done** (`apps/web/src/components/insights/insights-tab.tsx`, recharts: category pie, member bar, time line). **Mobile not done** — scoped down/skipped per the original brief's "best-effort" allowance for this item after prioritizing the other four Phase 6 items
 
 ---
 
@@ -331,18 +331,18 @@ Check items off as completed. Each phase should end with something runnable/demo
 - [x] Activity feed
 
 ### Phase 5 — Polish & Deploy
-- [ ] Dark mode
-- [ ] Empty states, loading states, error handling pass
-- [ ] Deploy web to Vercel
-- [ ] Build + submit mobile via EAS (at least internal/TestFlight)
-- [ ] README + screenshots for portfolio presentation
+- [x] Dark mode — web (next-themes, persisted) and mobile (NativeWind `useColorScheme`, persisted) both already working, toggle verified in `apps/web/src/app/settings/page.tsx` and `apps/mobile/app/(app)/(tabs)/settings.tsx`
+- [x] Empty states, loading states, error handling pass — web and mobile both audited: loading skeletons, empty states with CTAs, and inline error states with retry (queries) / toasts (mutations) across groups list, group detail (expenses/balances/activity), and related components
+- [x] Deploy web to Vercel — done in an earlier session, https://evensplit-eight.vercel.app, re-verified `pnpm --filter web build` still passes after all Phase 5/6 changes
+- [~] Build + submit mobile via EAS (at least internal/TestFlight) — **config only, build not run**: `apps/mobile/eas.json` (development/preview/production profiles) written, `eas-cli` installed as a dev dependency, `app.json` has an `owner` placeholder and the `expo-notifications` plugin. No `eas login`/`eas build` was run — no Expo account session or credentials available in this session. Sej needs to run `cd apps/mobile && npx eas-cli login` (set `owner` in app.json to the real Expo username first), then `npx eas-cli build --platform all --profile preview`
+- [~] README + screenshots for portfolio presentation — README extended with live deployment info, Supabase setup (existing-project and fresh-project paths), and EAS build instructions. **Screenshots not captured** — no simulator for mobile, and no browser/screenshot tool was available in this session for web
 
 ### Phase 6 — Stretch (pick based on time/interest)
-- [ ] Debt simplification algorithm
-- [ ] Push notifications
-- [ ] Recurring expenses
-- [ ] CSV/PDF export
-- [ ] Spending charts
+- [x] Debt simplification algorithm — `simplifyDebts()` in `packages/shared`, unit tested (5 new tests), surfaced as an "All debts"/"Simplified" toggle in the Balances tab on web and mobile
+- [~] Push notifications — Expo Notifications wired on mobile (permission request, token registration guarded to physical devices, local notification fired on the current user's own add-expense/settle-up). **Not live cross-device push**: no backend function sends notifications to other group members yet; a `push_tokens` table (with RLS) was added via migration `0006` as the landing spot for that future work
+- [~] Recurring expenses — UI complete on both platforms (Recurring toggle + Daily/Weekly/Monthly picker in Add/Edit Expense). Materialization logic is written and **deployed live** as the `materialize-recurring-expenses` Supabase Edge Function, but it is **not scheduled** — nothing calls it automatically yet. Needs pg_cron+pg_net (dashboard/CLI setup Sej would need to do) or an external cron hitting the function URL; documented in the function's header comment
+- [x] CSV/PDF export — CSV done on web (client-side Blob download) and mobile (Expo file-system + sharing). PDF explicitly scoped out as "nice to have" per the original task brief
+- [~] Spending charts — done on web (category/member/time charts via recharts in a new Insights tab). **Not done on mobile** — explicitly the lowest-priority, "best-effort" item in the brief and was skipped in favor of finishing the other four Phase 6 items to a verified state
 
 ---
 
@@ -362,6 +362,10 @@ Check items off as completed. Each phase should end with something runnable/demo
 
 ## Progress Log
 
+- **2026-08-25** — Phase 5 completed (mostly) and all of Phase 6 attempted, in one session. Verified clean: `pnpm --filter shared test` (21/21, incl. 5 new debt-simplification tests), `pnpm --filter web build`, `tsc --noEmit` for both `apps/web` and `apps/mobile`. Everything below is pushed to `origin/main`.
+  - **Fully done, verified:** dark mode (was already wired on both platforms, confirmed working/persisted, not rebuilt); empty/loading/error states audited and fixed across the groups list, group detail (expenses/balances/activity tabs), and related components on both web and mobile; debt-simplification algorithm (`simplifyDebts()` in `packages/shared/src/balances.ts`, greedy max-debtor-to-max-creditor) with a Balances-tab "All debts"/"Simplified" toggle on both platforms; CSV ledger export (web: Blob download; mobile: expo-file-system + expo-sharing); web spending charts (recharts: category/member/time, new Insights tab); recurring-expense picker UI (Daily/Weekly/Monthly) in Add/Edit Expense on both platforms, persisting `is_recurring`/`recurrence_rule`; Vercel deploy re-verified still building after all changes; README extended with live-deployment/Supabase/EAS setup instructions.
+  - **Stubbed/partial, and why:** (1) **EAS mobile build** — `eas.json` + `app.json` fields configured, `eas-cli` installed, but no actual build was run (no Expo account/login available in this session, deliberately not attempted per the task's own constraint) — Sej needs to run `eas login` then `eas build --platform all --profile preview` himself. (2) **Push notifications** — mobile fires a real local notification on the current user's *own* add-expense/settle-up actions (`apps/mobile/src/lib/notifications.ts`); this is explicitly not cross-device push — notifying *other* group members needs a backend function that doesn't exist yet, though its landing spot (`push_tokens` table, migration `0006`, RLS applied) does. (3) **Recurring-expense materialization** — the actual "create the next occurrence" logic is written and deployed live as the `materialize-recurring-expenses` Supabase Edge Function, but nothing calls it on a schedule; wiring pg_cron+pg_net needs Supabase dashboard/CLI secret-setup access this session doesn't have, so it's a documented TODO in the function's header comment. (4) **Mobile spending charts** — skipped; was explicitly the lowest-priority "best-effort" Phase 6 item, deprioritized in favor of verifying the other four items cleanly. (5) **Screenshots** — not captured; no mobile simulator and no browser/screenshot tool were available in this session.
+  - **Process note:** Phase 5/6 web work and mobile work were done concurrently by two parallel sessions working in the same working tree. One commit (`be7dc52`) ended up bundling a few already-written web files into a shared/mobile-focused commit due to a `git add` timing overlap — verified via `git show` that no content was lost or altered, just grouped under a different commit message than originally intended. No functional impact.
 - **2026-08-25** — Vercel project created and linked to GitHub via Vercel MCP (`create_git_project`), root directory `apps/web`, auto-deploy on push to `main`. First production deployment succeeded: https://evensplit-eight.vercel.app. No MCP tool exists for setting Vercel environment variables, so `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` still need to be added manually by Sej in the Vercel dashboard before auth/DB will work on the deployed site (build itself doesn't require them). Web/GitHub/Vercel side of Phase 5 is effectively done; EAS mobile build and the polish pass (dark mode, empty/loading/error states, screenshots) remain.
 - **2026-08-25** — Live Supabase project provisioned (`evensplit`, `opwiuqodrnhkysmbukme`, `ap-southeast-1`, free/$0 tier) after Sej connected the Supabase connector. All 4 schema migrations applied directly to the live project (init schema, RLS policies, storage buckets, realtime), plus a 5th migration locking down direct RPC access to two trigger-only functions (`handle_new_auth_user`, `handle_new_group`) that `get_advisors` flagged as publicly callable — `is_group_member`/`is_group_owner` were left callable since RLS policies depend on that grant. All 7 tables confirmed live with RLS enabled via `list_tables`. Generated TypeScript types from the live schema (`packages/shared/src/database.types.ts`) and wired them into `createEvenSplitClient` for a fully typed Supabase client; hand-written types in `types.ts` cross-checked against the live schema with no drift. Real credentials written to `apps/web/.env.local` / `apps/mobile/.env.local` (gitignored, confirmed untracked via `git check-ignore`). Re-verified after wiring: `next build` succeeds against the live project, web+mobile typecheck clean, all 16 shared unit tests still pass. Next: Phase 5 (Vercel deploy, EAS build, polish pass).
 
