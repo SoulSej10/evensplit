@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -9,12 +9,19 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/use-auth";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { ensureNotificationPermission } from "@/lib/notifications";
 
 export default function SettingsScreen() {
   const { authUser, profile, signOut } = useAuth();
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const [notifExpenses, setNotifExpenses] = useState(true);
   const [notifSettlements, setNotifSettlements] = useState(true);
+
+  // Request notification permission once, the first time the user visits
+  // Settings — not on app load, so it isn't intrusive on first launch.
+  useEffect(() => {
+    void ensureNotificationPermission();
+  }, []);
 
   async function onSignOut() {
     await signOut();
@@ -82,7 +89,8 @@ export default function SettingsScreen() {
             Notifications
           </Text>
           <Text className="mb-3 text-xs text-neutral-500">
-            Local preference only — push notifications are a stretch goal (Phase 6).
+            You'll get a local notification when you add an expense or settle up.
+            Notifying other members needs a backend push service (not yet built).
           </Text>
           <View className="gap-3">
             <View className="flex-row items-center justify-between">

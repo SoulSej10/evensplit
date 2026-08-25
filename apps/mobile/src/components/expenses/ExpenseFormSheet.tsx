@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import { Check, Image as ImageIcon } from "lucide-react-native";
+import { Check, Image as ImageIcon, Repeat } from "lucide-react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { computeSplitShares, SplitError, type SplitType, type User } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { createExpense, updateExpense, uploadReceipt, type ExpenseWithShares } from "@/lib/api/expenses";
 import { formatDate, formatMoney } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { notifyLocal } from "@/lib/notifications";
 
 const SPLIT_LABELS: Record<SplitType, string> = {
   equal: "Equal",
@@ -21,6 +22,19 @@ const SPLIT_LABELS: Record<SplitType, string> = {
 };
 
 const CATEGORIES = ["food", "transport", "lodging", "utilities", "entertainment", "other"];
+
+type RecurrenceFrequency = "DAILY" | "WEEKLY" | "MONTHLY";
+
+const FREQUENCIES: { label: string; value: RecurrenceFrequency }[] = [
+  { label: "Daily", value: "DAILY" },
+  { label: "Weekly", value: "WEEKLY" },
+  { label: "Monthly", value: "MONTHLY" },
+];
+
+function parseFrequency(rule: string | null | undefined): RecurrenceFrequency | null {
+  const match = rule?.match(/FREQ=(DAILY|WEEKLY|MONTHLY)/);
+  return (match?.[1] as RecurrenceFrequency | undefined) ?? null;
+}
 
 export function ExpenseFormSheet({
   visible,
@@ -53,6 +67,8 @@ export function ExpenseFormSheet({
   const [values, setValues] = useState<Record<string, string>>({});
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [frequency, setFrequency] = useState<RecurrenceFrequency>("WEEKLY");
 
   useEffect(() => {
     if (!visible) return;
@@ -63,6 +79,8 @@ export function ExpenseFormSheet({
     setCategory(existingExpense?.category ?? "other");
     setDate(existingExpense ? new Date(existingExpense.expense_date) : new Date());
     setReceiptUri(null);
+    setIsRecurring(existingExpense?.is_recurring ?? false);
+    setFrequency(parseFrequency(existingExpense?.recurrence_rule) ?? "WEEKLY");
     const initialParticipants =
       existingExpense?.expense_shares.map((s) => s.user_id) ?? members.map((m) => m.user_id);
     setSelected(new Set(initialParticipants));
@@ -136,6 +154,8 @@ export function ExpenseFormSheet({
         expense_date: date.toISOString().slice(0, 10),
         receipt_url: existingExpense?.receipt_url ?? null,
         participants,
+        is_recurring: isRecurring,
+        recurrence_rule: isRecurring ? `FREQ=${frequency}` : null,
       };
 
       const expense = isEdit
@@ -149,6 +169,11 @@ export function ExpenseFormSheet({
 
       await queryClient.invalidateQueries({ queryKey: ["group-expenses", groupId] });
       await queryClient.invalidateQueries({ queryKey: ["group-activity", groupId] });
+
+      if (!isEdit) {
+        void notifyLocal("Expense added", `${description.trim()} · ${formatMoney(numericAmount, groupCurrency)}`);
+      }
+
       onClose();
     } catch (err) {
       if (err instanceof SplitError) Alert.alert("Split error", err.message);
@@ -309,6 +334,52 @@ export function ExpenseFormSheet({
             );
           })}
         </View>
+      </View>
+
+      <View className="gap-2">
+        <Pressable
+          onPress={() => setIsRecurring((v) => !v)}
+          className="flex-row items-center justify-between rounded-2xl border border-neutral-500/20 px-4 py-3"
+        >
+          <View className="flex-row items-center gap-2">
+            <Repeat size={16} color={isRecurring ? "#2F6F5E" : "#6B7169"} />
+            <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+              Recurring expense
+            </Text>
+          </View>
+          <View
+            className={cn(
+              "h-5 w-5 items-center justify-center rounded-md border",
+              isRecurring ? "border-primary bg-primary" : "border-neutral-500/40"
+            )}
+          >
+            {isRecurring && <Check size={12} color="white" />}
+          </View>
+        </Pressable>
+
+        {isRecurring && (
+          <View className="flex-row gap-2">
+            {FREQUENCIES.map((f) => (
+              <Pressable
+                key={f.value}
+                onPress={() => setFrequency(f.value)}
+                className={cn(
+                  "flex-1 items-center rounded-2xl border py-2",
+                  frequency === f.value ? "border-primary bg-primary-light" : "border-neutral-500/20"
+                )}
+              >
+                <Text
+                  className={cn(
+                    "text-xs font-semibold",
+                    frequency === f.value ? "text-primary" : "text-neutral-500"
+                  )}
+                >
+                  {f.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </View>
 
       <Pressable

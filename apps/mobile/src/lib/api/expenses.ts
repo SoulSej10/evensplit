@@ -42,6 +42,8 @@ export async function createExpense(
       expense_date: input.expense_date,
       receipt_url: input.receipt_url ?? null,
       created_by: createdBy,
+      is_recurring: input.is_recurring ?? false,
+      recurrence_rule: input.is_recurring ? (input.recurrence_rule ?? null) : null,
     })
     .select()
     .single();
@@ -77,6 +79,8 @@ export async function updateExpense(
       category: input.category ?? null,
       expense_date: input.expense_date,
       receipt_url: input.receipt_url ?? null,
+      is_recurring: input.is_recurring ?? false,
+      recurrence_rule: input.is_recurring ? (input.recurrence_rule ?? null) : null,
     })
     .eq("id", expenseId)
     .select()

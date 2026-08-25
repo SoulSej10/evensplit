@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { recordSettlement } from "@/lib/api/settlements";
 import { cn } from "@/lib/cn";
+import { formatMoney } from "@/lib/format";
+import { notifyLocal } from "@/lib/notifications";
 
 const METHODS = ["Cash", "GCash", "PayPal", "Bank transfer", "Venmo", "Other"];
 
@@ -61,6 +63,9 @@ export function SettleUpSheet({
       await queryClient.invalidateQueries({ queryKey: ["group-settlements", groupId] });
       await queryClient.invalidateQueries({ queryKey: ["group-activity", groupId] });
       await queryClient.invalidateQueries({ queryKey: ["group-expenses", groupId] });
+
+      void notifyLocal("Settlement recorded", `${fromName} paid ${toName} ${formatMoney(numeric, groupCurrency)}`);
+
       setNote("");
       onClose();
     } catch (err) {
