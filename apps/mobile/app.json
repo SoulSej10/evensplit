@@ -2,7 +2,7 @@
   "expo": {
     "name": "EvenSplit",
     "slug": "evensplit",
-    "owner": "REPLACE_WITH_YOUR_EXPO_USERNAME",
+    "owner": "jessanthonytahil10",
     "scheme": "evensplit",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -50,6 +50,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1f9f8da0-26c5-4f11-897d-1926555648df"
+      }
     }
   }
 }
