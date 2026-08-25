@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "EvenSplit",
+    "name": "SplitEven",
     "slug": "evensplit",
     "owner": "jessanthonytahil10",
     "scheme": "evensplit",
@@ -16,7 +16,7 @@
     "android": {
       "package": "com.evensplit.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E4F2EE",
+        "backgroundColor": "#0A0A0A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -32,18 +32,25 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "EvenSplit uses your photos to attach receipts and profile pictures."
+          "photosPermission": "SplitEven uses your photos to attach receipts and profile pictures."
         }
       ],
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0A0A0A"
+        }
+      ],
       "@react-native-community/datetimepicker",
       "expo-web-browser",
       [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#2F6F5E"
+          "color": "#35D6B5"
         }
       ],
       "expo-sharing"

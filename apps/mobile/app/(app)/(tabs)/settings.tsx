@@ -87,7 +87,7 @@ export default function SettingsScreen() {
             <Switch
               value={colorScheme === "dark"}
               onValueChange={toggleColorScheme}
-              trackColor={{ true: "#2F6F5E", false: "#D9DCD6" }}
+              trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
             />
           </View>
         </Card>
@@ -106,7 +106,7 @@ export default function SettingsScreen() {
               <Switch
                 value={notifExpenses}
                 onValueChange={setNotifExpenses}
-                trackColor={{ true: "#2F6F5E", false: "#D9DCD6" }}
+                trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
               />
             </View>
             <View className="flex-row items-center justify-between">
@@ -114,7 +114,7 @@ export default function SettingsScreen() {
               <Switch
                 value={notifSettlements}
                 onValueChange={setNotifSettlements}
-                trackColor={{ true: "#2F6F5E", false: "#D9DCD6" }}
+                trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
               />
             </View>
           </View>
@@ -122,7 +122,7 @@ export default function SettingsScreen() {
 
         <Button variant="outline" size="lg" onPress={onSignOut}>
           <View className="flex-row items-center gap-2">
-            <LogOut size={18} color="#1A1D1B" />
+            <LogOut size={18} color="#0A0A0A" />
             <Text className="font-semibold text-neutral-900 dark:text-neutral-100">Sign out</Text>
           </View>
         </Button>

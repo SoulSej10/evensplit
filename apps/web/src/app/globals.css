@@ -53,83 +53,87 @@
 }
 
 :root {
-  /* EvenSplit brand tokens — PROJECT_PLAN.md §3.2 */
+  /* SplitEven brand tokens — PROJECT_PLAN.md §3.2. Primary #35D6B5 family
+     supplied directly by Sej; --primary here is the darker #16A88F variant
+     for AA contrast on white, with #35D6B5/#63E7CE reserved for dark-mode
+     accents and highlights where a brighter teal reads better. */
   --background: #f4f5f3; /* neutral-100 */
-  --foreground: #1a1d1b; /* neutral-900 */
+  --foreground: #0a0a0a;
   --card: #ffffff; /* surface */
-  --card-foreground: #1a1d1b;
+  --card-foreground: #0a0a0a;
   --popover: #ffffff;
-  --popover-foreground: #1a1d1b;
-  --primary: #2f6f5e; /* deep teal-green */
+  --popover-foreground: #0a0a0a;
+  --primary: #16a88f; /* dark variant, AA-contrast on white */
   --primary-foreground: #ffffff;
-  --primary-light: #e4f2ee;
-  --secondary: #e4f2ee; /* primary-light */
-  --secondary-foreground: #2f6f5e;
+  --primary-light: #e3fbf6;
+  --secondary: #e3fbf6; /* primary-light */
+  --secondary-foreground: #16a88f;
   --muted: #ececea;
   --muted-foreground: #6b7169; /* neutral-500 */
-  --accent: #e4f2ee;
-  --accent-foreground: #2f6f5e;
+  --accent: #e3fbf6;
+  --accent-foreground: #16a88f;
   --destructive: #d95f5f; /* negative */
   --positive: #2e9e6b;
   --negative: #d95f5f;
   --warning: #e0a63a;
   --border: #e3e6e1;
   --input: #e3e6e1;
-  --ring: #2f6f5e;
-  --chart-1: #2f6f5e;
+  --ring: #35d6b5;
+  --chart-1: #16a88f;
   --chart-2: #2e9e6b;
   --chart-3: #e0a63a;
   --chart-4: #d95f5f;
   --chart-5: #6b7169;
   --radius: 0.5rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1a1d1b;
-  --sidebar-primary: #2f6f5e;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #16a88f;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e4f2ee;
-  --sidebar-accent-foreground: #2f6f5e;
+  --sidebar-accent: #e3fbf6;
+  --sidebar-accent-foreground: #16a88f;
   --sidebar-border: #e3e6e1;
-  --sidebar-ring: #2f6f5e;
+  --sidebar-ring: #35d6b5;
 }
 
 .dark {
-  /* Dark mode: invert neutrals, keep brand hues with slightly reduced
-     saturation, per PROJECT_PLAN.md §3.2. */
-  --background: #1a1d1b; /* neutral-900 */
-  --foreground: #f4f5f3; /* neutral-100 */
-  --card: #22271f; /* surface (dark) */
-  --card-foreground: #f4f5f3;
-  --popover: #22271f;
-  --popover-foreground: #f4f5f3;
-  --primary: #4d9683;
-  --primary-foreground: #0f1512;
-  --primary-light: #1f332d;
-  --secondary: #26332d;
-  --secondary-foreground: #bfe4d9;
-  --muted: #262b23;
-  --muted-foreground: #9aa199;
-  --accent: #26332d;
-  --accent-foreground: #bfe4d9;
+  /* Dark mode uses the brand's dark background (#0A0A0A) directly, with
+     the brighter #35D6B5 primary and #63E7CE highlight reading well
+     against near-black, per the supplied SplitEven palette. */
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --card: #141414; /* surface (dark) */
+  --card-foreground: #f5f5f5;
+  --popover: #141414;
+  --popover-foreground: #f5f5f5;
+  --primary: #35d6b5;
+  --primary-foreground: #0a0a0a;
+  --primary-light: rgba(53, 214, 181, 0.14);
+  --secondary: rgba(53, 214, 181, 0.14);
+  --secondary-foreground: #63e7ce;
+  --muted: #1c1c1c;
+  --muted-foreground: #9a9a9a;
+  --accent: rgba(53, 214, 181, 0.14);
+  --accent-foreground: #63e7ce;
   --destructive: #e07b7b;
   --positive: #4bb583;
   --negative: #e07b7b;
   --warning: #e6b45c;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #4d9683;
-  --chart-1: #4d9683;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.13);
+  --ring: #35d6b5;
+  --chart-1: #35d6b5;
   --chart-2: #4bb583;
   --chart-3: #e6b45c;
   --chart-4: #e07b7b;
-  --chart-5: #9aa199;
-  --sidebar: #22271f;
-  --sidebar-foreground: #f4f5f3;
-  --sidebar-primary: #4d9683;
-  --sidebar-primary-foreground: #0f1512;
-  --sidebar-accent: #26332d;
-  --sidebar-accent-foreground: #bfe4d9;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #4d9683;
+  --chart-5: #9a9a9a;
+  --sidebar: #141414;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #35d6b5;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: rgba(53, 214, 181, 0.14);
+  --sidebar-accent-foreground: #63e7ce;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #35d6b5;
 }
 
 @layer base {

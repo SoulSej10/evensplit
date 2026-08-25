@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Link, router } from "expo-router";
-import { Wallet } from "lucide-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { logInSchema, type LogInInput } from "@evensplit/shared";
@@ -42,10 +41,8 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="mb-10 items-center gap-3">
-          <View className="h-16 w-16 items-center justify-center rounded-3xl bg-primary">
-            <Wallet color="white" size={28} />
-          </View>
-          <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">EvenSplit</Text>
+          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-2xl" />
+          <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">SplitEven</Text>
           <Text className="text-neutral-500">Split expenses. Stay even.</Text>
         </View>
 

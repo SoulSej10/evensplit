@@ -136,20 +136,20 @@ export default function GroupDetailScreen() {
           onPress={() => router.back()}
           className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
         >
-          <ArrowLeft size={18} color="#1A1D1B" />
+          <ArrowLeft size={18} color="#0A0A0A" />
         </Pressable>
         <View className="flex-row gap-2">
           <Pressable
             onPress={() => setInviteOpen(true)}
             className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
           >
-            <UserPlus size={18} color="#1A1D1B" />
+            <UserPlus size={18} color="#0A0A0A" />
           </Pressable>
           <Pressable
             onPress={onMore}
             className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
           >
-            <MoreVertical size={18} color="#1A1D1B" />
+            <MoreVertical size={18} color="#0A0A0A" />
           </Pressable>
         </View>
       </View>
@@ -217,7 +217,7 @@ export default function GroupDetailScreen() {
           disabled={Math.abs(myBalance) < 0.005}
           onPress={() => setTab("balances")}
         >
-          <ArrowLeftRight color="#2F6F5E" size={18} />
+          <ArrowLeftRight color="#16A88F" size={18} />
           <Text className="font-semibold text-primary">Settle up</Text>
         </Button>
         <Button size="lg" className="flex-1 flex-row gap-2" onPress={() => setAddExpenseOpen(true)}>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Link, router } from "expo-router";
-import { ArrowLeft, Wallet } from "lucide-react-native";
+import { ArrowLeft } from "lucide-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema, type SignUpInput } from "@evensplit/shared";
@@ -42,13 +42,11 @@ export default function SignUpScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10">
-          <ArrowLeft size={18} color="#1A1D1B" />
+          <ArrowLeft size={18} color="#0A0A0A" />
         </Pressable>
 
         <View className="mb-10 items-center gap-3">
-          <View className="h-16 w-16 items-center justify-center rounded-3xl bg-primary">
-            <Wallet color="white" size={28} />
-          </View>
+          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-2xl" />
           <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Create account</Text>
           <Text className="text-neutral-500">Start splitting expenses in seconds</Text>
         </View>

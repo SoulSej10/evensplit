@@ -342,7 +342,7 @@ export function ExpenseFormSheet({
           className="flex-row items-center justify-between rounded-2xl border border-neutral-500/20 px-4 py-3"
         >
           <View className="flex-row items-center gap-2">
-            <Repeat size={16} color={isRecurring ? "#2F6F5E" : "#6B7169"} />
+            <Repeat size={16} color={isRecurring ? "#16A88F" : "#6B7169"} />
             <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
               Recurring expense
             </Text>

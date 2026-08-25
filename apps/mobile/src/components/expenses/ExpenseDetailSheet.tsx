@@ -68,7 +68,7 @@ export function ExpenseDetailSheet({
         <View className="flex-row gap-3">
           <Button variant="outline" className="flex-1" onPress={onEdit}>
             <View className="flex-row items-center gap-2">
-              <Pencil size={16} color="#1A1D1B" />
+              <Pencil size={16} color="#0A0A0A" />
               <Text className="font-semibold text-neutral-900 dark:text-neutral-100">Edit</Text>
             </View>
           </Button>

@@ -44,14 +44,14 @@ export function InviteSheet({
 
   async function shareLink() {
     if (!inviteUrl) return;
-    await Share.share({ message: `Join my EvenSplit group: ${inviteUrl}` });
+    await Share.share({ message: `Join my SplitEven group: ${inviteUrl}` });
   }
 
   return (
     <BottomSheet visible={visible} onClose={onClose} title="Invite to group">
       <View className="items-center gap-2">
         <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary-light">
-          <UserPlus color="#2F6F5E" size={24} />
+          <UserPlus color="#16A88F" size={24} />
         </View>
         <Text className="text-center text-neutral-500">
           Share this link — anyone with it can join the group. Expires in 7 days.
@@ -67,7 +67,7 @@ export function InviteSheet({
       <View className="flex-row gap-3">
         <Button variant="outline" className="flex-1" onPress={copyLink} disabled={!inviteUrl}>
           <View className="flex-row items-center gap-2">
-            <Copy size={16} color="#1A1D1B" />
+            <Copy size={16} color="#0A0A0A" />
             <Text className="font-semibold text-neutral-900 dark:text-neutral-100">Copy</Text>
           </View>
         </Button>

@@ -156,7 +156,7 @@ function SettingsContent() {
         <Card className="rounded-2xl border-border/60 shadow-sm">
           <CardHeader>
             <CardTitle>Appearance</CardTitle>
-            <CardDescription>Choose how EvenSplit looks on this device.</CardDescription>
+            <CardDescription>Choose how SplitEven looks on this device.</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-between">
             <Label htmlFor="dark-mode">Dark mode</Label>

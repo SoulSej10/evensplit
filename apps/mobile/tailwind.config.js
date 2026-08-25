@@ -5,23 +5,25 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
-      // EvenSplit brand tokens — PROJECT_PLAN.md §3.2
+      // SplitEven brand tokens — PROJECT_PLAN.md §3.2
       colors: {
         primary: {
-          DEFAULT: "#2F6F5E",
-          light: "#E4F2EE",
+          DEFAULT: "#16A88F",
+          light: "#E3FBF6",
+          bright: "#35D6B5",
+          soft: "#63E7CE",
         },
         positive: "#2E9E6B",
         negative: "#D95F5F",
         warning: "#E0A63A",
         surface: "#FFFFFF",
         neutral: {
-          900: "#1A1D1B",
+          900: "#0A0A0A",
           500: "#6B7169",
           100: "#F4F5F3",
         },
         // Dark mode surfaces (applied via `dark:` variants)
-        "surface-dark": "#22271F",
+        "surface-dark": "#0A0A0A",
       },
       fontFamily: {
         sans: ["Poppins_400Regular"],

@@ -1,4 +1,4 @@
-# EvenSplit
+# SplitEven
 
 A cross-platform (mobile + web) shared-expense and budget app for splitting costs among groups — roommates, trips, couples, households — and tracking who owes whom in real time, with a clean settle-up flow.
 
@@ -31,7 +31,7 @@ supabase/
 
 - **Web:** https://evensplit-eight.vercel.app — Git-connected to this repo's `main` branch on Vercel, auto-deploys on every push.
 - **Database:** live Supabase project (`evensplit`, `ap-southeast-1`), schema/RLS/Realtime/storage all applied.
-- **Mobile:** not yet built/submitted via EAS — see [Mobile builds (EAS)](#mobile-builds-eas) below.
+- **Mobile:** Android preview builds run via EAS — see [Mobile builds (EAS)](#mobile-builds-eas) below. iOS not attempted yet (needs an Apple Developer account).
 
 ## Prerequisites
 
@@ -88,16 +88,15 @@ No credentials are hardcoded anywhere in the codebase; both apps read them from 
 
 ## Mobile builds (EAS)
 
-`apps/mobile/eas.json` defines `development`/`preview`/`production` build profiles. EAS builds were **not** run as part of this pass (no `eas-cli` login/Expo account session was available). To produce an actual build:
+`apps/mobile/eas.json` defines `development`/`preview`/`production` build profiles, linked to the `@jessanthonytahil10/evensplit` EAS project. Android preview builds work end-to-end:
 
 ```bash
 cd apps/mobile
-npx eas-cli login                                   # log in with Sej's Expo account
-# then set app.json's "owner" field to that Expo username (currently a placeholder)
-npx eas-cli build --platform all --profile preview   # internal/TestFlight-style build
+npx eas-cli login                                   # log in with your Expo account
+npx eas-cli build --platform android --profile preview
 ```
 
-`eas-cli` is already installed as a dev dependency (`pnpm --filter mobile add -D eas-cli` was run so it's available via `npx`/workspace scripts without a global install).
+`eas-cli` is already installed as a dev dependency, available via `npx` without a global install. iOS builds need an Apple Developer account for code signing (not attempted yet).
 
 ## Screenshots
 

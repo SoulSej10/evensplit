@@ -32,12 +32,12 @@ export default function ForgotPasswordScreen() {
   return (
     <View className="flex-1 justify-center bg-neutral-100 px-6 dark:bg-neutral-900">
       <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10">
-        <ArrowLeft size={18} color="#1A1D1B" />
+        <ArrowLeft size={18} color="#0A0A0A" />
       </Pressable>
 
       <View className="mb-8 items-center gap-3">
         <View className="h-14 w-14 items-center justify-center rounded-3xl bg-primary-light">
-          <Mail color="#2F6F5E" size={24} />
+          <Mail color="#16A88F" size={24} />
         </View>
         <Text className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
           Reset your password

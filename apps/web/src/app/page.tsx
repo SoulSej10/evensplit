@@ -2,13 +2,13 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowLeftRight,
-  PiggyBank,
   Receipt,
   SlidersHorizontal,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Logo } from "@/components/brand/logo";
 
 const splitTypes = [
   { label: "Equal", detail: "Split evenly across everyone" },
@@ -17,15 +17,53 @@ const splitTypes = [
   { label: "Shares", detail: "Weighted by shares, like 2:1:1" },
 ];
 
+const steps = [
+  {
+    number: "1",
+    title: "Start a group",
+    detail: "Name it, add an icon, invite people with a link. No app store required to join.",
+  },
+  {
+    number: "2",
+    title: "Log an expense",
+    detail: "Enter the amount and pick who paid. Split it equal, exact, by percentage, or by shares.",
+  },
+  {
+    number: "3",
+    title: "Settle up",
+    detail: "SplitEven works out the minimum number of payments needed to zero everyone out.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Does everyone in the group need the app?",
+    answer:
+      "No. You can invite people by link, and they can view and settle their balance from a browser without installing anything.",
+  },
+  {
+    question: "Can a group use more than one currency?",
+    answer:
+      "Each group has a default currency, and individual expenses can override it if someone paid in something else.",
+  },
+  {
+    question: "How does the minimum-payments settle-up work?",
+    answer:
+      "Instead of everyone paying everyone, SplitEven simplifies the group's debts down to the fewest transactions that get everyone back to even.",
+  },
+  {
+    question: "Is it free?",
+    answer: "Yes, SplitEven is free to use for any group size.",
+  },
+];
+
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <PiggyBank className="h-4 w-4" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">EvenSplit</span>
+          <Logo size={32} />
+          <span className="text-lg font-semibold tracking-tight">SplitEven</span>
         </div>
         <nav className="flex items-center gap-2">
           <Button variant="ghost" asChild>
@@ -52,7 +90,7 @@ export default function LandingPage() {
               Split costs. See who owes whom.
             </h1>
             <p className="max-w-md text-lg text-muted-foreground">
-              EvenSplit keeps every shared expense in one ledger and settles the math in real
+              SplitEven keeps every shared expense in one ledger and settles the math in real
               time, so nobody has to be the one who brings it up.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -127,8 +165,31 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features: asymmetric 3-cell bento, not three equal cards */}
+        {/* How it works: numbered steps, a layout family distinct from the bento/chip/CTA sections below */}
         <section id="how-it-works" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+          <h2 className="max-w-md text-2xl font-semibold tracking-tight sm:text-3xl">
+            Three steps, start to settled
+          </h2>
+          <div className="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-6">
+            {steps.map((step, i) => (
+              <div key={step.number} className="relative flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-sm font-semibold text-primary-foreground">
+                    {step.number}
+                  </span>
+                  {i < steps.length - 1 && (
+                    <span className="hidden h-px flex-1 bg-border sm:block" aria-hidden />
+                  )}
+                </div>
+                <h3 className="font-medium">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">{step.detail}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Features: asymmetric 3-cell bento, not three equal cards */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
           <h2 className="max-w-md text-2xl font-semibold tracking-tight sm:text-3xl">
             Everything a group needs to stay square
           </h2>
@@ -199,6 +260,21 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* FAQ: 2-column list, a layout family distinct from every section above */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+          <h2 className="max-w-md text-2xl font-semibold tracking-tight sm:text-3xl">
+            Questions people actually ask
+          </h2>
+          <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {faqs.map((faq) => (
+              <div key={faq.question} className="border-t border-border/60 pt-4">
+                <h3 className="font-medium">{faq.question}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">{faq.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 

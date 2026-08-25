@@ -9,7 +9,7 @@ import type { ExpenseWithShares } from "@/lib/api/expenses";
 
 type ChartMode = "category" | "member";
 
-const BAR_COLORS = ["#2F6F5E", "#2E9E6B", "#E0A63A", "#6B7169", "#D95F5F", "#8AB9AC"];
+const BAR_COLORS = ["#16A88F", "#2E9E6B", "#E0A63A", "#6B7169", "#D95F5F", "#8AB9AC"];
 
 /**
  * Lightweight spending breakdown chart (Phase 6 stretch, best-effort) —

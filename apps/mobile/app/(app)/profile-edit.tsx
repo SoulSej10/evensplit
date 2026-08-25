@@ -64,7 +64,7 @@ export default function ProfileEditScreen() {
           onPress={() => router.back()}
           className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
         >
-          <ArrowLeft size={18} color="#1A1D1B" />
+          <ArrowLeft size={18} color="#0A0A0A" />
         </Pressable>
         <Text className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           Edit profile

@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EvenSplit - Split expenses, stay even",
+  title: "SplitEven - Split expenses, stay even",
   description:
     "Track shared expenses with roommates, trips, and groups. See who owes whom in real time, and settle up in a tap.",
 };

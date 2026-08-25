@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Wallet } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 function GoogleIcon() {
   return (
@@ -93,10 +93,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Wallet className="h-6 w-6" />
-          </span>
-          <h1 className="text-2xl font-semibold tracking-tight">EvenSplit</h1>
+          <Logo size={48} />
+          <h1 className="text-2xl font-semibold tracking-tight">SplitEven</h1>
           <p className="text-sm text-muted-foreground">Split expenses. Stay even.</p>
         </div>
 
