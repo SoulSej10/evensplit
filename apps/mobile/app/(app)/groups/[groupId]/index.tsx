@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useGroup, useGroupExpenses, useGroupRealtime, useGroupSettlements } from "@/hooks/use-group-detail";
 import { archiveGroup, leaveGroup } from "@/lib/api/groups";
 import type { ExpenseWithShares } from "@/lib/api/expenses";
+import { buildGroupLedgerCsv, exportAndShareCsv } from "@/lib/csv";
 
 type Tab = "expenses" | "balances" | "activity";
 
@@ -80,8 +81,24 @@ export default function GroupDetailScreen() {
     ]);
   }
 
+  async function onExportCsv() {
+    if (!group) return;
+    try {
+      const memberById = new Map(members.map((m) => [m.user_id, m.users]));
+      const csv = buildGroupLedgerCsv(group.name, expenses ?? [], settlements ?? [], memberById);
+      const fileName = `${group.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "group"}-ledger.csv`;
+      const shared = await exportAndShareCsv(fileName, csv);
+      if (!shared) {
+        Alert.alert("Sharing unavailable", "This device doesn't support sharing files.");
+      }
+    } catch (err) {
+      Alert.alert("Could not export CSV", err instanceof Error ? err.message : "Try again");
+    }
+  }
+
   function onMore() {
     const options: { text: string; style?: "destructive" | "cancel"; onPress?: () => void }[] = [];
+    options.push({ text: "Export CSV", onPress: onExportCsv });
     if (isOwner) options.push({ text: "Archive group", onPress: onArchive });
     options.push({ text: "Leave group", style: "destructive", onPress: onLeave });
     options.push({ text: "Cancel", style: "cancel" });
