@@ -6,17 +6,20 @@ import { Avatar } from "@/components/ui/Avatar";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { SpendingChart } from "@/components/expenses/SpendingChart";
 import { useGroupExpenses } from "@/hooks/use-group-detail";
 import { formatDate } from "@/lib/format";
 import type { ExpenseWithShares } from "@/lib/api/expenses";
 
 export function ExpensesTabView({
   groupId,
+  groupCurrency,
   members,
   currentUserId,
   onSelectExpense,
 }: {
   groupId: string;
+  groupCurrency: string;
   members: { user_id: string; users: User | null }[];
   currentUserId: string;
   onSelectExpense: (expense: ExpenseWithShares) => void;
@@ -45,7 +48,10 @@ export function ExpensesTabView({
   }
 
   return (
-    <View className="gap-2">
+    <View className="gap-3">
+      {expenses && expenses.length > 1 && (
+        <SpendingChart expenses={expenses} groupCurrency={groupCurrency} members={members} />
+      )}
       {expenses?.map((expense) => {
         const payer = members.find((m) => m.user_id === expense.paid_by)?.users;
         const myShare = expense.expense_shares.find((s) => s.user_id === currentUserId)?.share_amount ?? 0;

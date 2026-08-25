@@ -182,6 +182,7 @@ export default function GroupDetailScreen() {
         {tab === "expenses" && (
           <ExpensesTabView
             groupId={groupId}
+            groupCurrency={group.currency}
             members={members}
             currentUserId={authUser.id}
             onSelectExpense={setSelectedExpense}
