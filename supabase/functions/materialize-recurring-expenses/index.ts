@@ -7,18 +7,10 @@
 // instance back to the template via recurrence_parent_id, and advances the
 // template's next_occurrence_date according to its recurrence_rule.
 //
-// NOT WIRED TO A SCHEDULER YET. This function only runs when invoked. To
-// actually run it daily, Sej needs to either:
-//   (a) enable the pg_cron + pg_net extensions on the Supabase project and
-//       schedule a `select net.http_post(...)` call to this function's URL
-//       on a daily cron (requires storing the function's URL + a service
-//       role/anon key as a Postgres secret, done from the Supabase
-//       dashboard SQL editor or via `supabase secrets set` — needs
-//       dashboard/CLI access this session doesn't have), or
-//   (b) call it from any external scheduler (GitHub Actions cron, Vercel
-//       Cron Job, etc.) that does an authenticated POST to the function URL
-//       once a day.
-// See PROJECT_PLAN.md Progress Log for the exact TODO.
+// Scheduled via pg_cron + pg_net — see
+// supabase/migrations/0008_schedule_recurring_expense_materializer.sql,
+// which runs `select cron.schedule('materialize-recurring-expenses-daily',
+// '15 0 * * *', ...)` to POST to this function once a day at 00:15 UTC.
 //
 // recurrence_rule is a simplified subset of RRULE: "FREQ=DAILY",
 // "FREQ=WEEKLY", "FREQ=MONTHLY" (optionally ";INTERVAL=N").
