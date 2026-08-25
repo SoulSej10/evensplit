@@ -4,12 +4,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Plus, Users } from "lucide-react-native";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { CreateGroupSheet } from "@/components/groups/CreateGroupSheet";
+import { SkeletonCardRows } from "@/components/ui/Skeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyGroups } from "@/hooks/use-groups";
 
 export default function GroupsListScreen() {
   const { profile } = useAuth();
-  const { data: groups, isLoading } = useMyGroups();
+  const { data: groups, isLoading, isError, refetch, isRefetching } = useMyGroups();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
@@ -19,10 +21,23 @@ export default function GroupsListScreen() {
           {profile?.display_name ? `Hey, ${profile.display_name.split(" ")[0]}` : "Your groups"}
         </Text>
         <Text className="mb-6 text-neutral-500">
-          {groups?.length ? `${groups.length} group${groups.length === 1 ? "" : "s"}` : "No groups yet"}
+          {isLoading
+            ? "Loading…"
+            : groups?.length
+              ? `${groups.length} group${groups.length === 1 ? "" : "s"}`
+              : "No groups yet"}
         </Text>
 
-        {!isLoading && groups?.length === 0 && (
+        {isLoading && <SkeletonCardRows count={3} />}
+
+        {!isLoading && isError && (
+          <ErrorState
+            message="Couldn't load your groups. Check your connection and try again."
+            onRetry={() => refetch()}
+          />
+        )}
+
+        {!isLoading && !isError && groups?.length === 0 && (
           <View className="mt-10 items-center gap-3">
             <View className="h-16 w-16 items-center justify-center rounded-full bg-primary-light">
               <Users color="#2F6F5E" size={28} />
@@ -33,12 +48,22 @@ export default function GroupsListScreen() {
             <Text className="text-center text-neutral-500">
               Create a group for a trip, household, or anything you split costs on.
             </Text>
+            <Pressable
+              onPress={() => setSheetOpen(true)}
+              className="mt-2 rounded-pill bg-primary px-5 py-3 active:opacity-90"
+            >
+              <Text className="font-semibold text-white">Create your first group</Text>
+            </Pressable>
           </View>
         )}
 
-        {groups?.map((g) => (
-          <GroupCard key={g.id} group={g} />
-        ))}
+        {!isLoading &&
+          !isError &&
+          groups?.map((g) => <GroupCard key={g.id} group={g} />)}
+
+        {isRefetching && !isLoading && (
+          <Text className="mt-2 text-center text-xs text-neutral-500">Refreshing…</Text>
+        )}
       </ScrollView>
 
       <Pressable

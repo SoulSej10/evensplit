@@ -27,7 +27,7 @@ export default function GroupDetailScreen() {
   const { authUser } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: group, isLoading } = useGroup(groupId);
+  const { data: group, isLoading, isError, refetch } = useGroup(groupId);
   const { data: expenses } = useGroupExpenses(groupId);
   const { data: settlements } = useGroupSettlements(groupId);
   useGroupRealtime(groupId);
@@ -86,6 +86,20 @@ export default function GroupDetailScreen() {
     options.push({ text: "Leave group", style: "destructive", onPress: onLeave });
     options.push({ text: "Cancel", style: "cancel" });
     Alert.alert(group?.name ?? "Group", undefined, options);
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center gap-3 bg-neutral-100 px-8 dark:bg-neutral-900">
+        <Text className="text-center text-neutral-500">Couldn't load this group.</Text>
+        <Pressable
+          onPress={() => refetch()}
+          className="rounded-pill bg-primary px-5 py-2.5 active:opacity-90"
+        >
+          <Text className="font-semibold text-white">Try again</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
   }
 
   if (isLoading || !group || !authUser) {

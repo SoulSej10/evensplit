@@ -1,9 +1,11 @@
 import { Pressable, Text, View } from "react-native";
 import type { User } from "@evensplit/shared";
-import { Receipt } from "lucide-react-native";
+import { Receipt, Repeat } from "lucide-react-native";
 import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { MoneyText } from "@/components/ui/MoneyText";
+import { SkeletonCardRows } from "@/components/ui/Skeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useGroupExpenses } from "@/hooks/use-group-detail";
 import { formatDate } from "@/lib/format";
 import type { ExpenseWithShares } from "@/lib/api/expenses";
@@ -19,13 +21,21 @@ export function ExpensesTabView({
   currentUserId: string;
   onSelectExpense: (expense: ExpenseWithShares) => void;
 }) {
-  const { data: expenses, isLoading } = useGroupExpenses(groupId);
+  const { data: expenses, isLoading, isError, refetch } = useGroupExpenses(groupId);
 
   function name(userId: string) {
     return members.find((m) => m.user_id === userId)?.users?.display_name ?? "Someone";
   }
 
-  if (!isLoading && (expenses?.length ?? 0) === 0) {
+  if (isLoading) {
+    return <SkeletonCardRows count={4} />;
+  }
+
+  if (isError) {
+    return <ErrorState message="Couldn't load expenses." onRetry={() => refetch()} />;
+  }
+
+  if ((expenses?.length ?? 0) === 0) {
     return (
       <View className="items-center gap-2 py-14">
         <Receipt color="#6B7169" size={22} />
@@ -44,9 +54,16 @@ export function ExpensesTabView({
             <Card className="flex-row items-center gap-3 py-3">
               <Avatar name={payer?.display_name} uri={payer?.avatar_url} size={40} />
               <View className="min-w-0 flex-1">
-                <Text className="font-medium text-neutral-900 dark:text-neutral-100" numberOfLines={1}>
-                  {expense.description}
-                </Text>
+                <View className="flex-row items-center gap-1.5">
+                  <Text className="shrink font-medium text-neutral-900 dark:text-neutral-100" numberOfLines={1}>
+                    {expense.description}
+                  </Text>
+                  {expense.is_recurring && (
+                    <View className="flex-row items-center gap-0.5 rounded-pill bg-primary-light px-1.5 py-0.5">
+                      <Repeat color="#2F6F5E" size={10} />
+                    </View>
+                  )}
+                </View>
                 <Text className="text-xs text-neutral-500">
                   {name(expense.paid_by)} paid · {formatDate(expense.expense_date)}
                   {expense.category ? ` · ${expense.category}` : ""}

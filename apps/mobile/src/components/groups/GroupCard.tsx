@@ -13,7 +13,7 @@ export function GroupCard({ group }: { group: GroupWithMembers }) {
   const { authUser } = useAuth();
   const memberIds = group.group_members.map((m) => m.user_id);
 
-  const { data: balance } = useQuery({
+  const { data: balance, isLoading: balanceLoading, isError: balanceError } = useQuery({
     queryKey: ["group-card-balance", group.id, authUser?.id],
     enabled: !!authUser?.id,
     queryFn: async () => {
@@ -32,7 +32,15 @@ export function GroupCard({ group }: { group: GroupWithMembers }) {
   });
 
   const amount = balance ?? 0;
-  const label = amount > 0.005 ? "you're owed" : amount < -0.005 ? "you owe" : "settled up";
+  const label = balanceError
+    ? "balance unavailable"
+    : balanceLoading
+      ? "loading…"
+      : amount > 0.005
+        ? "you're owed"
+        : amount < -0.005
+          ? "you owe"
+          : "settled up";
 
   return (
     <Pressable onPress={() => router.push(`/(app)/groups/${group.id}`)}>

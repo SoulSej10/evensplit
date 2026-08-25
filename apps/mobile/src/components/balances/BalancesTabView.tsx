@@ -1,10 +1,17 @@
+import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import type { User } from "@evensplit/shared";
+import { simplifyDebts } from "@evensplit/shared";
 import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { Button } from "@/components/ui/Button";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SkeletonCardRows } from "@/components/ui/Skeleton";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useGroupBalances, useGroupExpenses, useGroupSettlements } from "@/hooks/use-group-detail";
+
+type DebtView = "all" | "simplified";
 
 export function BalancesTabView({
   groupId,
@@ -19,8 +26,20 @@ export function BalancesTabView({
   currentUserId: string;
   onSettleUp: (fromUserId: string, toUserId: string, amount: number) => void;
 }) {
-  const { data: expenses } = useGroupExpenses(groupId);
-  const { data: settlements } = useGroupSettlements(groupId);
+  const {
+    data: expenses,
+    isLoading: expensesLoading,
+    isError: expensesError,
+    refetch: refetchExpenses,
+  } = useGroupExpenses(groupId);
+  const {
+    data: settlements,
+    isLoading: settlementsLoading,
+    isError: settlementsError,
+    refetch: refetchSettlements,
+  } = useGroupSettlements(groupId);
+  const [debtView, setDebtView] = useState<DebtView>("all");
+
   const memberIds = members.map((m) => m.user_id);
   const allShares = (expenses ?? []).flatMap((e) => e.expense_shares);
   const { balances, pairwiseDebts } = useGroupBalances(
@@ -31,11 +50,33 @@ export function BalancesTabView({
     settlements ?? []
   );
 
+  const simplifiedDebts = useMemo(() => simplifyDebts(balances), [balances]);
+  const isLoading = expensesLoading || settlementsLoading;
+  const isError = expensesError || settlementsError;
+  const debtsToShow = debtView === "simplified" ? simplifiedDebts : pairwiseDebts;
+  const transactionsSaved = pairwiseDebts.length - simplifiedDebts.length;
+
   function name(userId: string) {
     return members.find((m) => m.user_id === userId)?.users?.display_name ?? "Someone";
   }
   function avatarUri(userId: string) {
     return members.find((m) => m.user_id === userId)?.users?.avatar_url;
+  }
+
+  if (isLoading) {
+    return <SkeletonCardRows count={4} />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        message="Couldn't load balances."
+        onRetry={() => {
+          void refetchExpenses();
+          void refetchSettlements();
+        }}
+      />
+    );
   }
 
   return (
@@ -54,13 +95,32 @@ export function BalancesTabView({
       </View>
 
       <View className="gap-2">
-        <Text className="text-sm font-medium text-neutral-500">Who owes whom</Text>
-        {pairwiseDebts.length === 0 ? (
+        <View className="flex-row items-center justify-between">
+          <Text className="text-sm font-medium text-neutral-500">Who owes whom</Text>
+        </View>
+
+        <SegmentedControl
+          value={debtView}
+          onChange={setDebtView}
+          options={[
+            { label: "All debts", value: "all" },
+            { label: "Simplified", value: "simplified" },
+          ]}
+        />
+
+        {debtView === "simplified" && transactionsSaved > 0 && (
+          <Text className="text-xs text-neutral-500">
+            Minimized to {simplifiedDebts.length} transaction{simplifiedDebts.length === 1 ? "" : "s"}{" "}
+            (down from {pairwiseDebts.length})
+          </Text>
+        )}
+
+        {debtsToShow.length === 0 ? (
           <Text className="rounded-2xl border border-dashed border-neutral-500/25 py-8 text-center text-sm text-neutral-500">
             Everyone's settled up 🎉
           </Text>
         ) : (
-          pairwiseDebts.map((debt, i) => (
+          debtsToShow.map((debt, i) => (
             <Card key={`${debt.from_user}-${debt.to_user}-${i}`} className="flex-row items-center gap-3 py-3">
               <Avatar name={name(debt.from_user)} uri={avatarUri(debt.from_user)} size={32} />
               <Text className="flex-1 text-sm text-neutral-900 dark:text-neutral-100">
