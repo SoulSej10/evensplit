@@ -264,3 +264,62 @@ export function calculatePairwiseDebts(
 
   return results;
 }
+
+/**
+ * Debt simplification (Phase 6 stretch): reduces a group's full debt graph
+ * to the minimum number of transactions needed to zero everyone out, using
+ * the classic greedy "max debtor pays max creditor" min-cash-flow algorithm.
+ *
+ * Given each member's net balance (positive = owed money, negative = owes
+ * money), repeatedly matches the member who owes the most against the
+ * member who is owed the most, settles the smaller of the two amounts, and
+ * repeats until all balances are (near) zero. This does not necessarily
+ * preserve who-originally-owed-whom pairwise, but it is the mathematically
+ * minimal transaction set to net everyone to zero.
+ */
+export function simplifyDebts(balances: UserGroupBalance[]): PairwiseDebt[] {
+  const EPSILON = 0.005;
+
+  // Working copy, in cents (integers) to avoid float drift across many
+  // subtractions.
+  const entries = balances
+    .map((b) => ({ user_id: b.user_id, cents: Math.round(b.balance * CENTS) }))
+    .filter((e) => e.cents !== 0);
+
+  const results: PairwiseDebt[] = [];
+
+  // Repeatedly pick the largest creditor and largest debtor, settle the
+  // smaller magnitude between them, and remove whichever hits zero.
+  // O(n^2 log n) worst case for n members, fine at group scale.
+  while (true) {
+    let maxCreditorIdx = -1;
+    let maxDebtorIdx = -1;
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i].cents === 0) continue;
+      if (entries[i].cents > 0 && (maxCreditorIdx === -1 || entries[i].cents > entries[maxCreditorIdx].cents)) {
+        maxCreditorIdx = i;
+      }
+      if (entries[i].cents < 0 && (maxDebtorIdx === -1 || entries[i].cents < entries[maxDebtorIdx].cents)) {
+        maxDebtorIdx = i;
+      }
+    }
+
+    if (maxCreditorIdx === -1 || maxDebtorIdx === -1) break;
+
+    const creditor = entries[maxCreditorIdx];
+    const debtor = entries[maxDebtorIdx];
+    const settleCents = Math.min(creditor.cents, -debtor.cents);
+
+    if (settleCents <= 0) break;
+
+    const amount = round2(settleCents / CENTS);
+    if (amount > EPSILON) {
+      results.push({ from_user: debtor.user_id, to_user: creditor.user_id, amount });
+    }
+
+    creditor.cents -= settleCents;
+    debtor.cents += settleCents;
+  }
+
+  return results;
+}

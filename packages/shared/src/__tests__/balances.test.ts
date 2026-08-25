@@ -4,11 +4,13 @@ import {
   calculatePairwiseDebts,
   calculateUserBalances,
   computeSplitShares,
+  simplifyDebts,
 } from "../balances";
 
 const ALICE = "11111111-1111-1111-1111-111111111111";
 const BOB = "22222222-2222-2222-2222-222222222222";
 const CARL = "33333333-3333-3333-3333-333333333333";
+const DAVE = "44444444-4444-4444-4444-444444444444";
 
 describe("computeSplitShares - equal", () => {
   it("splits evenly across participants", () => {
@@ -233,5 +235,63 @@ describe("calculatePairwiseDebts", () => {
   it("omits pairs that are fully settled or never owed anything", () => {
     const debts = calculatePairwiseDebts([], [], []);
     expect(debts).toEqual([]);
+  });
+});
+
+describe("simplifyDebts", () => {
+  it("returns no transactions when everyone is already settled", () => {
+    expect(
+      simplifyDebts([
+        { user_id: ALICE, balance: 0 },
+        { user_id: BOB, balance: 0 },
+      ])
+    ).toEqual([]);
+  });
+
+  it("collapses a simple two-person imbalance into one transaction", () => {
+    const result = simplifyDebts([
+      { user_id: ALICE, balance: 50 },
+      { user_id: BOB, balance: -50 },
+    ]);
+    expect(result).toEqual([{ from_user: BOB, to_user: ALICE, amount: 50 }]);
+  });
+
+  it("reduces a chain (A owes B owes C) to a single transaction A->C", () => {
+    // Classic case: naive pairwise ledger would need 2 txns, simplified needs 1.
+    const result = simplifyDebts([
+      { user_id: ALICE, balance: -100 },
+      { user_id: BOB, balance: 0 },
+      { user_id: CARL, balance: 100 },
+    ]);
+    expect(result).toEqual([{ from_user: ALICE, to_user: CARL, amount: 100 }]);
+  });
+
+  it("minimizes transactions for a 4-person mixed group (never exceeds n-1 txns)", () => {
+    const balances = [
+      { user_id: ALICE, balance: 30 },
+      { user_id: BOB, balance: -10 },
+      { user_id: CARL, balance: -40 },
+      { user_id: DAVE, balance: 20 },
+    ];
+    const result = simplifyDebts(balances);
+    expect(result.length).toBeLessThanOrEqual(balances.length - 1);
+
+    // Verify it actually nets everyone to zero.
+    const net = new Map(balances.map((b) => [b.user_id, b.balance]));
+    for (const txn of result) {
+      net.set(txn.from_user, (net.get(txn.from_user) ?? 0) + txn.amount);
+      net.set(txn.to_user, (net.get(txn.to_user) ?? 0) - txn.amount);
+    }
+    for (const [, remaining] of net) {
+      expect(Math.abs(remaining)).toBeLessThan(0.01);
+    }
+  });
+
+  it("ignores near-zero balances (rounding noise)", () => {
+    const result = simplifyDebts([
+      { user_id: ALICE, balance: 0.001 },
+      { user_id: BOB, balance: -0.001 },
+    ]);
+    expect(result).toEqual([]);
   });
 });
