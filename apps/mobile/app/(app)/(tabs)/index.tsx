@@ -4,6 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Plus, Users } from "lucide-react-native";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { CreateGroupSheet } from "@/components/groups/CreateGroupSheet";
+import { JoinGroupSheet } from "@/components/groups/JoinGroupSheet";
+import { QuickActions } from "@/components/groups/QuickActions";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,6 +15,7 @@ export default function GroupsListScreen() {
   const { profile } = useAuth();
   const { data: groups, isLoading, isError, refetch, isRefetching } = useMyGroups();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [joinSheetOpen, setJoinSheetOpen] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-neutral-100 dark:bg-neutral-900" edges={["top"]}>
@@ -20,13 +23,15 @@ export default function GroupsListScreen() {
         <Text className="mb-1 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           {profile?.display_name ? `Hey, ${profile.display_name.split(" ")[0]}` : "Your groups"}
         </Text>
-        <Text className="mb-6 text-neutral-500">
+        <Text className="mb-5 text-neutral-500">
           {isLoading
             ? "Loading…"
             : groups?.length
               ? `${groups.length} group${groups.length === 1 ? "" : "s"}`
               : "No groups yet"}
         </Text>
+
+        <QuickActions onCreateGroup={() => setSheetOpen(true)} onJoinGroup={() => setJoinSheetOpen(true)} />
 
         {isLoading && <SkeletonCardRows count={3} />}
 
@@ -81,6 +86,7 @@ export default function GroupsListScreen() {
       </Pressable>
 
       <CreateGroupSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} />
+      <JoinGroupSheet visible={joinSheetOpen} onClose={() => setJoinSheetOpen(false)} />
     </SafeAreaView>
   );
 }

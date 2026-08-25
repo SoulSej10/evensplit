@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { Tabs } from "expo-router";
-import { Home, Settings } from "lucide-react-native";
+import { BarChart3, Home, ListChecks, Settings } from "lucide-react-native";
 
 /**
  * Floating, pill-shaped tab bar — explicitly not a flat bottom nav bar, per
@@ -14,7 +14,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: "#16A88F",
         tabBarInactiveTintColor: "#6B7169",
         tabBarShowLabel: true,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
         tabBarStyle: {
           position: "absolute",
           left: 20,
@@ -36,8 +36,22 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Groups",
+          title: "Home",
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="activity"
+        options={{
+          title: "Activity",
+          tabBarIcon: ({ color, size }) => <ListChecks color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          title: "Insights",
+          tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
         }}
       />
       <Tabs.Screen

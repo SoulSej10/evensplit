@@ -22,6 +22,19 @@ export async function fetchGroupExpenses(groupId: string): Promise<ExpenseWithSh
   return (data ?? []) as ExpenseWithShares[];
 }
 
+/** Expenses across every group a user belongs to — powers the top-level Insights tab. */
+export async function fetchExpensesForGroups(groupIds: string[]): Promise<ExpenseWithShares[]> {
+  if (groupIds.length === 0) return [];
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("expenses")
+    .select("*, expense_shares(*)")
+    .in("group_id", groupIds)
+    .order("expense_date", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ExpenseWithShares[];
+}
+
 export async function createExpense(
   input: CreateExpenseInput,
   createdBy: string
