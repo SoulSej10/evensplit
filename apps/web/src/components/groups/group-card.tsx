@@ -15,7 +15,7 @@ export function GroupCard({ group }: { group: GroupWithMembers }) {
   const { authUser } = useAuth();
   const memberIds = useMemo(() => group.group_members.map((m) => m.user_id), [group]);
 
-  const { data: netBalance } = useQuery({
+  const { data: netBalance, isError: balanceError } = useQuery({
     queryKey: ["group-card-balance", group.id, authUser?.id],
     enabled: !!authUser?.id,
     queryFn: async () => {
@@ -66,16 +66,22 @@ export function GroupCard({ group }: { group: GroupWithMembers }) {
             </div>
           </div>
           <div className="text-right">
-            <p
-              className={`font-mono text-lg font-semibold tabular-nums ${
-                isPositive ? "text-positive" : isNegative ? "text-negative" : "text-muted-foreground"
-              }`}
-            >
-              {formatMoney(Math.abs(balance), group.currency)}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {isPositive ? "you're owed" : isNegative ? "you owe" : "settled up"}
-            </p>
+            {balanceError ? (
+              <p className="text-xs text-muted-foreground">Balance unavailable</p>
+            ) : (
+              <>
+                <p
+                  className={`font-mono text-lg font-semibold tabular-nums ${
+                    isPositive ? "text-positive" : isNegative ? "text-negative" : "text-muted-foreground"
+                  }`}
+                >
+                  {formatMoney(Math.abs(balance), group.currency)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isPositive ? "you're owed" : isNegative ? "you owe" : "settled up"}
+                </p>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

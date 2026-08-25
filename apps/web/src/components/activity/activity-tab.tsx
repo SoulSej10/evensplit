@@ -1,7 +1,8 @@
 "use client";
 
 import type { User } from "@evensplit/shared";
-import { ArrowRightLeft, Receipt } from "lucide-react";
+import { AlertCircle, ArrowRightLeft, Receipt } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGroupActivity } from "@/hooks/use-group-detail";
 import { formatDateTime, formatMoney } from "@/lib/format";
@@ -17,7 +18,7 @@ export function ActivityTab({
   members: { user_id: string; users: User | null }[];
   currentUserId: string;
 }) {
-  const { data: activity, isLoading } = useGroupActivity(groupId);
+  const { data: activity, isLoading, isError, refetch, isRefetching } = useGroupActivity(groupId);
 
   function name(userId: string) {
     if (userId === currentUserId) return "You";
@@ -29,6 +30,18 @@ export function ActivityTab({
       <div className="space-y-2">
         <Skeleton className="h-14 rounded-xl" />
         <Skeleton className="h-14 rounded-xl" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive/40 py-14 text-center">
+        <AlertCircle className="h-6 w-6 text-destructive" />
+        <p className="text-sm font-medium">Couldn't load activity</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
+          {isRefetching ? "Retrying…" : "Try again"}
+        </Button>
       </div>
     );
   }

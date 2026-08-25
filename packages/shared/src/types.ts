@@ -52,6 +52,10 @@ export interface Expense {
   created_at: ISODateTimeString;
   is_recurring: boolean;
   recurrence_rule: string | null;
+  /** Set when this expense was auto-generated from a recurring template expense. */
+  recurrence_parent_id: UUID | null;
+  /** For a recurring template expense, the date the next instance is due. */
+  next_occurrence_date: ISODateString | null;
 }
 
 export interface ExpenseShare {
@@ -107,4 +111,16 @@ export interface PairwiseDebt {
   from_user: UUID;
   to_user: UUID;
   amount: number;
+}
+
+/**
+ * A registered Expo push notification token for a user's device (Phase 6
+ * stretch). Populated client-side after Expo Notifications permission grant.
+ */
+export interface PushToken {
+  id: UUID;
+  user_id: UUID;
+  expo_push_token: string;
+  created_at: ISODateTimeString;
+  updated_at: ISODateTimeString;
 }

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "@evensplit/shared";
-import { Plus, Receipt, Trash2 } from "lucide-react";
+import { AlertCircle, Plus, Receipt, Trash2, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpenseFormDialog } from "@/components/expenses/expense-form-dialog";
 import { deleteExpense, type ExpenseWithShares } from "@/lib/api/expenses";
@@ -45,7 +46,7 @@ export function ExpensesTab({
   members: { user_id: string; users: User | null }[];
   currentUserId: string;
 }) {
-  const { data: expenses, isLoading } = useGroupExpenses(groupId);
+  const { data: expenses, isLoading, isError, refetch, isRefetching } = useGroupExpenses(groupId);
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(CATEGORY_ALL);
@@ -122,15 +123,32 @@ export function ExpensesTab({
         </div>
       )}
 
-      {!isLoading && filtered.length === 0 && (
+      {isError && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive/40 py-14 text-center">
+          <AlertCircle className="h-6 w-6 text-destructive" />
+          <p className="text-sm font-medium">Couldn't load expenses</p>
+          <p className="max-w-xs text-xs text-muted-foreground">
+            Something went wrong. Try again.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
+            {isRefetching ? "Retrying…" : "Try again"}
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !isError && filtered.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border py-14 text-center">
           <Receipt className="h-6 w-6 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">No expenses yet. Add the first one.</p>
+          <p className="text-sm text-muted-foreground">
+            {expenses && expenses.length > 0
+              ? "No expenses match your search/filter."
+              : "No expenses yet. Add the first one."}
+          </p>
         </div>
       )}
 
       <div className="space-y-2">
-        {filtered.map((expense) => (
+        {!isError && filtered.map((expense) => (
           <ExpenseRow
             key={expense.id}
             expense={expense}
@@ -179,7 +197,14 @@ function ExpenseRow({
       <ExpenseFormDialog
         trigger={
           <button className="min-w-0 flex-1 text-left">
-            <p className="truncate font-medium">{expense.description}</p>
+            <p className="flex items-center gap-1.5 truncate font-medium">
+              <span className="truncate">{expense.description}</span>
+              {expense.is_recurring && (
+                <Badge variant="secondary" className="shrink-0 gap-1">
+                  <Repeat className="h-3 w-3" /> Recurring
+                </Badge>
+              )}
+            </p>
             <p className="text-xs text-muted-foreground">
               {payerName} paid · {formatDate(expense.expense_date)}
               {expense.category ? ` · ${expense.category}` : ""}

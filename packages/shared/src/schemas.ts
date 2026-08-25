@@ -69,6 +69,9 @@ export const createExpenseSchema = z
     expense_date: z.string().min(1, "Date is required"),
     receipt_url: z.string().url().nullable().optional(),
     participants: z.array(splitParticipantSchema).min(1, "At least one participant is required"),
+    is_recurring: z.boolean().optional(),
+    /** Simple recurrence rule string, e.g. "FREQ=WEEKLY" or "FREQ=MONTHLY". */
+    recurrence_rule: z.string().max(100).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.split_type === "exact") {

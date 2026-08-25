@@ -32,17 +32,19 @@ import { InviteDialog } from "@/components/groups/invite-dialog";
 import { ExpensesTab } from "@/components/expenses/expenses-tab";
 import { BalancesTab } from "@/components/balances/balances-tab";
 import { ActivityTab } from "@/components/activity/activity-tab";
+import { InsightsTab } from "@/components/insights/insights-tab";
 import { useAuth } from "@/hooks/use-auth";
 import { useGroup, useGroupExpenses, useGroupRealtime, useGroupSettlements } from "@/hooks/use-group-detail";
 import { archiveGroup, leaveGroup, removeMember } from "@/lib/api/groups";
 import { formatMoney, initials } from "@/lib/format";
-import { MoreVertical, UserPlus, UserMinus, Archive, LogOut } from "lucide-react";
+import { downloadGroupLedgerCsv } from "@/lib/csv";
+import { MoreVertical, UserPlus, UserMinus, Archive, LogOut, AlertCircle, Download } from "lucide-react";
 
 function GroupDetailContent({ groupId }: { groupId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { authUser } = useAuth();
-  const { data: group, isLoading } = useGroup(groupId);
+  const { data: group, isLoading, isError, refetch, isRefetching } = useGroup(groupId);
   const { data: expenses } = useGroupExpenses(groupId);
   const { data: settlements } = useGroupSettlements(groupId);
   useGroupRealtime(groupId);
@@ -91,6 +93,25 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
     }
   }
 
+  if (isError) {
+    return (
+      <AppShell>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-destructive/40 py-16 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="h-6 w-6" />
+          </span>
+          <p className="font-medium">Couldn't load this group</p>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            Something went wrong loading this group's details. Try again.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
+            {isRefetching ? "Retrying…" : "Try again"}
+          </Button>
+        </div>
+      </AppShell>
+    );
+  }
+
   if (isLoading || !group) {
     return (
       <AppShell>
@@ -117,6 +138,22 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full"
+              title="Export CSV"
+              onClick={() =>
+                downloadGroupLedgerCsv({
+                  groupName: group.name,
+                  expenses: expenses ?? [],
+                  settlements: settlements ?? [],
+                  members,
+                })
+              }
+            >
+              <Download className="h-4 w-4" />
+            </Button>
             <InviteDialog
               groupId={groupId}
               trigger={
@@ -234,6 +271,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="balances">Balances</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
         <TabsContent value="expenses">
           <ExpensesTab
@@ -257,6 +295,13 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
             groupCurrency={group.currency}
             members={members}
             currentUserId={authUser!.id}
+          />
+        </TabsContent>
+        <TabsContent value="insights">
+          <InsightsTab
+            groupId={groupId}
+            groupCurrency={group.currency}
+            members={members}
           />
         </TabsContent>
       </Tabs>

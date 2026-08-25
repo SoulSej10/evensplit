@@ -2,6 +2,7 @@
   "expo": {
     "name": "EvenSplit",
     "slug": "evensplit",
+    "owner": "REPLACE_WITH_YOUR_EXPO_USERNAME",
     "scheme": "evensplit",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -37,7 +38,15 @@
       "expo-font",
       "expo-splash-screen",
       "@react-native-community/datetimepicker",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#2F6F5E"
+        }
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true
