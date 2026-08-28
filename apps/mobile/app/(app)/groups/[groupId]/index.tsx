@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
-import { ArrowLeft, ArrowLeftRight, MoreVertical, Plus, UserPlus } from "lucide-react-native";
+import { Archive, ArrowLeft, ArrowLeftRight, Download, LogOut, MoreVertical, Plus, UserPlus } from "lucide-react-native";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import { BottomActionBar } from "@/components/ui/BottomActionBar";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -41,6 +42,7 @@ export default function GroupDetailScreen() {
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithShares | null>(null);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithShares | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [settleUp, setSettleUp] = useState<{ from: string; to: string; amount: number } | null>(null);
 
   const members = group?.group_members ?? [];
@@ -99,14 +101,6 @@ export default function GroupDetailScreen() {
     }
   }
 
-  function onMore() {
-    const options: { text: string; style?: "destructive" | "cancel"; onPress?: () => void }[] = [];
-    options.push({ text: "Export CSV", onPress: onExportCsv });
-    if (isOwner) options.push({ text: "Archive group", onPress: onArchive });
-    options.push({ text: "Leave group", style: "destructive", onPress: onLeave });
-    options.push({ text: "Cancel", style: "cancel" });
-    Alert.alert(group?.name ?? "Group", undefined, options);
-  }
 
   if (isError) {
     return (
@@ -147,7 +141,7 @@ export default function GroupDetailScreen() {
             <UserPlus size={18} color="#0A0A0A" />
           </Pressable>
           <Pressable
-            onPress={onMore}
+            onPress={() => setMoreMenuOpen(true)}
             className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
           >
             <MoreVertical size={18} color="#0A0A0A" />
@@ -269,6 +263,41 @@ export default function GroupDetailScreen() {
       />
 
       <InviteSheet visible={inviteOpen} onClose={() => setInviteOpen(false)} groupId={groupId} />
+
+      <BottomSheet visible={moreMenuOpen} onClose={() => setMoreMenuOpen(false)} title={group.name}>
+        <Pressable
+          onPress={() => {
+            setMoreMenuOpen(false);
+            onExportCsv();
+          }}
+          className="flex-row items-center gap-3 py-3"
+        >
+          <Download size={18} color="#16A88F" />
+          <Text className="text-base text-neutral-900 dark:text-neutral-100">Export CSV</Text>
+        </Pressable>
+        {isOwner && (
+          <Pressable
+            onPress={() => {
+              setMoreMenuOpen(false);
+              onArchive();
+            }}
+            className="flex-row items-center gap-3 py-3"
+          >
+            <Archive size={18} color="#16A88F" />
+            <Text className="text-base text-neutral-900 dark:text-neutral-100">Archive group</Text>
+          </Pressable>
+        )}
+        <Pressable
+          onPress={() => {
+            setMoreMenuOpen(false);
+            onLeave();
+          }}
+          className="flex-row items-center gap-3 py-3"
+        >
+          <LogOut size={18} color="#D95F5F" />
+          <Text className="text-base text-negative">Leave group</Text>
+        </Pressable>
+      </BottomSheet>
 
       {settleUp && (
         <SettleUpSheet

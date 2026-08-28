@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import * as DocumentPicker from "expo-document-picker";
+import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import {
   ChevronRight,
@@ -11,6 +13,7 @@ import {
   ListChecks,
   LogOut,
   PiggyBank,
+  ShieldCheck,
   Tag,
   Trash2,
   Upload,
@@ -25,6 +28,7 @@ import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/use-auth";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { ensureNotificationPermission, registerForPushTokenAsync } from "@/lib/notifications";
+import { hasShownNotificationNudge, setNotificationNudgeShown } from "@/lib/device-flags";
 import { upsertProfile } from "@/lib/api/profile";
 import {
   usePersonalAccounts,
@@ -49,6 +53,7 @@ function goToFinancesTab(tab: string, onClose: () => void) {
 export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
   const { authUser, profile, signOut, refreshProfile } = useAuth();
   const { colorScheme, toggleColorScheme } = useColorScheme();
+  const insets = useSafeAreaInsets();
   const [notifExpenses, setNotifExpenses] = useState(true);
   const [notifSettlements, setNotifSettlements] = useState(true);
   const [savingCurrency, setSavingCurrency] = useState(false);
@@ -64,13 +69,30 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
   const { data: categories } = usePersonalCategories();
   const queryClient = useQueryClient();
 
+  // A one-time, friendly nudge instead of silently firing the raw OS
+  // permission dialog on every Settings visit - only shown once ever
+  // (persisted per-device), and only when notifications genuinely haven't
+  // been decided on yet (not if the user already granted or denied them).
   useEffect(() => {
-    void ensureNotificationPermission().then((granted) => {
-      if (!granted) return;
-      void registerForPushTokenAsync().then((token) => {
-        if (token) console.log("EvenSplit: Expo push token (not yet persisted):", token);
-      });
-    });
+    (async () => {
+      if (await hasShownNotificationNudge()) return;
+      const { status } = await Notifications.getPermissionsAsync();
+      await setNotificationNudgeShown();
+      if (status !== "undetermined") return;
+
+      Alert.alert("Enable notifications?", "Get notified on this device when you add an expense or settle up.", [
+        { text: "Not now", style: "cancel" },
+        {
+          text: "Enable",
+          onPress: async () => {
+            const granted = await ensureNotificationPermission();
+            if (!granted) return;
+            const token = await registerForPushTokenAsync();
+            if (token) console.log("EvenSplit: Expo push token (not yet persisted):", token);
+          },
+        },
+      ]);
+    })();
   }, []);
 
   async function onChangeCurrency(currency: string) {
@@ -227,7 +249,11 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="gap-4 px-5 pb-10" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerClassName="gap-4 px-5"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Card className="flex-row items-center gap-4">
           <Avatar name={profile?.display_name} uri={profile?.avatar_url} size={52} />
           <View className="flex-1">
@@ -413,6 +439,22 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
           </View>
         </Card>
 
+        <Card>
+          <Pressable
+            onPress={() => {
+              onClose();
+              router.push("/(app)/privacy-policy");
+            }}
+            className="flex-row items-center justify-between py-1"
+          >
+            <View className="flex-row items-center gap-2.5">
+              <ShieldCheck size={17} color="#16A88F" />
+              <Text className="text-neutral-900 dark:text-neutral-100">Privacy policy</Text>
+            </View>
+            <ChevronRight color="#6B7169" size={17} />
+          </Pressable>
+        </Card>
+
         <Card className="items-center gap-1 py-5">
           <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             {Constants.expoConfig?.name ?? "SplitEven"}
@@ -422,19 +464,21 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
           <Text className="text-xs text-neutral-500">A Peniko product</Text>
         </Card>
 
-        <Button variant="outline" size="lg" onPress={onSignOut}>
-          <View className="flex-row items-center gap-2">
-            <LogOut size={18} color="#0A0A0A" />
-            <Text className="font-semibold text-neutral-900 dark:text-neutral-100">Sign out</Text>
-          </View>
-        </Button>
+        <View className="flex-row gap-3">
+          <Button variant="outline" size="sm" className="flex-1" onPress={onSignOut}>
+            <View className="flex-row items-center gap-1.5">
+              <LogOut size={15} color="#0A0A0A" />
+              <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Sign out</Text>
+            </View>
+          </Button>
 
-        <Button variant="destructive" size="lg" onPress={onDeleteAccount}>
-          <View className="flex-row items-center gap-2">
-            <Trash2 size={18} color="white" />
-            <Text className="font-semibold text-white">Delete account</Text>
-          </View>
-        </Button>
+          <Button variant="outline" size="sm" className="flex-1 border-negative/40" onPress={onDeleteAccount}>
+            <View className="flex-row items-center gap-1.5">
+              <Trash2 size={15} color="#D95F5F" />
+              <Text className="text-sm font-semibold text-negative">Delete account</Text>
+            </View>
+          </Button>
+        </View>
       </ScrollView>
     </View>
   );

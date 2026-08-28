@@ -28,14 +28,16 @@ module.exports = {
         warning: "#E0A63A", // warm amber
         surface: "#FFFFFF",
         neutral: {
-          900: "#0A0A0A",
+          900: "#0A120D", // dark-mode screen background — deep green-black, not flat black
           500: "#6B7169",
           100: "#F4F5F3",
         },
-        // Dark mode surfaces (applied via `dark:` variants) — dark mode is
-        // now the default (see app/_layout.tsx), so this is the brand's
-        // true near-black, not a tinted variant.
-        "surface-dark": "#0A0A0A",
+        // Dark mode card surface (applied via `dark:bg-surface-dark`) — a
+        // visible step lighter than neutral-900 so cards actually read as
+        // raised against the background, per feedback that dark mode was
+        // "too dark" and components weren't visible (surface-dark used to
+        // equal neutral-900 exactly, i.e. zero contrast between the two).
+        "surface-dark": "#15251C",
       },
       fontFamily: {
         sans: ["PlusJakartaSans_400Regular"],

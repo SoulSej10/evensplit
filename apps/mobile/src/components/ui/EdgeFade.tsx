@@ -25,7 +25,7 @@ const BANDS = 10;
  */
 export function EdgeFade({ edge, size = 90 }: { edge: "bottom" | "left" | "right"; size?: number }) {
   const { colorScheme } = useColorScheme();
-  const bg = colorScheme === "dark" ? "#0A0A0A" : "#F7F8F7";
+  const bg = colorScheme === "dark" ? "#0A120D" : "#F7F8F7";
 
   const bands = Array.from({ length: BANDS }, (_, i) => Math.pow((i + 1) / BANDS, 1.5));
 

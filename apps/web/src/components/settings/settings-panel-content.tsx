@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { ChevronRight, Download, KeyRound, ListChecks, LogOut, PiggyBank, Tag, Trash2, Upload, Wallet } from "lucide-react";
+import { ChevronRight, Download, KeyRound, ListChecks, LogOut, PiggyBank, ShieldCheck, Tag, Trash2, Upload, Wallet } from "lucide-react";
 import {
   passwordResetSchema,
   profileSetupSchema,
@@ -357,6 +357,21 @@ export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
               onCheckedChange={(checked) => setNotifPrefs((p) => ({ ...p, settlements: checked }))}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border-border/60 shadow-sm">
+        <CardContent className="p-0">
+          <button
+            type="button"
+            onClick={() => goTo("/privacy-policy")}
+            className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm hover:bg-muted"
+          >
+            <span className="flex items-center gap-2.5">
+              <ShieldCheck className="h-4 w-4 text-primary" /> Privacy policy
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
         </CardContent>
       </Card>
 
