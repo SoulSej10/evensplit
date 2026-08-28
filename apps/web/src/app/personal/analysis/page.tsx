@@ -32,11 +32,11 @@ const MONTH_NAMES = [
 type ViewType = "expense-overview" | "income-overview" | "expense-flow" | "income-flow" | "account-analysis";
 
 const VIEW_OPTIONS: { value: ViewType; label: string }[] = [
-  { value: "expense-overview", label: "Expense overview" },
-  { value: "income-overview", label: "Income overview" },
-  { value: "expense-flow", label: "Expense flow" },
-  { value: "income-flow", label: "Income flow" },
-  { value: "account-analysis", label: "Account analysis" },
+  { value: "expense-overview", label: "Spending breakdown" },
+  { value: "income-overview", label: "Earnings breakdown" },
+  { value: "expense-flow", label: "Daily spending" },
+  { value: "income-flow", label: "Daily earnings" },
+  { value: "account-analysis", label: "By account" },
 ];
 
 const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
@@ -220,7 +220,7 @@ export default function PersonalAnalysisPage() {
         <div className="space-y-4">
           <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
             <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-              {kind === "expense" ? "Expense" : "Income"} flow
+              Daily {kind === "expense" ? "spending" : "earnings"}
             </h3>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={flowSeries}>

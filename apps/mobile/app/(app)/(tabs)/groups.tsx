@@ -48,7 +48,7 @@ export default function GroupsListScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="px-5 pb-32 pt-3" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-4 pt-3" showsVerticalScrollIndicator={false}>
         <Text className="mb-1 text-2xl font-extrabold text-neutral-900 dark:text-neutral-100">
           {groups?.length ? "Your groups" : "Groups"}
         </Text>

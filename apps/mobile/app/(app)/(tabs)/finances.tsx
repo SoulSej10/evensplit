@@ -103,7 +103,7 @@ export default function FinancesScreen() {
 
       <PillTabs options={TABS} value={tab} onChange={setTab} />
 
-      <ScrollView contentContainerClassName="px-5 pb-32" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-4" showsVerticalScrollIndicator={false}>
         {tab === "overview" && <OverviewTabView onNavigateTab={setTab} />}
         {tab === "records" && <RecordsTabView />}
         {tab === "analysis" && <AnalysisTabView />}

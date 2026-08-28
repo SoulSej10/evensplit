@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Link, router } from "expo-router";
+import { useColorScheme } from "nativewind";
 import { ArrowLeft } from "lucide-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -13,6 +14,8 @@ import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function SignUpScreen() {
   const [submitting, setSubmitting] = useState(false);
+  const { colorScheme } = useColorScheme();
+  const iconColor = colorScheme === "dark" ? "#F4F5F3" : "#0A0A0A";
   const { handleSubmit, formState, setValue, watch } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
     defaultValues: { email: "", password: "" },
@@ -52,8 +55,8 @@ export default function SignUpScreen() {
         contentContainerClassName="flex-1 justify-center px-6 py-10 pb-40"
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10">
-          <ArrowLeft size={18} color="#0A0A0A" />
+        <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark">
+          <ArrowLeft size={18} color={iconColor} />
         </Pressable>
 
         <View className="mb-10 items-center gap-3">

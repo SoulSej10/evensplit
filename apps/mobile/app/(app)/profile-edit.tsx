@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { router, Stack } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { useColorScheme } from "nativewind";
 import { ArrowLeft } from "lucide-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -17,6 +18,8 @@ import { cn } from "@/lib/cn";
 
 export default function ProfileEditScreen() {
   const { authUser, profile, refreshProfile } = useAuth();
+  const { colorScheme } = useColorScheme();
+  const iconColor = colorScheme === "dark" ? "#F4F5F3" : "#0A0A0A";
   const [submitting, setSubmitting] = useState(false);
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url ?? null);
 
@@ -62,9 +65,9 @@ export default function ProfileEditScreen() {
       <View className="flex-row items-center gap-3 px-5 pt-3">
         <Pressable
           onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
+          className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark"
         >
-          <ArrowLeft size={18} color="#0A0A0A" />
+          <ArrowLeft size={18} color={iconColor} />
         </Pressable>
         <Text className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           Edit profile

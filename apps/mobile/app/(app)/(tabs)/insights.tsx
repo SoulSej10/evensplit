@@ -18,6 +18,7 @@ import { EdgeFade } from "@/components/ui/EdgeFade";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { DonutChart } from "@/components/ui/DonutChart";
 import { MonthCalendar } from "@/components/ui/MonthCalendar";
+import { CategoryBreakdownList } from "@/components/ui/CategoryBreakdownList";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettingsDrawer } from "@/context/settings-drawer";
 import { useMyGroups, useAllExpenses } from "@/hooks/use-groups";
@@ -37,10 +38,10 @@ function CategoryDonut({
   title: string;
   total: number;
   currency: string;
-  categories: { label: string; amount: number }[];
+  categories: { label: string; icon?: string | null; amount: number }[];
 }) {
   return (
-    <Card className="gap-3">
+    <Card className="gap-4">
       <View className="flex-row items-center justify-between">
         <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{title}</Text>
         <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
@@ -52,6 +53,16 @@ function CategoryDonut({
         segments={categories.map((c, i) => ({
           label: c.label,
           value: c.amount,
+          color: DONUT_COLORS[i % DONUT_COLORS.length],
+        }))}
+      />
+      <CategoryBreakdownList
+        currency={currency}
+        rows={categories.map((c, i) => ({
+          label: c.label,
+          icon: c.icon,
+          amount: c.amount,
+          percent: total > 0 ? (c.amount / total) * 100 : 0,
           color: DONUT_COLORS[i % DONUT_COLORS.length],
         }))}
       />
@@ -193,7 +204,7 @@ export default function InsightsScreen() {
         <Text className="text-neutral-500">Where your shared money is going</Text>
       </View>
 
-      <ScrollView contentContainerClassName="gap-4 px-5 pb-32 pt-2" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="gap-4 px-5 pb-4 pt-2" showsVerticalScrollIndicator={false}>
         {isLoading && <SkeletonCardRows count={3} />}
 
         {!isLoading && isError && (
@@ -260,7 +271,11 @@ export default function InsightsScreen() {
             title="Personal spending by category"
             total={personalMonthTotal}
             currency={personalCurrency}
-            categories={personalBreakdown.map((c) => ({ label: c.category_name, amount: c.amount }))}
+            categories={personalBreakdown.map((c) => ({
+              label: c.category_name,
+              icon: personalCategories?.find((cat) => cat.id === c.category_id)?.icon,
+              amount: c.amount,
+            }))}
           />
         )}
 

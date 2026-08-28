@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useColorScheme } from "nativewind";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
@@ -31,6 +32,8 @@ export default function GroupDetailScreen() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
   const { authUser } = useAuth();
   const queryClient = useQueryClient();
+  const { colorScheme } = useColorScheme();
+  const headerIconColor = colorScheme === "dark" ? "#F4F5F3" : "#0A0A0A";
 
   const { data: group, isLoading, isError, refetch } = useGroup(groupId);
   const { data: expenses } = useGroupExpenses(groupId);
@@ -129,22 +132,22 @@ export default function GroupDetailScreen() {
       <View className="flex-row items-center justify-between px-5 pt-2">
         <Pressable
           onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
+          className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark"
         >
-          <ArrowLeft size={18} color="#0A0A0A" />
+          <ArrowLeft size={18} color={headerIconColor} />
         </Pressable>
         <View className="flex-row gap-2">
           <Pressable
             onPress={() => setInviteOpen(true)}
-            className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark"
           >
-            <UserPlus size={18} color="#0A0A0A" />
+            <UserPlus size={18} color={headerIconColor} />
           </Pressable>
           <Pressable
             onPress={() => setMoreMenuOpen(true)}
-            className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark"
           >
-            <MoreVertical size={18} color="#0A0A0A" />
+            <MoreVertical size={18} color={headerIconColor} />
           </Pressable>
         </View>
       </View>

@@ -24,11 +24,11 @@ const MONTH_NAMES = [
 type ViewType = "expense-overview" | "income-overview" | "expense-flow" | "income-flow" | "account-analysis";
 
 const VIEW_OPTIONS: { value: ViewType; label: string }[] = [
-  { value: "expense-overview", label: "Expense overview" },
-  { value: "income-overview", label: "Income overview" },
-  { value: "expense-flow", label: "Expense flow" },
-  { value: "income-flow", label: "Income flow" },
-  { value: "account-analysis", label: "Account analysis" },
+  { value: "expense-overview", label: "Spending breakdown" },
+  { value: "income-overview", label: "Earnings breakdown" },
+  { value: "expense-flow", label: "Daily spending" },
+  { value: "income-flow", label: "Daily earnings" },
+  { value: "account-analysis", label: "By account" },
 ];
 
 /** Every day of the given month, zero-filled where there's no data — so a flow chart reads as one continuous month, not a handful of scattered points. */
@@ -177,7 +177,7 @@ export function AnalysisTabView() {
         <>
           <Card className="gap-3">
             <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-              {kind === "expense" ? "Expense" : "Income"} flow
+              Daily {kind === "expense" ? "spending" : "earnings"}
             </Text>
             <LineChart
               series={[

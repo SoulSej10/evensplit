@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
+import { useColorScheme } from "nativewind";
 import { ArrowLeft, Mail } from "lucide-react-native";
 import * as Linking from "expo-linking";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,8 @@ import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordScreen() {
   const [sent, setSent] = useState(false);
+  const { colorScheme } = useColorScheme();
+  const iconColor = colorScheme === "dark" ? "#F4F5F3" : "#0A0A0A";
   const { handleSubmit, formState, setValue, watch } = useForm<PasswordResetRequestInput>({
     resolver: zodResolver(passwordResetRequestSchema),
     defaultValues: { email: "" },
@@ -31,8 +34,8 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View className="flex-1 justify-center bg-neutral-100 px-6 dark:bg-neutral-900">
-      <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/10">
-        <ArrowLeft size={18} color="#0A0A0A" />
+      <Pressable onPress={() => router.back()} className="absolute left-6 top-14 h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-surface-dark">
+        <ArrowLeft size={18} color={iconColor} />
       </Pressable>
 
       <View className="mb-8 items-center gap-3">

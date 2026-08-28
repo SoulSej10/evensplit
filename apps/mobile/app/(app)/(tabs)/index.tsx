@@ -127,7 +127,7 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="px-5 pb-32 pt-3" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-4 pt-3" showsVerticalScrollIndicator={false}>
         <Text className="mb-5 text-2xl font-extrabold text-neutral-900 dark:text-neutral-100">
           {profile?.display_name ? `Good to see you, ${profile.display_name.split(" ")[0]}` : "Home"}
         </Text>

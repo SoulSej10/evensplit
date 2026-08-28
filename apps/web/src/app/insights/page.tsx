@@ -68,16 +68,30 @@ function CategoryPieChart({
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <ul className="mt-2 space-y-1">
-        {categories.map((c, i) => (
-          <li key={c.label} className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1.5 capitalize text-muted-foreground">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
-              {c.label}
-            </span>
-            <span className="font-medium">{formatMoney(c.amount, currency)}</span>
-          </li>
-        ))}
+      <ul className="mt-4 space-y-3">
+        {categories.map((c, i) => {
+          const percent = total > 0 ? (c.amount / total) * 100 : 0;
+          return (
+            <li key={c.label} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1.5 capitalize">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                  {c.label}
+                </span>
+                <span className="font-medium">{formatMoney(c.amount, currency)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${Math.min(100, percent)}%`, backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                  />
+                </div>
+                <span className="w-10 text-right text-xs text-muted-foreground">{percent.toFixed(0)}%</span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
