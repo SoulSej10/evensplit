@@ -17,6 +17,8 @@ const ACCOUNT_TYPES: { value: PersonalAccountType; label: string }[] = [
   { value: "investment", label: "Investment" },
 ];
 
+const ACCOUNT_ICONS = ["💵", "💳", "👛", "🏦", "🐷", "📈", "💰", "🪙", "🏧", "💎", "🧾", "🎯"];
+
 export function AddAccountSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { profile } = useAuth();
   const createAccount = useCreatePersonalAccount();
@@ -24,6 +26,7 @@ export function AddAccountSheet({ visible, onClose }: { visible: boolean; onClos
   const [type, setType] = useState<PersonalAccountType>("cash");
   const [currency, setCurrency] = useState(profile?.default_currency ?? "PHP");
   const [startingBalance, setStartingBalance] = useState("0");
+  const [icon, setIcon] = useState(ACCOUNT_ICONS[0]);
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit() {
@@ -32,6 +35,7 @@ export function AddAccountSheet({ visible, onClose }: { visible: boolean; onClos
       type,
       currency,
       starting_balance: Number(startingBalance) || 0,
+      icon,
     });
     if (!parsed.success) {
       Alert.alert("Check the account details", parsed.error.issues[0]?.message ?? "Invalid input");
@@ -61,6 +65,21 @@ export function AddAccountSheet({ visible, onClose }: { visible: boolean; onClos
         </Button>
       }
     >
+      <View className="flex-row flex-wrap gap-2">
+        {ACCOUNT_ICONS.map((i) => (
+          <Pressable
+            key={i}
+            onPress={() => setIcon(i)}
+            className={cn(
+              "h-11 w-11 items-center justify-center rounded-card",
+              icon === i ? "bg-primary-light" : "bg-neutral-100 dark:bg-white/5"
+            )}
+          >
+            <Text className="text-xl">{i}</Text>
+          </Pressable>
+        ))}
+      </View>
+
       <TextField label="Name" placeholder="Everyday card" value={name} onChangeText={setName} />
 
       <View className="gap-1.5">

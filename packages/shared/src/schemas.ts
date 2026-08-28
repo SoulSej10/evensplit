@@ -157,6 +157,7 @@ export const createPersonalAccountSchema = z.object({
   type: personalAccountTypeSchema,
   currency: currencyCodeSchema,
   starting_balance: z.number().finite().default(0),
+  icon: z.string().max(16).nullable().optional(),
 });
 export type CreatePersonalAccountInput = z.infer<typeof createPersonalAccountSchema>;
 

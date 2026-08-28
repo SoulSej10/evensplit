@@ -77,8 +77,11 @@ export function OverviewTabView({ onNavigateTab }: { onNavigateTab: (tab: "accou
         {(accounts ?? []).map((account) => {
           const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
           return (
-            <Card key={account.id} className="flex-row items-center justify-between py-3">
-              <View>
+            <Card key={account.id} className="flex-row items-center gap-3 py-3">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-primary-light">
+                <Text className="text-base">{account.icon ?? "💵"}</Text>
+              </View>
+              <View className="flex-1">
                 <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{account.name}</Text>
                 <Text className="text-xs capitalize text-neutral-500">{account.type}</Text>
               </View>

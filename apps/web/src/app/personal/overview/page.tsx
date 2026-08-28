@@ -74,8 +74,11 @@ export default function PersonalOverviewPage() {
           {(accounts ?? []).map((account) => {
             const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
             return (
-              <Card key={account.id} className="flex items-center justify-between p-3">
-                <div>
+              <Card key={account.id} className="flex items-center gap-3 p-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-sm">
+                  {account.icon ?? "💵"}
+                </span>
+                <div className="flex-1">
                   <p className="text-sm font-medium">{account.name}</p>
                   <p className="text-xs capitalize text-muted-foreground">{account.type}</p>
                 </div>

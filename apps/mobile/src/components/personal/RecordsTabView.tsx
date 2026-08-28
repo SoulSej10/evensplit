@@ -1,6 +1,7 @@
+import { useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Receipt } from "lucide-react-native";
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChevronLeft, ChevronRight, Receipt } from "lucide-react-native";
 import { Card } from "@/components/ui/Card";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
@@ -35,12 +36,35 @@ function transactionLabel(tx: PersonalTransaction, category: string | null, acco
   return category ?? (tx.kind === "income" ? "Income" : "Expense");
 }
 
-/** The "Add transaction" action lives in finances.tsx's floating action button, not inline here. */
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * The "Add transaction" action lives in finances.tsx's floating action
+ * button, not inline here. Defaults to the current month, with prev/next
+ * navigation to browse history - showing every transaction ever logged in
+ * one flat list doesn't scale and buries recent activity.
+ */
 export function RecordsTabView() {
   const { data: transactions, isLoading, isError, refetch } = usePersonalTransactions();
   const { data: accounts } = usePersonalAccounts();
   const { data: categories } = usePersonalCategories();
   const deleteTransaction = useDeletePersonalTransaction();
+  const [month, setMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+
+  const monthKey = `${month.year}-${String(month.month + 1).padStart(2, "0")}`;
+  const monthTransactions = useMemo(
+    () => (transactions ?? []).filter((t) => t.occurred_at.slice(0, 7) === monthKey),
+    [transactions, monthKey]
+  );
+
+  const today = new Date();
+  const isCurrentMonth = month.year === today.getFullYear() && month.month === today.getMonth();
 
   function accountName(id: string) {
     return accounts?.find((a) => a.id === id)?.name ?? "Account";
@@ -63,6 +87,27 @@ export function RecordsTabView() {
 
   return (
     <View className="gap-3">
+      <View className="flex-row items-center justify-between">
+        <Pressable
+          onPress={() => setMonth((m) => (m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 }))}
+          hitSlop={10}
+          className="h-8 w-8 items-center justify-center rounded-lg bg-neutral-500/10"
+        >
+          <ChevronLeft color="#6B7169" size={16} />
+        </Pressable>
+        <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          {MONTH_NAMES[month.month]} {month.year}
+        </Text>
+        <Pressable
+          onPress={() => setMonth((m) => (m.month === 11 ? { year: m.year + 1, month: 0 } : { year: m.year, month: m.month + 1 }))}
+          disabled={isCurrentMonth}
+          hitSlop={10}
+          className={`h-8 w-8 items-center justify-center rounded-lg bg-neutral-500/10 ${isCurrentMonth ? "opacity-30" : ""}`}
+        >
+          <ChevronRight color="#6B7169" size={16} />
+        </Pressable>
+      </View>
+
       {(accounts?.length ?? 0) === 0 && (
         <View className="items-center gap-2 py-14">
           <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-light">
@@ -72,16 +117,18 @@ export function RecordsTabView() {
         </View>
       )}
 
-      {(accounts?.length ?? 0) > 0 && transactions?.length === 0 && (
+      {(accounts?.length ?? 0) > 0 && monthTransactions.length === 0 && (
         <View className="items-center gap-2 py-14">
           <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-light">
             <Receipt color="#16A88F" size={22} />
           </View>
-          <Text className="text-sm text-neutral-500">No transactions yet. Log your first one.</Text>
+          <Text className="text-sm text-neutral-500">
+            {isCurrentMonth ? "No transactions yet. Log your first one." : "No transactions this month."}
+          </Text>
         </View>
       )}
 
-      {transactions?.map((tx) => {
+      {monthTransactions.map((tx) => {
         const account = accounts?.find((a) => a.id === tx.account_id);
         const category = categoryLabel(tx.category_id);
         const isDebit = tx.kind === "expense" || tx.kind === "group_advance";

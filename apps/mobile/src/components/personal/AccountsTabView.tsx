@@ -44,8 +44,11 @@ export function AccountsTabView() {
         const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
         return (
           <Pressable key={account.id} onLongPress={() => onArchive(account.id, account.name)}>
-            <Card className="flex-row items-center justify-between py-3">
-              <View>
+            <Card className="flex-row items-center gap-3 py-3">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-primary-light">
+                <Text className="text-lg">{account.icon ?? "💵"}</Text>
+              </View>
+              <View className="flex-1">
                 <Text className="font-medium text-neutral-900 dark:text-neutral-100">{account.name}</Text>
                 <Text className="text-xs capitalize text-neutral-500">{account.type}</Text>
               </View>

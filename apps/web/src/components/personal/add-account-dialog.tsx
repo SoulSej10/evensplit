@@ -31,22 +31,26 @@ const ACCOUNT_TYPES = [
   { value: "investment", label: "Investment" },
 ] as const;
 
+const ACCOUNT_ICONS = ["💵", "💳", "👛", "🏦", "🐷", "📈", "💰", "🪙", "🏧", "💎", "🧾", "🎯"];
+
 export function AddAccountDialog() {
   const { profile } = useAuth();
   const [open, setOpen] = useState(false);
+  const [icon, setIcon] = useState(ACCOUNT_ICONS[0]);
   const createAccount = useCreatePersonalAccount();
 
   const { register, handleSubmit, reset, watch, setValue, formState } = useForm<CreatePersonalAccountInput>({
     resolver: zodResolver(createPersonalAccountSchema),
-    defaultValues: { name: "", type: "cash", currency: profile?.default_currency ?? "PHP", starting_balance: 0 },
+    defaultValues: { name: "", type: "cash", currency: profile?.default_currency ?? "PHP", starting_balance: 0, icon: ACCOUNT_ICONS[0] },
   });
 
   async function onSubmit(values: CreatePersonalAccountInput) {
     try {
-      await createAccount.mutateAsync(values);
+      await createAccount.mutateAsync({ ...values, icon });
       toast.success(`${values.name} added`);
       setOpen(false);
       reset();
+      setIcon(ACCOUNT_ICONS[0]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not add account");
     }
@@ -65,6 +69,21 @@ export function AddAccountDialog() {
           <DialogDescription>Cash, a card, savings — wherever your money lives.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            {ACCOUNT_ICONS.map((i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => setIcon(i)}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl text-xl transition-colors ${
+                  icon === i ? "bg-primary-light ring-2 ring-primary" : "bg-muted"
+                }`}
+              >
+                {i}
+              </button>
+            ))}
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="account-name">Name</Label>
             <Input id="account-name" placeholder="Everyday card" {...register("name")} />

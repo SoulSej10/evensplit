@@ -171,6 +171,7 @@ export interface PersonalAccount {
   type: PersonalAccountType;
   currency: string;
   starting_balance: number;
+  icon: string | null;
   created_at: ISODateTimeString;
   archived_at: ISODateTimeString | null;
 }

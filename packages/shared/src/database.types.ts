@@ -280,6 +280,7 @@ export type Database = {
           archived_at: string | null
           created_at: string
           currency: string
+          icon: string | null
           id: string
           name: string
           starting_balance: number
@@ -290,6 +291,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           currency?: string
+          icon?: string | null
           id?: string
           name: string
           starting_balance?: number
@@ -300,6 +302,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           currency?: string
+          icon?: string | null
           id?: string
           name?: string
           starting_balance?: number

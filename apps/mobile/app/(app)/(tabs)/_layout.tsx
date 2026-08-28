@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import { useColorScheme } from "nativewind";
@@ -7,8 +6,12 @@ import { SettingsDrawerProvider } from "@/context/settings-drawer";
 import { SettingsDrawer } from "@/components/settings/SettingsDrawer";
 
 /**
- * Floating, pill-shaped tab bar — explicitly not a flat bottom nav bar, per
- * PROJECT_PLAN §3.5 (consumer-fintech direction).
+ * A standard fixed, full-width bottom tab bar — not floating with side
+ * margins/rounded corners, per direct feedback ("fixed position, no edges
+ * on it whatsoever"). Not `position: absolute`, so React Navigation
+ * reserves its actual height (including the safe-area inset) as part of
+ * screen layout automatically, which also fixes the previous floating
+ * version not adapting cleanly to 3-button vs gesture navigation.
  *
  * Four primary destinations, matching the four jobs users actually do here:
  * Home ("how am I doing"), Groups ("shared money"), Finances ("my money"),
@@ -22,13 +25,6 @@ export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  // insets.bottom is 0 on 3-button nav (no gesture home indicator to clear)
-  // and >0 on gesture nav - respecting it either way keeps the floating bar
-  // from crowding the system nav bar on 3-button devices, and from
-  // overlapping the home indicator on gesture ones, instead of the old
-  // fixed 20/28 that only worked for one navigation mode.
-  const barBottom = insets.bottom + (Platform.OS === "ios" ? 8 : 12);
-
   return (
     <SettingsDrawerProvider>
       <Tabs
@@ -39,20 +35,13 @@ export default function TabsLayout() {
           tabBarShowLabel: true,
           tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
           tabBarStyle: {
-            position: "absolute",
-            left: 20,
-            right: 20,
-            bottom: barBottom,
-            height: 64,
-            borderRadius: 20,
-            backgroundColor: isDark ? "#15251C" : "#FFFFFF",
-            borderTopWidth: 0,
-            shadowColor: "#0A0A0A",
-            shadowOpacity: isDark ? 0.3 : 0.12,
-            shadowRadius: 16,
-            shadowOffset: { width: 0, height: 6 },
-            elevation: 8,
+            height: 56 + insets.bottom,
             paddingTop: 8,
+            paddingBottom: insets.bottom || 8,
+            backgroundColor: isDark ? "#15251C" : "#FFFFFF",
+            borderTopWidth: 1,
+            borderTopColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(10,10,10,0.08)",
+            elevation: 0,
           },
         }}
       >
