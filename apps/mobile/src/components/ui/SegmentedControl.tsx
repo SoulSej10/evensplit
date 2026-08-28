@@ -18,7 +18,15 @@ export function SegmentedControl<T extends string>({
           <Pressable
             key={opt.value}
             onPress={() => onChange(opt.value)}
-            className={cn("flex-1 items-center rounded-pill py-2", active && "bg-surface shadow-sm dark:bg-surface-dark")}
+            className={cn("flex-1 items-center rounded-pill py-2", active && "bg-surface dark:bg-surface-dark")}
+            // `shadow-*` (and slash-opacity color) classes that toggle on
+            // press are a documented nativewind/react-native-css-interop
+            // race condition with expo-router's navigation context
+            // (nativewind/nativewind#1536, #1557, #1711) - it intermittently
+            // throws "Couldn't find a navigation context" on press. Moving
+            // the shadow to a plain style prop (never a className) avoids
+            // triggering that interop path entirely.
+            style={active ? { shadowColor: "#0A0A0A", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 1 } : undefined}
           >
             <Text
               className={cn(

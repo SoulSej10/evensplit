@@ -1,0 +1,385 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { AlertCircle, Layers, PieChart as PieChartIcon, Receipt } from "lucide-react";
+import {
+  computeCategoryBreakdown,
+  computeDailyTotals,
+  computeSharedFinanceSummary,
+  filterTransactionsForCurrentMonth,
+  type DailyTotal,
+} from "@evensplit/shared";
+import { AuthGuard } from "@/components/auth/auth-guard";
+import { AppShell } from "@/components/app-shell/top-nav";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SegmentedTabs } from "@/components/personal/segmented-tabs";
+import { MonthCalendar } from "@/components/personal/month-calendar";
+import { useAuth } from "@/hooks/use-auth";
+import { useMyGroups, useAllExpenses } from "@/hooks/use-groups";
+import { usePersonalAccounts, usePersonalCategories, usePersonalTransactions } from "@/hooks/use-personal";
+import { formatMoney } from "@/lib/format";
+
+const CATEGORY_ALL = "__all__";
+
+const CHART_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+const TOOLTIP_STYLE = {
+  backgroundColor: "var(--card)",
+  borderColor: "var(--border)",
+  borderRadius: "0.75rem",
+  fontSize: "0.75rem",
+  color: "var(--card-foreground)",
+};
+
+function CategoryPieChart({
+  title,
+  total,
+  currency,
+  categories,
+}: {
+  title: string;
+  total: number;
+  currency: string;
+  categories: { label: string; amount: number }[];
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        <span className="text-sm font-semibold">{formatMoney(total, currency)}</span>
+      </div>
+      <div className="h-56">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={categories.map((c) => ({ name: c.label, value: c.amount }))}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={50}
+              outerRadius={80}
+            >
+              {categories.map((_, i) => (
+                <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => formatMoney(Number(value), currency)} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="mt-2 space-y-1">
+        {categories.map((c, i) => (
+          <li key={c.label} className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 capitalize text-muted-foreground">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+              {c.label}
+            </span>
+            <span className="font-medium">{formatMoney(c.amount, currency)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * Top-level Insights: spending broken down by category, aggregated across
+ * every group the user belongs to (not just one group at a time — that's
+ * the per-group Insights tab inside a group's own page). Currencies are
+ * never blended into one total; each currency gets its own section.
+ * Mirrors apps/mobile's top-level Insights tab.
+ */
+function InsightsContent() {
+  const { authUser } = useAuth();
+  const { data: groups } = useMyGroups();
+  const { data: expenses, isLoading, isError, refetch, isRefetching } = useAllExpenses();
+  const { data: personalTransactions } = usePersonalTransactions();
+  const { data: personalCategories } = usePersonalCategories();
+  const { data: personalAccounts } = usePersonalAccounts();
+
+  const personalCurrency = personalAccounts?.[0]?.currency ?? "PHP";
+
+  const [view, setView] = useState<"charts" | "calendar">("charts");
+  const [categoryFilter, setCategoryFilter] = useState<string>(CATEGORY_ALL);
+  const [calendarDate, setCalendarDate] = useState(() => new Date());
+
+  const monthTransactions = useMemo(
+    () => filterTransactionsForCurrentMonth(personalTransactions ?? []),
+    [personalTransactions]
+  );
+
+  const personalBreakdown = useMemo(
+    () => computeCategoryBreakdown(monthTransactions, personalCategories ?? [], "expense"),
+    [monthTransactions, personalCategories]
+  );
+  const personalMonthTotal = personalBreakdown.reduce((sum, c) => sum + c.amount, 0);
+
+  const sharedSummary = useMemo(() => computeSharedFinanceSummary(monthTransactions), [monthTransactions]);
+
+  /** This user's own share of every group expense this month, per currency — never blended. */
+  const sharedParticipationByCurrency = useMemo(() => {
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const totals = new Map<string, number>();
+    for (const e of expenses ?? []) {
+      if (e.expense_date.slice(0, 7) !== monthKey) continue;
+      const myShare = e.expense_shares.find((s) => s.user_id === authUser?.id)?.share_amount ?? 0;
+      totals.set(e.currency, (totals.get(e.currency) ?? 0) + myShare);
+    }
+    return [...totals.entries()].filter(([, amount]) => amount > 0.005);
+  }, [expenses, authUser]);
+
+  const hasNarrative =
+    personalMonthTotal > 0.005 ||
+    sharedParticipationByCurrency.length > 0 ||
+    sharedSummary.advanced > 0.005 ||
+    sharedSummary.recovered > 0.005;
+
+  const byCurrency = useMemo(() => {
+    // Keyed and matched by the lowercased category (free text, not an
+    // enum - "Food" and "food" must land in the same bucket); capitalized
+    // only in the final label below, once, since this also feeds the
+    // recharts Pie/Tooltip (SVG/portal content a CSS `capitalize` class on
+    // a parent wouldn't reach).
+    const byCat = new Map<string, Map<string, number>>();
+    const totals = new Map<string, number>();
+    for (const e of expenses ?? []) {
+      totals.set(e.currency, (totals.get(e.currency) ?? 0) + e.amount);
+      const key = e.category?.trim().toLowerCase() || "uncategorized";
+      const categories = byCat.get(e.currency) ?? new Map<string, number>();
+      categories.set(key, (categories.get(key) ?? 0) + e.amount);
+      byCat.set(e.currency, categories);
+    }
+    return [...byCat.entries()]
+      .map(([currency, categories]) => ({
+        currency,
+        total: totals.get(currency) ?? 0,
+        categories: [...categories.entries()]
+          .map(([key, amount]) => ({ label: key.charAt(0).toUpperCase() + key.slice(1), amount }))
+          .sort((a, b) => b.amount - a.amount)
+          .slice(0, 6),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [expenses]);
+
+  /** All free-text group-expense category labels seen, for the calendar filter pills. */
+  const groupCategoryLabels = useMemo(() => {
+    const labels = new Set<string>();
+    for (const e of expenses ?? []) labels.add(e.category?.trim().toLowerCase() || "other");
+    return [...labels].sort();
+  }, [expenses]);
+
+  const calendarMonthKey = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, "0")}`;
+
+  /** Group expenses (all currencies mixed — the calendar is a date-shape view, not a totals view) as daily totals. */
+  const groupDailyTotals: DailyTotal[] = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const e of expenses ?? []) {
+      if (e.expense_date.slice(0, 7) !== calendarMonthKey) continue;
+      const label = e.category?.trim().toLowerCase() || "other";
+      if (categoryFilter !== CATEGORY_ALL && label !== categoryFilter) continue;
+      const day = e.expense_date.slice(0, 10);
+      totals.set(day, (totals.get(day) ?? 0) + e.amount);
+    }
+    return [...totals.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, expense]) => ({ date, expense, income: 0 }));
+  }, [expenses, calendarMonthKey, categoryFilter]);
+
+  const personalCalendarTransactions = useMemo(
+    () => (personalTransactions ?? []).filter((t) => t.occurred_at.slice(0, 7) === calendarMonthKey),
+    [personalTransactions, calendarMonthKey]
+  );
+  const personalDailyTotals = useMemo(
+    () => computeDailyTotals(personalCalendarTransactions),
+    [personalCalendarTransactions]
+  );
+
+  return (
+    <AppShell>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Insights</h1>
+          <p className="text-sm text-muted-foreground">Where your shared money is going</p>
+        </div>
+        {!isLoading && !isError && (
+          <SegmentedTabs
+            value={view}
+            onChange={(v) => setView(v as "charts" | "calendar")}
+            options={[
+              { value: "charts", label: "Charts" },
+              { value: "calendar", label: "Calendar" },
+            ]}
+          />
+        )}
+      </div>
+
+      {isLoading && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+        </div>
+      )}
+
+      {!isLoading && isError && (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-destructive/40 py-16 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="h-6 w-6" />
+          </span>
+          <p className="font-medium">Couldn&apos;t load insights</p>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
+            {isRefetching ? "Retrying…" : "Try again"}
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !isError && (
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4">
+            <Layers className="h-4 w-4 text-primary" />
+            <span className="text-lg font-bold">{groups?.length ?? 0}</span>
+            <span className="text-xs text-muted-foreground">Active groups</span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4">
+            <Receipt className="h-4 w-4 text-primary" />
+            <span className="text-lg font-bold">{expenses?.length ?? 0}</span>
+            <span className="text-xs text-muted-foreground">Expenses logged</span>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !isError && view === "charts" && hasNarrative && (
+        <Card className="mb-6 gap-1.5 p-4">
+          <h2 className="text-sm font-semibold">This month</h2>
+          {personalMonthTotal > 0.005 && (
+            <p className="text-sm text-muted-foreground">
+              You spent {formatMoney(personalMonthTotal, personalCurrency)} personally.
+            </p>
+          )}
+          {sharedParticipationByCurrency.map(([currency, amount]) => (
+            <p key={currency} className="text-sm text-muted-foreground">
+              You were part of {formatMoney(amount, currency)} in shared group spending.
+            </p>
+          ))}
+          {(sharedSummary.advanced > 0.005 || sharedSummary.recovered > 0.005) && (
+            <p className="text-sm text-muted-foreground">
+              You&apos;ve advanced {formatMoney(sharedSummary.advanced, personalCurrency)} for others and recovered{" "}
+              {formatMoney(sharedSummary.recovered, personalCurrency)}
+              {sharedSummary.outstanding > 0.005
+                ? `, with ${formatMoney(sharedSummary.outstanding, personalCurrency)} still outstanding.`
+                : "."}
+            </p>
+          )}
+        </Card>
+      )}
+
+      {!isLoading && !isError && view === "charts" && personalBreakdown.length > 0 && (
+        <div className="mb-6">
+          <CategoryPieChart
+            title="Personal spending by category"
+            total={personalMonthTotal}
+            currency={personalCurrency}
+            categories={personalBreakdown.map((c) => ({ label: c.category_name, amount: c.amount }))}
+          />
+        </div>
+      )}
+
+      {!isLoading && !isError && view === "charts" && byCurrency.length === 0 && (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light text-primary">
+            <PieChartIcon className="h-6 w-6" />
+          </span>
+          <p className="font-medium">No expenses yet</p>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            Once you add some group expenses, spending by category shows up here.
+          </p>
+        </div>
+      )}
+
+      {view === "charts" && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {!isLoading &&
+            !isError &&
+            byCurrency.map(({ currency, total, categories }) => (
+              <CategoryPieChart
+                key={currency}
+                title={`Spending by category · ${currency}`}
+                total={total}
+                currency={currency}
+                categories={categories}
+              />
+            ))}
+        </div>
+      )}
+
+      {!isLoading && !isError && view === "calendar" && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="mb-3 text-sm font-semibold">Personal</h2>
+            <MonthCalendar
+              year={calendarDate.getFullYear()}
+              month={calendarDate.getMonth()}
+              dailyTotals={personalDailyTotals}
+              kind="expense"
+              currency={personalCurrency}
+              onPrevMonth={() => setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
+              onNextMonth={() => setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
+            />
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="mb-3 text-sm font-semibold">Group expenses</h2>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setCategoryFilter(CATEGORY_ALL)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                  categoryFilter === CATEGORY_ALL
+                    ? "border-primary bg-primary-light text-primary"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                All categories
+              </button>
+              {groupCategoryLabels.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setCategoryFilter(label)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium capitalize ${
+                    categoryFilter === label
+                      ? "border-primary bg-primary-light text-primary"
+                      : "border-border text-muted-foreground"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="mb-3 text-[11px] text-muted-foreground">
+              Amounts mix currencies across groups — use this view for activity shape, not totals.
+            </p>
+            <MonthCalendar
+              year={calendarDate.getFullYear()}
+              month={calendarDate.getMonth()}
+              dailyTotals={groupDailyTotals}
+              kind="expense"
+              currency={byCurrency[0]?.currency ?? personalCurrency}
+              onPrevMonth={() => setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
+              onNextMonth={() => setCalendarDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
+            />
+          </div>
+        </div>
+      )}
+    </AppShell>
+  );
+}
+
+export default function InsightsPage() {
+  return (
+    <AuthGuard>
+      <InsightsContent />
+    </AuthGuard>
+  );
+}

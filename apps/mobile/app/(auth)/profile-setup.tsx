@@ -21,7 +21,7 @@ export default function ProfileSetupScreen() {
 
   const { handleSubmit, formState, setValue, watch } = useForm<ProfileSetupInput>({
     resolver: zodResolver(profileSetupSchema),
-    defaultValues: { display_name: "", default_currency: "USD" },
+    defaultValues: { display_name: "", default_currency: "PHP" },
   });
 
   async function pickAvatar() {
@@ -35,7 +35,15 @@ export default function ProfileSetupScreen() {
   }
 
   async function onSubmit(values: ProfileSetupInput) {
-    if (!authUser) return;
+    if (!authUser) {
+      // Shouldn't normally happen (this screen is only reachable right
+      // after a session-bearing sign-up), but fail loudly rather than a
+      // silent no-op if it ever does - e.g. a session that expired while
+      // the form was open.
+      Alert.alert("Session expired", "Please log in again to finish setting up your profile.");
+      router.replace("/(auth)/login");
+      return;
+    }
     setSubmitting(true);
     try {
       let avatarUrl: string | null = null;

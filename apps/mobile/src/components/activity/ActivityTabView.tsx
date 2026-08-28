@@ -35,7 +35,7 @@ export function ActivityTabView({
 
   if ((activity?.length ?? 0) === 0) {
     return (
-      <Text className="rounded-2xl border border-dashed border-neutral-500/25 py-14 text-center text-sm text-neutral-500">
+      <Text className="rounded-card border border-dashed border-neutral-500/25 py-14 text-center text-sm text-neutral-500">
         No activity yet.
       </Text>
     );
@@ -47,9 +47,9 @@ export function ActivityTabView({
         <Card key={`${item.type}-${item.id}`} className="flex-row items-center gap-3 py-3">
           <View className="h-9 w-9 items-center justify-center rounded-full bg-primary-light">
             {item.type === "expense_added" ? (
-              <Receipt color="#16A88F" size={16} />
+              <Receipt color="#5B3A8E" size={16} />
             ) : (
-              <ArrowRightLeft color="#16A88F" size={16} />
+              <ArrowRightLeft color="#5B3A8E" size={16} />
             )}
           </View>
           <View className="flex-1">

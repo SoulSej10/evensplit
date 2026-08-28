@@ -72,7 +72,7 @@ export function BalancesTab({
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
           <AlertCircle className="h-5 w-5" />
         </span>
-        <p className="text-sm font-medium">Couldn't load balances</p>
+        <p className="text-sm font-medium">Couldn&apos;t load balances</p>
         <Button
           variant="outline"
           size="sm"
@@ -157,7 +157,7 @@ export function BalancesTab({
 
         {debtsToShow.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-            Everyone's settled up 🎉
+            Everyone&apos;s settled up 🎉
           </p>
         ) : (
           <div className="space-y-2">
@@ -174,7 +174,9 @@ export function BalancesTab({
                   <span className="font-medium">
                     {debt.from_user === currentUserId ? "You" : name(debt.from_user)}
                   </span>{" "}
-                  <span className="text-muted-foreground">owe</span>{" "}
+                  <span className="text-muted-foreground">
+                    {debt.from_user === currentUserId ? "owe" : "owes"}
+                  </span>{" "}
                   <span className="font-medium">
                     {debt.to_user === currentUserId ? "you" : name(debt.to_user)}
                   </span>
@@ -194,6 +196,7 @@ export function BalancesTab({
                   toUserId={debt.to_user}
                   suggestedAmount={debt.amount}
                   members={members}
+                  currentUserId={currentUserId}
                 />
               </div>
             ))}

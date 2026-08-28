@@ -84,17 +84,35 @@ function computeExactShares(
   amount: number,
   participants: SplitParticipantInput[]
 ): { user_id: UUID; share_amount: number }[] {
-  const shares = participants.map((p) => ({
-    user_id: p.user_id,
-    share_amount: round2(p.value ?? 0),
-  }));
-  const sum = round2(shares.reduce((acc, s) => acc + s.share_amount, 0));
-  if (Math.abs(sum - round2(amount)) > 0.01) {
+  const cents = participants.map((p) => Math.round(round2(p.value ?? 0) * CENTS));
+  const totalCents = Math.round(round2(amount) * CENTS);
+  const sumCents = cents.reduce((a, b) => a + b, 0);
+  const diffCents = totalCents - sumCents;
+
+  // Anything more than a single rounding cent off is a real user error, not
+  // float noise - reject it rather than silently reconciling.
+  if (Math.abs(diffCents) > 1) {
+    const sum = round2(sumCents / CENTS);
     throw new SplitError(
       `Exact split amounts (${sum.toFixed(2)}) must sum to the expense total (${amount.toFixed(2)})`
     );
   }
-  return shares;
+
+  if (diffCents !== 0) {
+    // A single stray cent from rounding: apply it to the largest share so
+    // totals always reconcile exactly to `amount`, per this function's
+    // contract, instead of letting a cent silently vanish from the ledger.
+    let largestIdx = 0;
+    for (let i = 1; i < cents.length; i++) {
+      if (cents[i] > cents[largestIdx]) largestIdx = i;
+    }
+    cents[largestIdx] += diffCents;
+  }
+
+  return participants.map((p, i) => ({
+    user_id: p.user_id,
+    share_amount: round2(cents[i] / CENTS),
+  }));
 }
 
 function computePercentageShares(
@@ -208,8 +226,8 @@ export function calculateUserBalances(
  * directly. Returns one entry per ordered pair with a strictly positive
  * net amount owed.
  *
- * This is a literal ledger of who-owes-whom, distinct from the (stretch,
- * unimplemented) minimum-transaction debt-simplification algorithm.
+ * This is a literal ledger of who-owes-whom, distinct from the minimum-
+ * transaction debt-simplification algorithm in `simplifyDebts` below.
  */
 export function calculatePairwiseDebts(
   expenses: Pick<Expense, "id" | "paid_by">[],
@@ -322,4 +340,62 @@ export function simplifyDebts(balances: UserGroupBalance[]): PairwiseDebt[] {
   }
 
   return results;
+}
+
+/** One group's worth of raw ledger data, enough to compute one user's balance in it. */
+export interface GroupBalanceInput {
+  group_id: UUID;
+  currency: string;
+  member_ids: UUID[];
+  expenses: Pick<Expense, "id" | "amount" | "paid_by">[];
+  expense_shares: Pick<ExpenseShare, "user_id" | "share_amount" | "expense_id">[];
+  settlements: Pick<Settlement, "from_user" | "to_user" | "amount">[];
+}
+
+/** Net shared-money position across every group, bucketed by currency. */
+export interface SharedBalancesSummary {
+  currency: string;
+  /** Sum of positive per-group balances — money other people owe the user. */
+  owedToYou: number;
+  /** Sum of the absolute value of negative per-group balances — money the user owes. */
+  youOwe: number;
+  /** owedToYou - youOwe. */
+  net: number;
+}
+
+/**
+ * Home's "Shared balances" card: how much the user is owed vs. owes, summed
+ * across every group they're in. Reuses calculateUserBalances per group
+ * (unchanged group-balance math - this is purely an aggregation on top),
+ * and never blends currencies, matching the rest of the app's convention
+ * that a PHP group and a USD group are never added together.
+ */
+export function computeSharedBalancesSummary(
+  groups: GroupBalanceInput[],
+  userId: UUID
+): SharedBalancesSummary[] {
+  const byCurrency = new Map<string, { owedToYou: number; youOwe: number }>();
+
+  for (const group of groups) {
+    const balances = calculateUserBalances(
+      group.member_ids,
+      group.expenses,
+      group.expense_shares,
+      group.settlements
+    );
+    const myBalance = balances.find((b) => b.user_id === userId)?.balance ?? 0;
+    if (Math.abs(myBalance) < 0.005) continue;
+
+    const bucket = byCurrency.get(group.currency) ?? { owedToYou: 0, youOwe: 0 };
+    if (myBalance > 0) bucket.owedToYou += myBalance;
+    else bucket.youOwe += -myBalance;
+    byCurrency.set(group.currency, bucket);
+  }
+
+  return [...byCurrency.entries()].map(([currency, { owedToYou, youOwe }]) => ({
+    currency,
+    owedToYou: round2(owedToYou),
+    youOwe: round2(youOwe),
+    net: round2(owedToYou - youOwe),
+  }));
 }

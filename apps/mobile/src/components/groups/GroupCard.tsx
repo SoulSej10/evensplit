@@ -45,7 +45,7 @@ export function GroupCard({ group }: { group: GroupWithMembers }) {
   return (
     <Pressable onPress={() => router.push(`/(app)/groups/${group.id}`)}>
       <Card className="mb-3 flex-row items-center gap-4">
-        <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary-light">
+        <View className="h-14 w-14 items-center justify-center rounded-card bg-primary-light">
           <Text className="text-2xl">{group.icon || "👥"}</Text>
         </View>
         <View className="flex-1">

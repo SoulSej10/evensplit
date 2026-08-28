@@ -47,17 +47,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     const supabase = getSupabaseClient();
 
-    supabase.auth.getSession().then(({ data }) => {
+    // `loading` must stay true until the profile fetch (not just the
+    // session lookup) has settled. fetchProfile is async and was
+    // previously fired without being awaited here, so on a cold start
+    // `loading` flipped to false and `profile` was still null - app/index.tsx
+    // reads that as "no profile yet" and redirects a fully-authenticated
+    // returning user to profile-setup, before their real profile ever had a
+    // chance to load. This is the "session doesn't survive a restart" bug:
+    // the session was never actually lost, the redirect just fired one
+    // render too early.
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!mounted) return;
       setSession(data.session);
-      setLoading(false);
-      if (data.session?.user.id) void fetchProfile(data.session.user.id);
+      if (data.session?.user.id) {
+        await fetchProfile(data.session.user.id);
+      }
+      if (mounted) setLoading(false);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       if (newSession?.user.id) {
-        void fetchProfile(newSession.user.id);
+        // Same race as the cold-start path above, but for a fresh sign-in:
+        // login.tsx does router.replace("/") right after signInWithPassword
+        // resolves, which re-evaluates SplashGate immediately. Without this
+        // loading gate, SplashGate can see session=truthy, profile=null and
+        // send an existing user to profile-setup before their real profile
+        // has loaded, exactly as on a cold start.
+        setLoading(true);
+        void fetchProfile(newSession.user.id).finally(() => {
+          if (mounted) setLoading(false);
+        });
       } else {
         setProfile(null);
       }

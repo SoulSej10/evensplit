@@ -29,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { InviteDialog } from "@/components/groups/invite-dialog";
+import { OverviewTab } from "@/components/groups/overview-tab";
 import { ExpensesTab } from "@/components/expenses/expenses-tab";
 import { BalancesTab } from "@/components/balances/balances-tab";
 import { ActivityTab } from "@/components/activity/activity-tab";
@@ -66,7 +67,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
       await leaveGroup(groupId, authUser.id);
       await queryClient.invalidateQueries({ queryKey: ["groups"] });
       toast.success("Left group");
-      router.push("/dashboard");
+      router.push("/groups");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not leave group");
     }
@@ -77,7 +78,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
       await archiveGroup(groupId);
       await queryClient.invalidateQueries({ queryKey: ["groups"] });
       toast.success("Group archived");
-      router.push("/dashboard");
+      router.push("/groups");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not archive group");
     }
@@ -100,9 +101,9 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
             <AlertCircle className="h-6 w-6" />
           </span>
-          <p className="font-medium">Couldn't load this group</p>
+          <p className="font-medium">Couldn&apos;t load this group</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Something went wrong loading this group's details. Try again.
+            Something went wrong loading this group&apos;s details. Try again.
           </p>
           <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
             {isRefetching ? "Retrying…" : "Try again"}
@@ -180,7 +181,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Archive this group?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          It'll be hidden from your dashboard. This is reversible from the database
+                          It&apos;ll be hidden from your dashboard. This is reversible from the database
                           if needed.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
@@ -201,7 +202,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Leave this group?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        You'll lose access to its expenses and balances.
+                        You&apos;ll lose access to its expenses and balances.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -266,13 +267,17 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
         </div>
       </div>
 
-      <Tabs defaultValue="expenses">
+      <Tabs defaultValue="overview">
         <TabsList className="mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="balances">Balances</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
+        <TabsContent value="overview">
+          <OverviewTab groupId={groupId} groupCurrency={group.currency} members={members} currentUserId={authUser!.id} />
+        </TabsContent>
         <TabsContent value="expenses">
           <ExpensesTab
             groupId={groupId}

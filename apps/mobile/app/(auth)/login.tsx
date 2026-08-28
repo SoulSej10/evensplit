@@ -41,7 +41,7 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="mb-10 items-center gap-3">
-          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-2xl" />
+          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-card" />
           <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">SplitEven</Text>
           <Text className="text-neutral-500">Split expenses. Stay even.</Text>
         </View>

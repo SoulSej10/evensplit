@@ -3,6 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
 import { fetchMyGroups } from "@/lib/api/groups";
+import { fetchExpensesForGroups } from "@/lib/api/expenses";
+import { fetchActivityForGroups } from "@/lib/api/activity";
+import { fetchSettlementsForGroups } from "@/lib/api/settlements";
 import { useAuth } from "@/hooks/use-auth";
 
 /** Groups the current user is a member of, each annotated with their net balance. */
@@ -13,6 +16,39 @@ export function useMyGroups() {
     queryKey: ["groups", authUser?.id],
     queryFn: () => fetchMyGroups(authUser!.id),
     enabled: !!authUser?.id,
+  });
+}
+
+/** Expenses aggregated across every group the user belongs to, for the top-level Insights page. */
+export function useAllExpenses() {
+  const { data: groups } = useMyGroups();
+  const groupIds = groups?.map((g) => g.id) ?? [];
+  return useQuery({
+    queryKey: ["all-expenses", groupIds],
+    queryFn: () => fetchExpensesForGroups(groupIds),
+    enabled: !!groups,
+  });
+}
+
+/** Settlements aggregated across every group the user belongs to, for Home's shared-balances summary. */
+export function useAllSettlements() {
+  const { data: groups } = useMyGroups();
+  const groupIds = groups?.map((g) => g.id) ?? [];
+  return useQuery({
+    queryKey: ["all-settlements", groupIds],
+    queryFn: () => fetchSettlementsForGroups(groupIds),
+    enabled: !!groups,
+  });
+}
+
+/** Activity feed aggregated across every group the user belongs to, for Home's recent-activity preview. */
+export function useAllActivity() {
+  const { data: groups } = useMyGroups();
+  const groupIds = groups?.map((g) => g.id) ?? [];
+  return useQuery({
+    queryKey: ["all-activity", groupIds],
+    queryFn: () => fetchActivityForGroups(groupIds),
+    enabled: !!groups,
   });
 }
 

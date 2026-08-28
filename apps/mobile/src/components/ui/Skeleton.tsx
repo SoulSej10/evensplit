@@ -24,7 +24,7 @@ export function Skeleton({ className, style, ...props }: ViewProps & { className
 
   return (
     <Animated.View
-      className={cn("rounded-2xl bg-neutral-500/15", className)}
+      className={cn("rounded-card bg-neutral-500/15", className)}
       style={[{ opacity }, style]}
       {...props}
     />

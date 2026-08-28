@@ -9,7 +9,7 @@ export default function SplashGate() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-900">
-        <ActivityIndicator color="#16A88F" size="large" />
+        <ActivityIndicator color="#5B3A8E" size="large" />
       </View>
     );
   }

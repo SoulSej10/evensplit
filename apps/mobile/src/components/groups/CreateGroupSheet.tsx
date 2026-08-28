@@ -18,7 +18,7 @@ export function CreateGroupSheet({ visible, onClose }: { visible: boolean; onClo
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [icon, setIcon] = useState(ICONS[0]);
-  const [currency, setCurrency] = useState(profile?.default_currency ?? "USD");
+  const [currency, setCurrency] = useState(profile?.default_currency ?? "PHP");
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit() {
@@ -59,7 +59,7 @@ export function CreateGroupSheet({ visible, onClose }: { visible: boolean; onClo
             key={i}
             onPress={() => setIcon(i)}
             className={cn(
-              "h-11 w-11 items-center justify-center rounded-2xl",
+              "h-11 w-11 items-center justify-center rounded-card",
               icon === i ? "bg-primary-light" : "bg-neutral-100 dark:bg-white/5"
             )}
           >

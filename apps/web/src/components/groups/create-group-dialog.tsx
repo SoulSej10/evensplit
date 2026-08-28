@@ -38,7 +38,7 @@ export function CreateGroupDialog() {
   const { register, handleSubmit, reset, watch, setValue, formState } =
     useForm<CreateGroupInput>({
       resolver: zodResolver(createGroupSchema),
-      defaultValues: { name: "", currency: profile?.default_currency ?? "USD", icon: ICONS[0] },
+      defaultValues: { name: "", currency: profile?.default_currency ?? "PHP", icon: ICONS[0] },
     });
 
   async function onSubmit(values: CreateGroupInput) {
@@ -69,7 +69,7 @@ export function CreateGroupDialog() {
         <DialogHeader>
           <DialogTitle>Create a group</DialogTitle>
           <DialogDescription>
-            Name it after the trip, house, or crew you're splitting costs with.
+            Name it after the trip, house, or crew you&apos;re splitting costs with.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

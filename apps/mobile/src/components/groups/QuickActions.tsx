@@ -1,20 +1,21 @@
 import { Pressable, Text, View } from "react-native";
-import { router } from "expo-router";
-import { BarChart3, ListChecks, Plus, UserPlus } from "lucide-react-native";
+import { Plus, UserPlus } from "lucide-react-native";
 
 interface QuickAction {
   label: string;
+  sublabel: string;
   icon: React.ComponentType<{ color: string; size: number }>;
   onPress: () => void;
 }
 
 /**
- * Icon-grid quick actions on the Home tab — the pattern every consumer
- * fintech app reference uses (a row of "Send / Load / Transfer / Bills"
- * style buttons above the main content), adapted to what SplitEven
- * actually supports: the two things you can do without picking a group
- * first (start or join one), plus shortcuts into the two new top-level
- * tabs for quick discovery.
+ * Home-tab quick actions. Previously a 4-icon row that included "Activity"
+ * and "Insights" shortcuts - those duplicated the bottom tab bar 1:1 (same
+ * destination, different entry point), which read as redundant clutter.
+ * Activity/Insights belong to the tab bar; Finances has its own banner
+ * below. That leaves exactly two things you can do without picking a group
+ * first - start one or join one - so those are the only two actions here,
+ * given more visual weight instead of being squeezed into a 4-up row.
  */
 export function QuickActions({
   onCreateGroup,
@@ -24,22 +25,36 @@ export function QuickActions({
   onJoinGroup: () => void;
 }) {
   const actions: QuickAction[] = [
-    { label: "New group", icon: Plus, onPress: onCreateGroup },
-    { label: "Join group", icon: UserPlus, onPress: onJoinGroup },
-    { label: "Activity", icon: ListChecks, onPress: () => router.push("/(app)/(tabs)/activity") },
-    { label: "Insights", icon: BarChart3, onPress: () => router.push("/(app)/(tabs)/insights") },
+    { label: "New group", sublabel: "Start a ledger", icon: Plus, onPress: onCreateGroup },
+    { label: "Join group", sublabel: "Have an invite?", icon: UserPlus, onPress: onJoinGroup },
   ];
 
   return (
-    <View className="mb-6 flex-row justify-between">
+    <View className="mb-6 flex-row gap-3">
       {actions.map((action) => (
-        <Pressable key={action.label} onPress={action.onPress} className="items-center gap-2">
-          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary-light active:opacity-70">
-            <action.icon color="#16A88F" size={22} />
+        <Pressable
+          key={action.label}
+          onPress={action.onPress}
+          className="flex-1 flex-row items-center gap-3 rounded-card bg-surface p-4 active:opacity-80 dark:bg-surface-dark"
+          style={{
+            shadowColor: "#0A0A0A",
+            shadowOpacity: 0.05,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 1,
+          }}
+        >
+          <View className="h-11 w-11 items-center justify-center rounded-lg bg-neutral-500/10">
+            <action.icon color="#6B7169" size={20} />
           </View>
-          <Text className="text-xs font-medium text-neutral-900 dark:text-neutral-100">
-            {action.label}
-          </Text>
+          <View className="shrink">
+            <Text className="font-semibold text-neutral-900 dark:text-neutral-100" numberOfLines={1}>
+              {action.label}
+            </Text>
+            <Text className="text-xs text-neutral-500" numberOfLines={1}>
+              {action.sublabel}
+            </Text>
+          </View>
         </Pressable>
       ))}
     </View>

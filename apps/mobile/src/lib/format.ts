@@ -40,4 +40,4 @@ export function initials(name: string): string {
     .join("");
 }
 
-export const CURRENCIES = ["USD", "EUR", "GBP", "PHP", "SGD", "AUD", "CAD", "JPY", "INR"] as const;
+export const CURRENCIES = ["PHP", "USD", "EUR", "GBP", "SGD", "AUD", "CAD", "JPY", "INR"] as const;

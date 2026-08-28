@@ -22,8 +22,19 @@ export default function SignUpScreen() {
     setSubmitting(true);
     try {
       const supabase = getSupabaseClient();
-      const { error } = await supabase.auth.signUp(values);
+      const { data, error } = await supabase.auth.signUp(values);
       if (error) throw error;
+      if (!data.session) {
+        // Email confirmation is required: signUp() succeeds but returns no
+        // session, so there's no authenticated user yet to run profile
+        // setup for. Send them to log in instead of a dead-end screen.
+        Alert.alert(
+          "Check your email",
+          "We've sent a confirmation link to your email. Confirm it, then log in to finish setting up your account."
+        );
+        router.replace("/(auth)/login");
+        return;
+      }
       router.replace("/(auth)/profile-setup");
     } catch (err) {
       Alert.alert("Could not sign up", err instanceof Error ? err.message : "Try again");
@@ -46,7 +57,7 @@ export default function SignUpScreen() {
         </Pressable>
 
         <View className="mb-10 items-center gap-3">
-          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-2xl" />
+          <Image source={require("../../assets/icon.png")} className="h-16 w-16 rounded-card" />
           <Text className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Create account</Text>
           <Text className="text-neutral-500">Start splitting expenses in seconds</Text>
         </View>

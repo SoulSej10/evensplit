@@ -3,6 +3,7 @@ import {
   SplitError,
   calculatePairwiseDebts,
   calculateUserBalances,
+  computeSharedBalancesSummary,
   computeSplitShares,
   simplifyDebts,
 } from "../balances";
@@ -56,6 +57,28 @@ describe("computeSplitShares - exact", () => {
       computeSplitShares(100, "exact", [
         { user_id: ALICE, value: 60 },
         { user_id: BOB, value: 30 },
+      ])
+    ).toThrow(SplitError);
+  });
+
+  it("reconciles a single stray rounding cent onto the largest share instead of dropping it", () => {
+    const shares = computeSplitShares(100, "exact", [
+      { user_id: ALICE, value: 60.0 },
+      { user_id: BOB, value: 39.99 },
+    ]);
+    const sum = shares.reduce((a, s) => a + s.share_amount, 0);
+    expect(Math.round(sum * 100) / 100).toBe(100);
+    expect(shares).toEqual([
+      { user_id: ALICE, share_amount: 60.01 },
+      { user_id: BOB, share_amount: 39.99 },
+    ]);
+  });
+
+  it("still throws when off by more than a single cent", () => {
+    expect(() =>
+      computeSplitShares(100, "exact", [
+        { user_id: ALICE, value: 60 },
+        { user_id: BOB, value: 39.97 },
       ])
     ).toThrow(SplitError);
   });
@@ -293,5 +316,91 @@ describe("simplifyDebts", () => {
       { user_id: BOB, balance: -0.001 },
     ]);
     expect(result).toEqual([]);
+  });
+});
+
+describe("computeSharedBalancesSummary", () => {
+  it("sums owed-to-you and you-owe across multiple groups in the same currency", () => {
+    // Group 1: ALICE paid 100, split equally with BOB -> ALICE is owed 50.
+    // Group 2: BOB paid 30, split equally with ALICE -> ALICE owes 15.
+    const summary = computeSharedBalancesSummary(
+      [
+        {
+          group_id: "g1",
+          currency: "PHP",
+          member_ids: [ALICE, BOB],
+          expenses: [{ id: "e1", amount: 100, paid_by: ALICE }],
+          expense_shares: [
+            { expense_id: "e1", user_id: ALICE, share_amount: 50 },
+            { expense_id: "e1", user_id: BOB, share_amount: 50 },
+          ],
+          settlements: [],
+        },
+        {
+          group_id: "g2",
+          currency: "PHP",
+          member_ids: [ALICE, BOB],
+          expenses: [{ id: "e2", amount: 30, paid_by: BOB }],
+          expense_shares: [
+            { expense_id: "e2", user_id: ALICE, share_amount: 15 },
+            { expense_id: "e2", user_id: BOB, share_amount: 15 },
+          ],
+          settlements: [],
+        },
+      ],
+      ALICE
+    );
+    expect(summary).toEqual([{ currency: "PHP", owedToYou: 50, youOwe: 15, net: 35 }]);
+  });
+
+  it("keeps currencies separate rather than blending them", () => {
+    const summary = computeSharedBalancesSummary(
+      [
+        {
+          group_id: "g1",
+          currency: "PHP",
+          member_ids: [ALICE, BOB],
+          expenses: [{ id: "e1", amount: 100, paid_by: ALICE }],
+          expense_shares: [
+            { expense_id: "e1", user_id: ALICE, share_amount: 50 },
+            { expense_id: "e1", user_id: BOB, share_amount: 50 },
+          ],
+          settlements: [],
+        },
+        {
+          group_id: "g2",
+          currency: "USD",
+          member_ids: [ALICE, BOB],
+          expenses: [{ id: "e2", amount: 20, paid_by: BOB }],
+          expense_shares: [
+            { expense_id: "e2", user_id: ALICE, share_amount: 10 },
+            { expense_id: "e2", user_id: BOB, share_amount: 10 },
+          ],
+          settlements: [],
+        },
+      ],
+      ALICE
+    );
+    expect(summary.sort((a, b) => a.currency.localeCompare(b.currency))).toEqual([
+      { currency: "PHP", owedToYou: 50, youOwe: 0, net: 50 },
+      { currency: "USD", owedToYou: 0, youOwe: 10, net: -10 },
+    ]);
+  });
+
+  it("omits currencies where the user is fully settled up", () => {
+    const summary = computeSharedBalancesSummary(
+      [
+        {
+          group_id: "g1",
+          currency: "PHP",
+          member_ids: [ALICE, BOB],
+          expenses: [],
+          expense_shares: [],
+          settlements: [],
+        },
+      ],
+      ALICE
+    );
+    expect(summary).toEqual([]);
   });
 });

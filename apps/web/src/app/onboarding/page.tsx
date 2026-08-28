@@ -28,7 +28,7 @@ function OnboardingForm() {
     resolver: zodResolver(profileSetupSchema),
     defaultValues: {
       display_name: profile?.display_name ?? "",
-      default_currency: profile?.default_currency ?? "USD",
+      default_currency: profile?.default_currency ?? "PHP",
     },
   });
 

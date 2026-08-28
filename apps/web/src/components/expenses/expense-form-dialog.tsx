@@ -6,7 +6,6 @@ import { computeSplitShares, SplitError, type SplitType, type User } from "@even
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -21,8 +20,11 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createExpense, updateExpense, uploadReceipt, type ExpenseWithShares } from "@/lib/api/expenses";
+import { fetchPersonalAccounts } from "@/lib/api/personal";
 import { formatMoney, initials } from "@/lib/format";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+const NO_ACCOUNT = "__none__";
 
 const SPLIT_LABELS: Record<SplitType, string> = {
   equal: "Equal",
@@ -90,6 +92,9 @@ export function ExpenseFormDialog({
     existingExpense?.expense_date ?? new Date().toISOString().slice(0, 10)
   );
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [paidFromAccountId, setPaidFromAccountId] = useState<string | null>(
+    existingExpense?.paid_from_account_id ?? null
+  );
   const initialRecurrence = parseRecurrenceRule(existingExpense?.recurrence_rule);
   const [isRecurring, setIsRecurring] = useState(existingExpense?.is_recurring ?? false);
   const [frequency, setFrequency] = useState<Frequency>(initialRecurrence.freq);
@@ -110,6 +115,10 @@ export function ExpenseFormDialog({
 
   useEffect(() => {
     if (!open) return;
+    // Deliberate: reset the form fields whenever the dialog opens. The
+    // dialog content stays mounted while closed (for the close animation),
+    // so a remount-via-key isn't an option here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDescription(existingExpense?.description ?? "");
     setAmount(existingExpense ? String(existingExpense.amount) : "");
     setPaidBy(existingExpense?.paid_by ?? currentUserId);
@@ -117,12 +126,31 @@ export function ExpenseFormDialog({
     setCategory(existingExpense?.category ?? "other");
     setExpenseDate(existingExpense?.expense_date ?? new Date().toISOString().slice(0, 10));
     setReceiptFile(null);
+    setPaidFromAccountId(existingExpense?.paid_from_account_id ?? null);
     const recurrence = parseRecurrenceRule(existingExpense?.recurrence_rule);
     setIsRecurring(existingExpense?.is_recurring ?? false);
     setFrequency(recurrence.freq);
     setIntervalValue(recurrence.interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  // "Paid from" only makes sense when the current user is the payer — only
+  // they can know their own account structure, and create_group_expense/
+  // update_group_expense reject a linked account otherwise.
+  const isPayerCurrentUser = paidBy === currentUserId;
+  const { data: personalAccounts } = useQuery({
+    queryKey: ["personal-accounts", currentUserId],
+    queryFn: () => fetchPersonalAccounts(currentUserId),
+    enabled: open && isPayerCurrentUser,
+  });
+
+  function onChangePaidBy(userId: string) {
+    setPaidBy(userId);
+    // "Paid from" only makes sense when the current user is the payer -
+    // clear it the moment that stops being true, right where paidBy
+    // actually changes, instead of syncing it via a reactive effect.
+    if (userId !== currentUserId) setPaidFromAccountId(null);
+  }
 
   const numericAmount = Number(amount) || 0;
   const participantIds = useMemo(() => members.filter((m) => selected.has(m.user_id)), [members, selected]);
@@ -179,13 +207,14 @@ export function ExpenseFormDialog({
         recurrence_rule: isRecurring ? buildRecurrenceRule(frequency, interval) : null,
       };
 
+      const linkedAccountId = isPayerCurrentUser ? paidFromAccountId : null;
       const expense = isEdit
-        ? await updateExpense(existingExpense!.id, input)
-        : await createExpense(input, currentUserId);
+        ? await updateExpense(existingExpense!.id, input, linkedAccountId)
+        : await createExpense(input, currentUserId, linkedAccountId);
 
       if (receiptFile) {
         const path = await uploadReceipt(groupId, expense.id, receiptFile);
-        await updateExpense(expense.id, { ...input, receipt_url: path });
+        await updateExpense(expense.id, { ...input, receipt_url: path }, linkedAccountId);
       }
 
       await queryClient.invalidateQueries({ queryKey: ["group-expenses", groupId] });
@@ -206,7 +235,7 @@ export function ExpenseFormDialog({
       <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit expense" : "Add expense"}</DialogTitle>
-          <DialogDescription>Split it however's fair for the group.</DialogDescription>
+          <DialogDescription>Split it however&apos;s fair for the group.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -246,7 +275,7 @@ export function ExpenseFormDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Paid by</Label>
-              <Select value={paidBy} onValueChange={setPaidBy}>
+              <Select value={paidBy} onValueChange={onChangePaidBy}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -275,6 +304,32 @@ export function ExpenseFormDialog({
               </Select>
             </div>
           </div>
+
+          {isPayerCurrentUser && personalAccounts && personalAccounts.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Paid from (optional)</Label>
+              <Select
+                value={paidFromAccountId ?? NO_ACCOUNT}
+                onValueChange={(v) => setPaidFromAccountId(v === NO_ACCOUNT ? null : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_ACCOUNT}>Not linked</SelectItem>
+                  {personalAccounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Links this expense to one of your Finances accounts — your own share counts as
+                real spending there, and the rest is tracked as money owed back to you.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>Split method</Label>

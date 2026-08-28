@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { BottomActionBar } from "@/components/ui/BottomActionBar";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { OverviewTabView } from "@/components/groups/OverviewTabView";
 import { ExpensesTabView } from "@/components/expenses/ExpensesTabView";
 import { ExpenseFormSheet } from "@/components/expenses/ExpenseFormSheet";
 import { ExpenseDetailSheet } from "@/components/expenses/ExpenseDetailSheet";
@@ -23,7 +24,7 @@ import { archiveGroup, leaveGroup } from "@/lib/api/groups";
 import type { ExpenseWithShares } from "@/lib/api/expenses";
 import { buildGroupLedgerCsv, exportAndShareCsv } from "@/lib/csv";
 
-type Tab = "expenses" | "balances" | "activity";
+type Tab = "overview" | "expenses" | "balances" | "activity";
 
 export default function GroupDetailScreen() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -35,7 +36,7 @@ export default function GroupDetailScreen() {
   const { data: settlements } = useGroupSettlements(groupId);
   useGroupRealtime(groupId);
 
-  const [tab, setTab] = useState<Tab>("expenses");
+  const [tab, setTab] = useState<Tab>("overview");
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithShares | null>(null);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithShares | null>(null);
@@ -174,6 +175,7 @@ export default function GroupDetailScreen() {
             value={tab}
             onChange={setTab}
             options={[
+              { label: "Overview", value: "overview" },
               { label: "Expenses", value: "expenses" },
               { label: "Balances", value: "balances" },
               { label: "Activity", value: "activity" },
@@ -181,6 +183,15 @@ export default function GroupDetailScreen() {
           />
         </View>
 
+        {tab === "overview" && (
+          <OverviewTabView
+            groupId={groupId}
+            groupCurrency={group.currency}
+            members={members}
+            currentUserId={authUser.id}
+            onSettleUp={(from, to, amount) => setSettleUp({ from, to, amount })}
+          />
+        )}
         {tab === "expenses" && (
           <ExpensesTabView
             groupId={groupId}
@@ -217,7 +228,7 @@ export default function GroupDetailScreen() {
           disabled={Math.abs(myBalance) < 0.005}
           onPress={() => setTab("balances")}
         >
-          <ArrowLeftRight color="#16A88F" size={18} />
+          <ArrowLeftRight color="#5B3A8E" size={18} />
           <Text className="font-semibold text-primary">Settle up</Text>
         </Button>
         <Button size="lg" className="flex-1 flex-row gap-2" onPress={() => setAddExpenseOpen(true)}>
@@ -269,6 +280,7 @@ export default function GroupDetailScreen() {
           toUserId={settleUp.to}
           suggestedAmount={settleUp.amount}
           members={members}
+          currentUserId={authUser.id}
         />
       )}
     </SafeAreaView>

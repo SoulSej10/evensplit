@@ -116,7 +116,7 @@ export function BalancesTabView({
         )}
 
         {debtsToShow.length === 0 ? (
-          <Text className="rounded-2xl border border-dashed border-neutral-500/25 py-8 text-center text-sm text-neutral-500">
+          <Text className="rounded-card border border-dashed border-neutral-500/25 py-8 text-center text-sm text-neutral-500">
             Everyone's settled up 🎉
           </Text>
         ) : (
@@ -127,7 +127,7 @@ export function BalancesTabView({
                 <Text className="font-semibold">
                   {debt.from_user === currentUserId ? "You" : name(debt.from_user)}
                 </Text>{" "}
-                owe{" "}
+                {debt.from_user === currentUserId ? "owe" : "owes"}{" "}
                 <Text className="font-semibold">
                   {debt.to_user === currentUserId ? "you" : name(debt.to_user)}
                 </Text>

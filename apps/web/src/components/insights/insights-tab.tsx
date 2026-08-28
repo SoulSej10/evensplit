@@ -54,12 +54,19 @@ export function InsightsTab({
   }
 
   const byCategory = useMemo(() => {
+    // category is free text, not an enum - group by a lowercased key so
+    // "Food" and "food" don't split into two slices, then capitalize once
+    // for display (recharts renders inside SVG/a portal tooltip, so a CSS
+    // `capitalize` class on the legend wouldn't reach the chart itself).
     const totals = new Map<string, number>();
     for (const e of expenses ?? []) {
-      const key = e.category?.trim() || "Uncategorized";
+      const key = e.category?.trim().toLowerCase() || "uncategorized";
       totals.set(key, (totals.get(key) ?? 0) + e.amount);
     }
-    return Array.from(totals, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    return Array.from(totals, ([key, value]) => ({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value,
+    })).sort((a, b) => b.value - a.value);
   }, [expenses]);
 
   const byMember = useMemo(() => {
@@ -119,7 +126,7 @@ export function InsightsTab({
     return (
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive/40 py-14 text-center">
         <AlertCircle className="h-6 w-6 text-destructive" />
-        <p className="text-sm font-medium">Couldn't load insights</p>
+        <p className="text-sm font-medium">Couldn&apos;t load insights</p>
         <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
           {isRefetching ? "Retrying…" : "Try again"}
         </Button>

@@ -126,7 +126,7 @@ export function ExpensesTab({
       {isError && (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive/40 py-14 text-center">
           <AlertCircle className="h-6 w-6 text-destructive" />
-          <p className="text-sm font-medium">Couldn't load expenses</p>
+          <p className="text-sm font-medium">Couldn&apos;t load expenses</p>
           <p className="max-w-xs text-xs text-muted-foreground">
             Something went wrong. Try again.
           </p>
@@ -237,7 +237,7 @@ function ExpenseRow({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
             <AlertDialogDescription>
-              This recalculates balances for everyone in the group. This can't be undone.
+              This recalculates balances for everyone in the group. This can&apos;t be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

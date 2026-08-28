@@ -9,15 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
-import { acceptInvite, fetchInviteByCode } from "@/lib/api/invites";
-import { fetchGroup } from "@/lib/api/groups";
-import type { Group, Invite } from "@evensplit/shared";
+import { acceptInvite, fetchInviteByCode, type InvitePreview } from "@/lib/api/invites";
 
 function JoinGroupContent({ code }: { code: string }) {
   const router = useRouter();
   const { authUser } = useAuth();
-  const [invite, setInvite] = useState<Invite | null>(null);
-  const [group, setGroup] = useState<Group | null>(null);
+  const [invite, setInvite] = useState<InvitePreview | null>(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +23,11 @@ function JoinGroupContent({ code }: { code: string }) {
     (async () => {
       try {
         const found = await fetchInviteByCode(code);
-        if (!found) {
+        if (!found || !found.is_valid) {
           setError("This invite link is invalid or has expired.");
           return;
         }
         setInvite(found);
-        const g = await fetchGroup(found.group_id);
-        setGroup(g);
       } catch {
         setError("This invite link is invalid or has expired.");
       } finally {
@@ -45,9 +40,9 @@ function JoinGroupContent({ code }: { code: string }) {
     if (!invite || !authUser) return;
     setJoining(true);
     try {
-      await acceptInvite(invite.id, invite.group_id, authUser.id);
-      toast.success(`You've joined ${group?.name ?? "the group"}`);
-      router.push(`/groups/${invite.group_id}`);
+      const groupId = await acceptInvite(invite.invite_id);
+      toast.success(`You've joined ${invite.group_name}`);
+      router.push(`/groups/${groupId}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not join group");
     } finally {
@@ -63,14 +58,14 @@ function JoinGroupContent({ code }: { code: string }) {
             <Users className="h-6 w-6" />
           </span>
           <CardTitle>Join group</CardTitle>
-          {group && <CardDescription>You've been invited to join {group.name}</CardDescription>}
+          {invite && <CardDescription>You&apos;ve been invited to join {invite.group_name}</CardDescription>}
         </CardHeader>
         <CardContent>
           {loading && <Skeleton className="h-10 w-full rounded-full" />}
           {!loading && error && <p className="text-center text-sm text-destructive">{error}</p>}
           {!loading && !error && (
             <Button className="w-full rounded-full" onClick={onJoin} disabled={joining}>
-              Join {group?.name}
+              Join {invite?.group_name}
             </Button>
           )}
         </CardContent>

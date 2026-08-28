@@ -16,7 +16,7 @@ export function TextField({
       <TextInput
         placeholderTextColor="#6B7169"
         className={cn(
-          "h-12 rounded-2xl border border-neutral-500/20 bg-surface px-4 text-base text-neutral-900",
+          "h-12 rounded-card border border-neutral-500/20 bg-surface px-4 text-base text-neutral-900",
           "dark:bg-surface-dark dark:text-neutral-100",
           error && "border-negative",
           className

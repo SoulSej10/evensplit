@@ -38,7 +38,7 @@ export function ActivityTab({
     return (
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive/40 py-14 text-center">
         <AlertCircle className="h-6 w-6 text-destructive" />
-        <p className="text-sm font-medium">Couldn't load activity</p>
+        <p className="text-sm font-medium">Couldn&apos;t load activity</p>
         <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
           {isRefetching ? "Retrying…" : "Try again"}
         </Button>

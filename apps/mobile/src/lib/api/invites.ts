@@ -16,31 +16,34 @@ export async function createInvite(
   return data as Invite;
 }
 
-export async function fetchInviteByCode(code: string): Promise<Invite | null> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("invites")
-    .select("*")
-    .eq("invite_code", code)
-    .maybeSingle();
-  if (error) throw error;
-  return data as Invite | null;
+export interface InvitePreview {
+  invite_id: string;
+  group_id: string;
+  group_name: string;
+  is_valid: boolean;
 }
 
-export async function acceptInvite(
-  inviteId: string,
-  groupId: string,
-  userId: string
-): Promise<void> {
+/**
+ * Preview an invite by its code, before the viewer is a group member.
+ * Goes through the preview_invite() RPC (SECURITY DEFINER) rather than
+ * reading the invites table directly - members-only RLS on `invites`
+ * would otherwise block this for a not-yet-member.
+ */
+export async function fetchInviteByCode(code: string): Promise<InvitePreview | null> {
   const supabase = getSupabaseClient();
-  const { error: memberError } = await supabase
-    .from("group_members")
-    .insert({ group_id: groupId, user_id: userId, role: "member" });
-  if (memberError) throw memberError;
+  const { data, error } = await supabase.rpc("preview_invite", { p_invite_code: code }).maybeSingle();
+  if (error) throw error;
+  return data as InvitePreview | null;
+}
 
-  const { error: inviteError } = await supabase
-    .from("invites")
-    .update({ accepted_by: userId })
-    .eq("id", inviteId);
-  if (inviteError) throw inviteError;
+/**
+ * Accept an invite via the accept_group_invite() RPC (SECURITY DEFINER),
+ * which validates the invite server-side and performs the group_members
+ * insert + invites update atomically. Returns the joined group's id.
+ */
+export async function acceptInvite(inviteId: string): Promise<string> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.rpc("accept_group_invite", { p_invite_id: inviteId });
+  if (error) throw error;
+  return data as string;
 }

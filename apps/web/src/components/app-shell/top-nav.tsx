@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { LogOut, Settings } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { BarChart3, Home, LogOut, Settings, Users, Wallet } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,19 +14,64 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { SettingsPanelContent } from "@/components/settings/settings-panel-content";
+import { cn } from "@/lib/utils";
 import { initials } from "@/lib/format";
+
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/groups", label: "Groups", icon: Users },
+  { href: "/personal/overview", label: "Finances", icon: Wallet },
+  { href: "/insights", label: "Insights", icon: BarChart3 },
+];
+
+/**
+ * The four primary destinations, matching the four jobs users do here: Home
+ * ("how am I doing"), Groups ("shared money"), Finances ("my money"),
+ * Insights ("what can I learn"). Settings stays out of this row - it's
+ * reached only via the avatar menu, same as it already was on web.
+ */
+function PrimaryNav() {
+  const pathname = usePathname();
+  return (
+    <nav className="flex items-center gap-1">
+      {NAV_ITEMS.map((item) => {
+        // Finances covers every /personal/* sub-route (overview, analysis, budgets, etc.)
+        const active = pathname === item.href || (item.href.startsWith("/personal") && pathname.startsWith("/personal"));
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-label={item.label}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+            )}
+          >
+            <item.icon className="h-4 w-4" />
+            <span className="hidden sm:inline">{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export function TopNav() {
   const { profile, signOut } = useAuth();
   const router = useRouter();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+        <Link href="/dashboard" aria-label="SplitEven home" className="flex items-center gap-2 font-semibold">
           <Logo size={32} />
-          <span className="text-lg tracking-tight">SplitEven</span>
+          <span className="hidden text-lg tracking-tight sm:inline">SplitEven</span>
         </Link>
+
+        <PrimaryNav />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -41,7 +87,7 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-1.5 text-sm font-medium">{profile?.display_name}</div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/settings")}>
+            <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
               <Settings className="mr-2 h-4 w-4" /> Settings
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -55,6 +101,17 @@ export function TopNav() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <SheetContent side="left" className="overflow-y-auto p-0">
+          <SheetHeader className="border-b border-border/60">
+            <SheetTitle>Settings</SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <SettingsPanelContent onClose={() => setSettingsOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </header>
   );
 }

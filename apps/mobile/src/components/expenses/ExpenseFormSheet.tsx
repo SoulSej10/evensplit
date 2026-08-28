@@ -3,13 +3,14 @@ import { Alert, Pressable, Text, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { Check, Image as ImageIcon, Repeat } from "lucide-react-native";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { computeSplitShares, SplitError, type SplitType, type User } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { Avatar } from "@/components/ui/Avatar";
 import { createExpense, updateExpense, uploadReceipt, type ExpenseWithShares } from "@/lib/api/expenses";
+import { fetchPersonalAccounts } from "@/lib/api/personal";
 import { formatDate, formatMoney } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { notifyLocal } from "@/lib/notifications";
@@ -69,6 +70,16 @@ export function ExpenseFormSheet({
   const [submitting, setSubmitting] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [frequency, setFrequency] = useState<RecurrenceFrequency>("WEEKLY");
+  const [paidFromAccountId, setPaidFromAccountId] = useState<string | null>(null);
+
+  // Only the payer can link one of their own accounts — create_group_expense/
+  // update_group_expense reject a linked account for anyone else.
+  const isPayerCurrentUser = paidBy === currentUserId;
+  const { data: personalAccounts } = useQuery({
+    queryKey: ["personal-accounts", currentUserId],
+    queryFn: () => fetchPersonalAccounts(currentUserId),
+    enabled: visible && isPayerCurrentUser,
+  });
 
   useEffect(() => {
     if (!visible) return;
@@ -81,6 +92,7 @@ export function ExpenseFormSheet({
     setReceiptUri(null);
     setIsRecurring(existingExpense?.is_recurring ?? false);
     setFrequency(parseFrequency(existingExpense?.recurrence_rule) ?? "WEEKLY");
+    setPaidFromAccountId(existingExpense?.paid_from_account_id ?? null);
     const initialParticipants =
       existingExpense?.expense_shares.map((s) => s.user_id) ?? members.map((m) => m.user_id);
     setSelected(new Set(initialParticipants));
@@ -113,6 +125,10 @@ export function ExpenseFormSheet({
       return null;
     }
   }, [participantIds, numericAmount, splitType, values]);
+
+  useEffect(() => {
+    if (!isPayerCurrentUser) setPaidFromAccountId(null);
+  }, [isPayerCurrentUser]);
 
   function toggleMember(userId: string) {
     setSelected((prev) => {
@@ -158,13 +174,14 @@ export function ExpenseFormSheet({
         recurrence_rule: isRecurring ? `FREQ=${frequency}` : null,
       };
 
+      const linkedAccountId = isPayerCurrentUser ? paidFromAccountId : null;
       const expense = isEdit
-        ? await updateExpense(existingExpense!.id, input)
-        : await createExpense(input, currentUserId);
+        ? await updateExpense(existingExpense!.id, input, linkedAccountId)
+        : await createExpense(input, currentUserId, linkedAccountId);
 
       if (receiptUri) {
         const path = await uploadReceipt(groupId, expense.id, receiptUri, "receipt.jpg");
-        await updateExpense(expense.id, { ...input, receipt_url: path });
+        await updateExpense(expense.id, { ...input, receipt_url: path }, linkedAccountId);
       }
 
       await queryClient.invalidateQueries({ queryKey: ["group-expenses", groupId] });
@@ -213,7 +230,7 @@ export function ExpenseFormSheet({
           <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Date</Text>
           <Pressable
             onPress={() => setShowDatePicker(true)}
-            className="h-12 justify-center rounded-2xl border border-neutral-500/20 bg-surface px-4 dark:bg-surface-dark"
+            className="h-12 justify-center rounded-card border border-neutral-500/20 bg-surface px-4 dark:bg-surface-dark"
           >
             <Text className="text-neutral-900 dark:text-neutral-100">{formatDate(date.toISOString())}</Text>
           </Pressable>
@@ -256,6 +273,55 @@ export function ExpenseFormSheet({
         </View>
       </View>
 
+      {isPayerCurrentUser && personalAccounts && personalAccounts.length > 0 && (
+        <View className="gap-1.5">
+          <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+            Paid from (optional)
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <Pressable
+              onPress={() => setPaidFromAccountId(null)}
+              className={cn(
+                "rounded-pill border px-3 py-1.5",
+                paidFromAccountId === null ? "border-primary bg-primary-light" : "border-neutral-500/20"
+              )}
+            >
+              <Text
+                className={cn(
+                  "text-sm font-medium",
+                  paidFromAccountId === null ? "text-primary" : "text-neutral-500"
+                )}
+              >
+                Not linked
+              </Text>
+            </Pressable>
+            {personalAccounts.map((a) => (
+              <Pressable
+                key={a.id}
+                onPress={() => setPaidFromAccountId(a.id)}
+                className={cn(
+                  "rounded-pill border px-3 py-1.5",
+                  paidFromAccountId === a.id ? "border-primary bg-primary-light" : "border-neutral-500/20"
+                )}
+              >
+                <Text
+                  className={cn(
+                    "text-sm font-medium",
+                    paidFromAccountId === a.id ? "text-primary" : "text-neutral-500"
+                  )}
+                >
+                  {a.name}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text className="text-xs text-neutral-500">
+            Links this expense to a Finances account — your own share counts as real spending
+            there, and the rest is tracked as money owed back to you.
+          </Text>
+        </View>
+      )}
+
       <View className="gap-1.5">
         <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Category</Text>
         <View className="flex-row flex-wrap gap-2">
@@ -284,7 +350,7 @@ export function ExpenseFormSheet({
               key={t}
               onPress={() => setSplitType(t)}
               className={cn(
-                "flex-1 items-center rounded-2xl border py-2",
+                "flex-1 items-center rounded-card border py-2",
                 splitType === t ? "border-primary bg-primary-light" : "border-neutral-500/20"
               )}
             >
@@ -298,7 +364,7 @@ export function ExpenseFormSheet({
 
       <View className="gap-1.5">
         <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Split between</Text>
-        <View className="gap-2 rounded-2xl border border-neutral-500/20 p-2">
+        <View className="gap-2 rounded-card border border-neutral-500/20 p-2">
           {members.map((m) => {
             const isSelected = selected.has(m.user_id);
             const share = preview?.find((p) => p.user_id === m.user_id);
@@ -339,10 +405,10 @@ export function ExpenseFormSheet({
       <View className="gap-2">
         <Pressable
           onPress={() => setIsRecurring((v) => !v)}
-          className="flex-row items-center justify-between rounded-2xl border border-neutral-500/20 px-4 py-3"
+          className="flex-row items-center justify-between rounded-card border border-neutral-500/20 px-4 py-3"
         >
           <View className="flex-row items-center gap-2">
-            <Repeat size={16} color={isRecurring ? "#16A88F" : "#6B7169"} />
+            <Repeat size={16} color={isRecurring ? "#5B3A8E" : "#6B7169"} />
             <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
               Recurring expense
             </Text>
@@ -364,7 +430,7 @@ export function ExpenseFormSheet({
                 key={f.value}
                 onPress={() => setFrequency(f.value)}
                 className={cn(
-                  "flex-1 items-center rounded-2xl border py-2",
+                  "flex-1 items-center rounded-card border py-2",
                   frequency === f.value ? "border-primary bg-primary-light" : "border-neutral-500/20"
                 )}
               >
@@ -384,7 +450,7 @@ export function ExpenseFormSheet({
 
       <Pressable
         onPress={pickReceipt}
-        className="flex-row items-center gap-2 rounded-2xl border border-dashed border-neutral-500/30 px-4 py-3"
+        className="flex-row items-center gap-2 rounded-card border border-dashed border-neutral-500/30 px-4 py-3"
       >
         <ImageIcon size={18} color="#6B7169" />
         <Text className="text-sm text-neutral-500">

@@ -36,8 +36,8 @@ export default function ForgotPasswordScreen() {
       </Pressable>
 
       <View className="mb-8 items-center gap-3">
-        <View className="h-14 w-14 items-center justify-center rounded-3xl bg-primary-light">
-          <Mail color="#16A88F" size={24} />
+        <View className="h-14 w-14 items-center justify-center rounded-card bg-primary-light">
+          <Mail color="#5B3A8E" size={24} />
         </View>
         <Text className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
           Reset your password

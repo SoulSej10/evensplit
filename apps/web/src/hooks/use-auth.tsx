@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = useCallback(async () => {
     if (session?.user.id) await fetchProfile(session.user.id);
-  }, [session?.user.id, fetchProfile]);
+  }, [session, fetchProfile]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
