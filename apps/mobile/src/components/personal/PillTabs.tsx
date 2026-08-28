@@ -37,7 +37,7 @@ export function PillTabs<T extends string>({
               key={opt.value}
               onPress={() => onChange(opt.value)}
               className="flex-row items-center gap-1.5 rounded-lg px-4 py-2"
-              style={{ backgroundColor: active ? "#5B3A8E" : inactiveBg }}
+              style={{ backgroundColor: active ? "#16A88F" : inactiveBg }}
             >
               {opt.icon && <opt.icon color={active ? "white" : "#6B7169"} size={14} />}
               <Text className={cn("text-sm font-semibold", active ? "text-white" : "text-neutral-500")}>

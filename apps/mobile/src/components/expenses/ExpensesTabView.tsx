@@ -66,7 +66,7 @@ export function ExpensesTabView({
                   </Text>
                   {expense.is_recurring && (
                     <View className="flex-row items-center gap-0.5 rounded-pill bg-primary-light px-1.5 py-0.5">
-                      <Repeat color="#5B3A8E" size={10} />
+                      <Repeat color="#16A88F" size={10} />
                     </View>
                   )}
                 </View>

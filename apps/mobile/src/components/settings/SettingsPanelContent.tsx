@@ -282,7 +282,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               className="flex-row items-center justify-between py-2"
             >
               <View className="flex-row items-center gap-2.5">
-                <Wallet size={17} color="#5B3A8E" />
+                <Wallet size={17} color="#16A88F" />
                 <Text className="text-neutral-900 dark:text-neutral-100">Accounts</Text>
               </View>
               <ChevronRight color="#6B7169" size={17} />
@@ -292,7 +292,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               className="flex-row items-center justify-between py-2"
             >
               <View className="flex-row items-center gap-2.5">
-                <Tag size={17} color="#5B3A8E" />
+                <Tag size={17} color="#16A88F" />
                 <Text className="text-neutral-900 dark:text-neutral-100">Categories</Text>
               </View>
               <ChevronRight color="#6B7169" size={17} />
@@ -302,7 +302,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               className="flex-row items-center justify-between py-2"
             >
               <View className="flex-row items-center gap-2.5">
-                <PiggyBank size={17} color="#5B3A8E" />
+                <PiggyBank size={17} color="#16A88F" />
                 <Text className="text-neutral-900 dark:text-neutral-100">Budgets</Text>
               </View>
               <ChevronRight color="#6B7169" size={17} />
@@ -312,7 +312,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               className="flex-row items-center justify-between py-2"
             >
               <View className="flex-row items-center gap-2.5">
-                <ListChecks size={17} color="#5B3A8E" />
+                <ListChecks size={17} color="#16A88F" />
                 <Text className="text-neutral-900 dark:text-neutral-100">Transactions</Text>
               </View>
               <ChevronRight color="#6B7169" size={17} />
@@ -327,7 +327,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
             className="flex-row items-center justify-between py-1"
           >
             <View className="flex-row items-center gap-2.5">
-              <KeyRound size={17} color="#5B3A8E" />
+              <KeyRound size={17} color="#16A88F" />
               <Text className="text-neutral-900 dark:text-neutral-100">Change password</Text>
             </View>
             <ChevronRight color="#6B7169" size={17} />
@@ -361,14 +361,14 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
           <Text className="mb-3 font-semibold text-neutral-900 dark:text-neutral-100">Data</Text>
           <Pressable onPress={onExport} disabled={exporting} className="flex-row items-center justify-between py-2">
             <View className="flex-row items-center gap-2.5">
-              <Download size={17} color="#5B3A8E" />
+              <Download size={17} color="#16A88F" />
               <Text className="text-neutral-900 dark:text-neutral-100">Export data (CSV)</Text>
             </View>
             <ChevronRight color="#6B7169" size={17} />
           </Pressable>
           <Pressable onPress={onImport} disabled={importing} className="flex-row items-center justify-between py-2">
             <View className="flex-row items-center gap-2.5">
-              <Upload size={17} color="#5B3A8E" />
+              <Upload size={17} color="#16A88F" />
               <Text className="text-neutral-900 dark:text-neutral-100">Import data (CSV)</Text>
             </View>
             <ChevronRight color="#6B7169" size={17} />
@@ -382,7 +382,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
             <Switch
               value={colorScheme === "dark"}
               onValueChange={toggleColorScheme}
-              trackColor={{ true: "#5B3A8E", false: "#D9DCD6" }}
+              trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
             />
           </View>
         </Card>
@@ -399,7 +399,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               <Switch
                 value={notifExpenses}
                 onValueChange={setNotifExpenses}
-                trackColor={{ true: "#5B3A8E", false: "#D9DCD6" }}
+                trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
               />
             </View>
             <View className="flex-row items-center justify-between">
@@ -407,7 +407,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               <Switch
                 value={notifSettlements}
                 onValueChange={setNotifSettlements}
-                trackColor={{ true: "#5B3A8E", false: "#D9DCD6" }}
+                trackColor={{ true: "#16A88F", false: "#D9DCD6" }}
               />
             </View>
           </View>

@@ -55,27 +55,25 @@
 }
 
 :root {
-  /* SplitEven brand tokens v6 - full retheme per direct feedback ("done
-     with the generic white+green look"). Brand chrome moves to a deep
-     plum/indigo with a warm amber accent, on warm ivory (light) / warm
-     charcoal-plum (dark) surfaces instead of teal-on-white. Money semantics
-     are untouched on purpose: positive/negative/warning stay
-     emerald/coral/amber regardless of brand color, so "green" keeps
-     meaning "you're owed / gained money," never "this is a button." */
-  --background: #f7f5f2;
-  --foreground: #1e1b24;
+  /* SplitEven brand tokens v7 - reverted off the plum/indigo retheme back
+     to the original teal-green brand per direct feedback ("go back on the
+     green theme, I'm not satisfied with the new one"). The amber accent
+     and positive/negative/warning semantics introduced alongside personal
+     budgeting stay as-is - those aren't the brand-chrome complaint. */
+  --background: #f4f5f3;
+  --foreground: #0a0a0a;
   --card: #ffffff; /* surface */
-  --card-foreground: #1e1b24;
+  --card-foreground: #0a0a0a;
   --popover: #ffffff;
-  --popover-foreground: #1e1b24;
-  --primary: #5b3a8e; /* deep plum-indigo */
+  --popover-foreground: #0a0a0a;
+  --primary: #16a88f;
   --primary-foreground: #ffffff;
-  --primary-light: #ede5f7; /* pale lavender tint */
-  --primary-deep: #3e2766;
-  --secondary: #ede5f7; /* primary-light */
-  --secondary-foreground: #5b3a8e;
-  --muted: #eeece9;
-  --muted-foreground: #726c7d; /* neutral-500 */
+  --primary-light: #e3fbf6;
+  --primary-deep: #0f7a68;
+  --secondary: #e3fbf6; /* primary-light */
+  --secondary-foreground: #16a88f;
+  --muted: #ececea;
+  --muted-foreground: #6b7169; /* neutral-500 */
   --accent: #f5a524; /* warm amber - highlights, streaks, CTAs distinct from primary */
   --accent-foreground: #ffffff;
   --accent-light: #fdf1dc;
@@ -83,45 +81,44 @@
   --positive: #009b87; /* emerald - financial gains only, never decorative */
   --negative: #d95f5f; /* soft coral/red */
   --warning: #e0a63a; /* warm amber */
-  --border: #e6e2dd;
-  --input: #e6e2dd;
-  --ring: #5b3a8e;
-  --chart-1: #5b3a8e;
+  --border: #e3e6e1;
+  --input: #e3e6e1;
+  --ring: #16a88f;
+  --chart-1: #16a88f;
   --chart-2: #f5a524;
   --chart-3: #009b87;
   --chart-4: #d95f5f;
-  --chart-5: #726c7d;
+  --chart-5: #6b7169;
   --radius: 0.4rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1e1b24;
-  --sidebar-primary: #5b3a8e;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #16a88f;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ede5f7;
-  --sidebar-accent-foreground: #5b3a8e;
-  --sidebar-border: #e6e2dd;
-  --sidebar-ring: #5b3a8e;
+  --sidebar-accent: #e3fbf6;
+  --sidebar-accent-foreground: #16a88f;
+  --sidebar-border: #e3e6e1;
+  --sidebar-ring: #16a88f;
 }
 
 .dark {
-  /* Dark mode keeps the brand's near-black background, warmed toward plum
-     rather than a flat near-black, so both themes read as one consistent
-     identity. */
-  --background: #161320;
-  --foreground: #f5f3f7;
-  --card: #201c2c; /* surface (dark) */
-  --card-foreground: #f5f3f7;
-  --popover: #201c2c;
-  --popover-foreground: #f5f3f7;
-  --primary: #9b7fd4;
-  --primary-foreground: #161320;
-  --primary-light: rgba(155, 127, 212, 0.16);
-  --primary-deep: #c9b8e8;
-  --secondary: rgba(155, 127, 212, 0.16);
-  --secondary-foreground: #c9b8e8;
-  --muted: #221e2f;
-  --muted-foreground: #a099ac;
+  /* Dark mode is now the default theme (see providers.tsx) - back to the
+     brand's true near-black background with the brighter teal primary. */
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --card: #141414; /* surface (dark) */
+  --card-foreground: #f5f5f5;
+  --popover: #141414;
+  --popover-foreground: #f5f5f5;
+  --primary: #35d6b5;
+  --primary-foreground: #0a0a0a;
+  --primary-light: rgba(53, 214, 181, 0.14);
+  --primary-deep: #63e7ce;
+  --secondary: rgba(53, 214, 181, 0.14);
+  --secondary-foreground: #63e7ce;
+  --muted: #1c1c1c;
+  --muted-foreground: #9a9a9a;
   --accent: #f7b955;
-  --accent-foreground: #161320;
+  --accent-foreground: #0a0a0a;
   --accent-light: rgba(247, 185, 85, 0.14);
   --destructive: #e07b7b;
   --positive: #34c98f;
@@ -129,20 +126,20 @@
   --warning: #e6b45c;
   --border: rgba(255, 255, 255, 0.09);
   --input: rgba(255, 255, 255, 0.13);
-  --ring: #9b7fd4;
-  --chart-1: #9b7fd4;
+  --ring: #35d6b5;
+  --chart-1: #35d6b5;
   --chart-2: #f7b955;
   --chart-3: #34c98f;
   --chart-4: #e07b7b;
-  --chart-5: #a099ac;
-  --sidebar: #201c2c;
-  --sidebar-foreground: #f5f3f7;
-  --sidebar-primary: #9b7fd4;
-  --sidebar-primary-foreground: #161320;
-  --sidebar-accent: rgba(155, 127, 212, 0.16);
-  --sidebar-accent-foreground: #c9b8e8;
+  --chart-5: #9a9a9a;
+  --sidebar: #141414;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #35d6b5;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: rgba(53, 214, 181, 0.16);
+  --sidebar-accent-foreground: #63e7ce;
   --sidebar-border: rgba(255, 255, 255, 0.09);
-  --sidebar-ring: #9b7fd4;
+  --sidebar-ring: #35d6b5;
 }
 
 @layer base {

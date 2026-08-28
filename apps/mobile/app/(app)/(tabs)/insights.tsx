@@ -25,7 +25,7 @@ import { usePersonalAccounts, usePersonalCategories, usePersonalTransactions } f
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
-const DONUT_COLORS = ["#5B3A8E", "#9B7FD4", "#F5A524", "#009B87", "#D95F5F", "#726C7D"];
+const DONUT_COLORS = ["#16A88F", "#35D6B5", "#F5A524", "#009B87", "#D95F5F", "#726C7D"];
 const CATEGORY_ALL = "__all__";
 
 function CategoryDonut({
@@ -203,14 +203,14 @@ export default function InsightsScreen() {
         {!isLoading && !isError && (
           <View className="flex-row gap-3">
             <Card className="flex-1 items-start gap-1">
-              <Layers color="#5B3A8E" size={18} />
+              <Layers color="#16A88F" size={18} />
               <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                 {groups?.length ?? 0}
               </Text>
               <Text className="text-xs text-neutral-500">Active groups</Text>
             </Card>
             <Card className="flex-1 items-start gap-1">
-              <Receipt color="#5B3A8E" size={18} />
+              <Receipt color="#16A88F" size={18} />
               <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                 {expenses?.length ?? 0}
               </Text>

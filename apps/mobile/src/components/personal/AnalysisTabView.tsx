@@ -16,7 +16,7 @@ import { cn } from "@/lib/cn";
 import { usePersonalAccounts, usePersonalCategories, usePersonalTransactions } from "@/hooks/use-personal";
 import { formatMoney } from "@/lib/format";
 
-const DONUT_COLORS = ["#5B3A8E", "#9B7FD4", "#F5A524", "#009B87", "#D95F5F", "#726C7D"];
+const DONUT_COLORS = ["#16A88F", "#35D6B5", "#F5A524", "#009B87", "#D95F5F", "#726C7D"];
 const CATEGORY_ALL = "__all__";
 
 export function AnalysisTabView() {
@@ -52,7 +52,7 @@ export function AnalysisTabView() {
     return (
       <View className="items-center gap-2 py-14">
         <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-light">
-          <PieChart color="#5B3A8E" size={22} />
+          <PieChart color="#16A88F" size={22} />
         </View>
         <Text className="text-sm text-neutral-500">Log a few transactions to see your breakdown.</Text>
       </View>

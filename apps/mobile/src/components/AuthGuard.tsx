@@ -13,7 +13,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   if (loading || !session) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-900">
-        <ActivityIndicator color="#5B3A8E" size="large" />
+        <ActivityIndicator color="#16A88F" size="large" />
       </View>
     );
   }

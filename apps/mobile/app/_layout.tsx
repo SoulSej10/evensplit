@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { colorScheme } from "nativewind";
+import { I18nManager } from "react-native";
 import {
   useFonts,
   PlusJakartaSans_400Regular,
@@ -14,6 +16,24 @@ import "../global.css";
 import { Providers } from "@/components/Providers";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// This app has no RTL design at all - force LTR unconditionally so a
+// stale forceRTL(true) from an earlier debugging session (persisted
+// natively, survives JS reloads and even `adb install -r`) can't silently
+// flip every `left`/`right`/absolute-positioned layout in the app (this is
+// what caused the settings drawer to render pinned to the right instead of
+// the left it's coded for).
+if (I18nManager.isRTL) {
+  I18nManager.allowRTL(false);
+  I18nManager.forceRTL(false);
+}
+
+// App now defaults to dark mode regardless of the device's system setting,
+// per direct feedback. Set once at module load (not in an effect) so the
+// very first frame renders dark instead of flashing light first. The
+// Settings toggle still calls toggleColorScheme/setColorScheme normally —
+// this only changes the starting point each cold launch.
+colorScheme.set("dark");
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

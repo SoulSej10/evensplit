@@ -119,7 +119,7 @@ export default function FinancesScreen() {
           accessibilityLabel={CREATE_LABEL[tab]}
           className="absolute bottom-28 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
           style={{
-            shadowColor: "#5B3A8E",
+            shadowColor: "#16A88F",
             shadowOpacity: 0.35,
             shadowRadius: 12,
             shadowOffset: { width: 0, height: 6 },

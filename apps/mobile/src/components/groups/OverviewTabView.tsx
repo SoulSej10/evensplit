@@ -81,7 +81,7 @@ export function OverviewTabView({
         {recentExpenses.length === 0 ? (
           <View className="items-center gap-2 py-10">
             <View className="h-12 w-12 items-center justify-center rounded-full bg-primary-light">
-              <Receipt color="#5B3A8E" size={20} />
+              <Receipt color="#16A88F" size={20} />
             </View>
             <Text className="text-sm text-neutral-500">No expenses yet.</Text>
           </View>

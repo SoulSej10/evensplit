@@ -74,7 +74,7 @@ export default function GroupsListScreen() {
         {!isLoading && !isError && groups?.length === 0 && (
           <View className="mt-10 items-center gap-3">
             <View className="h-16 w-16 items-center justify-center rounded-full bg-primary-light">
-              <Users color="#5B3A8E" size={28} />
+              <Users color="#16A88F" size={28} />
             </View>
             <Text className="text-base font-medium text-neutral-900 dark:text-neutral-100">
               No groups yet
@@ -105,7 +105,7 @@ export default function GroupsListScreen() {
         onPress={() => setSheetOpen(true)}
         className="absolute bottom-28 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
         style={{
-          shadowColor: "#5B3A8E",
+          shadowColor: "#16A88F",
           shadowOpacity: 0.35,
           shadowRadius: 12,
           shadowOffset: { width: 0, height: 6 },

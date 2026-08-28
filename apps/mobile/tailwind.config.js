@@ -5,20 +5,18 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
-      // SplitEven brand tokens v6 — full retheme per direct feedback ("done
-      // with the generic white+green look"). Brand chrome moves to a deep
-      // plum/indigo with a warm amber accent, on warm ivory (light) / warm
-      // charcoal-plum (dark) surfaces instead of teal-on-white. Money
-      // semantics are untouched on purpose: positive/negative/warning stay
-      // emerald/coral/amber regardless of brand color, so "green" keeps
-      // meaning "you're owed / gained money," never "this is a button."
+      // SplitEven brand tokens v7 — reverted off the plum/indigo retheme
+      // back to the original teal-green brand per direct feedback ("go back
+      // on the green theme"). The amber accent and positive/negative/
+      // warning semantics introduced alongside personal budgeting stay as
+      // they are — those weren't the brand-chrome complaint.
       colors: {
         primary: {
-          DEFAULT: "#5B3A8E", // deep plum-indigo
-          light: "#EDE5F7", // pale lavender tint
-          bright: "#9B7FD4", // for dark-mode text/icons on the dark bg
-          soft: "#C9B8E8",
-          deep: "#3E2766", // for gradients / pressed states
+          DEFAULT: "#16A88F",
+          light: "#E3FBF6",
+          bright: "#35D6B5", // for dark-mode text/icons on the dark bg
+          soft: "#63E7CE",
+          deep: "#0F7A68", // for gradients / pressed states
         },
         accent: {
           DEFAULT: "#F5A524", // warm amber - CTAs, streaks, highlights
@@ -30,12 +28,14 @@ module.exports = {
         warning: "#E0A63A", // warm amber
         surface: "#FFFFFF",
         neutral: {
-          900: "#1E1B24", // near-black, plum-tinted text
-          500: "#726C7D",
-          100: "#F7F5F2", // warm ivory background
+          900: "#0A0A0A",
+          500: "#6B7169",
+          100: "#F4F5F3",
         },
-        // Dark mode surfaces (applied via `dark:` variants)
-        "surface-dark": "#1E1930",
+        // Dark mode surfaces (applied via `dark:` variants) — dark mode is
+        // now the default (see app/_layout.tsx), so this is the brand's
+        // true near-black, not a tinted variant.
+        "surface-dark": "#0A0A0A",
       },
       fontFamily: {
         sans: ["PlusJakartaSans_400Regular"],

@@ -45,7 +45,7 @@ export function BudgetsTabView() {
       {progress.length === 0 && (
         <View className="items-center gap-2 py-14">
           <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-light">
-            <PiggyBank color="#5B3A8E" size={22} />
+            <PiggyBank color="#16A88F" size={22} />
           </View>
           <Text className="text-sm text-neutral-500">Set a monthly limit for a category to track it here.</Text>
         </View>

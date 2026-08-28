@@ -198,7 +198,7 @@ export default function HomeScreen() {
           <Pressable onPress={() => router.navigate("/(app)/(tabs)/finances")}>
             <Card className="mb-4 gap-2">
               <View className="flex-row items-center gap-2">
-                <PiggyBank color="#5B3A8E" size={16} />
+                <PiggyBank color="#16A88F" size={16} />
                 <Text className="flex-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                   {budgetHighlight.category_name} budget
                 </Text>
@@ -245,7 +245,7 @@ export default function HomeScreen() {
             className="flex-row items-center gap-1 active:opacity-70"
           >
             <Text className="text-sm font-semibold text-primary">See all</Text>
-            <ArrowRight color="#5B3A8E" size={14} />
+            <ArrowRight color="#16A88F" size={14} />
           </Pressable>
         </View>
 
@@ -268,7 +268,7 @@ export default function HomeScreen() {
                 className="flex-row items-center gap-1 active:opacity-70"
               >
                 <Text className="text-sm font-semibold text-primary">See all</Text>
-                <ArrowRight color="#5B3A8E" size={14} />
+                <ArrowRight color="#16A88F" size={14} />
               </Pressable>
             </View>
             {recentActivity.map((item) => (

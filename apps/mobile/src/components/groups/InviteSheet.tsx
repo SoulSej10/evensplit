@@ -51,7 +51,7 @@ export function InviteSheet({
     <BottomSheet visible={visible} onClose={onClose} title="Invite to group">
       <View className="items-center gap-2">
         <View className="h-14 w-14 items-center justify-center rounded-card bg-primary-light">
-          <UserPlus color="#5B3A8E" size={24} />
+          <UserPlus color="#16A88F" size={24} />
         </View>
         <Text className="text-center text-neutral-500">
           Share this link — anyone with it can join the group. Expires in 7 days.

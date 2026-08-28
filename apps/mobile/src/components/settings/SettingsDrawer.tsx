@@ -24,8 +24,8 @@ export function SettingsDrawer() {
       <Animated.View
         entering={SlideInLeft.springify().damping(24).stiffness(220)}
         exiting={SlideOutLeft.duration(200)}
-        className="absolute bottom-0 left-0 top-0 bg-surface dark:bg-surface-dark"
-        style={{ width: PANEL_WIDTH }}
+        className="bg-surface dark:bg-surface-dark"
+        style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: PANEL_WIDTH }}
       >
         <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
           <View className="flex-1">

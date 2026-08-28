@@ -55,9 +55,9 @@ export default function ActivityScreen() {
               <Card key={`${item.type}-${item.id}`} className="mb-2 flex-row items-center gap-3 py-3">
                 <View className="h-9 w-9 items-center justify-center rounded-full bg-primary-light">
                   {item.type === "expense_added" ? (
-                    <Receipt color="#5B3A8E" size={16} />
+                    <Receipt color="#16A88F" size={16} />
                   ) : (
-                    <ArrowRightLeft color="#5B3A8E" size={16} />
+                    <ArrowRightLeft color="#16A88F" size={16} />
                   )}
                 </View>
                 <View className="flex-1">

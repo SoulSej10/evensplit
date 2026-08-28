@@ -228,7 +228,7 @@ export default function GroupDetailScreen() {
           disabled={Math.abs(myBalance) < 0.005}
           onPress={() => setTab("balances")}
         >
-          <ArrowLeftRight color="#5B3A8E" size={18} />
+          <ArrowLeftRight color="#16A88F" size={18} />
           <Text className="font-semibold text-primary">Settle up</Text>
         </Button>
         <Button size="lg" className="flex-1 flex-row gap-2" onPress={() => setAddExpenseOpen(true)}>

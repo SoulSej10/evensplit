@@ -48,11 +48,11 @@ function JoinGroupContent({ code }: { code: string }) {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-neutral-100 px-6 dark:bg-neutral-900">
       <View className="h-16 w-16 items-center justify-center rounded-card bg-primary-light">
-        <Users color="#5B3A8E" size={28} />
+        <Users color="#16A88F" size={28} />
       </View>
       <Text className="mt-4 text-xl font-bold text-neutral-900 dark:text-neutral-100">Join group</Text>
 
-      {loading && <ActivityIndicator className="mt-6" color="#5B3A8E" />}
+      {loading && <ActivityIndicator className="mt-6" color="#16A88F" />}
       {!loading && error && <Text className="mt-4 text-center text-negative">{error}</Text>}
       {!loading && !error && (
         <>
