@@ -1,4 +1,4 @@
-import type { CreateGroupInput, Group, GroupMember, User } from "@evensplit/shared";
+import type { CreateGroupInput, Group, GroupMember, UpdateGroupInput, User } from "@evensplit/shared";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 export interface GroupWithMembers extends Group {
@@ -48,6 +48,18 @@ export async function createGroup(input: CreateGroupInput, createdBy: string): P
       currency: input.currency,
       created_by: createdBy,
     })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Group;
+}
+
+export async function updateGroup(groupId: string, input: UpdateGroupInput): Promise<Group> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("groups")
+    .update(input)
+    .eq("id", groupId)
     .select()
     .single();
   if (error) throw error;

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { calculatePairwiseDebts, calculateUserBalances } from "@evensplit/shared";
-import { fetchGroup } from "@/lib/api/groups";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { calculatePairwiseDebts, calculateUserBalances, type UpdateGroupInput } from "@evensplit/shared";
+import { fetchGroup, updateGroup } from "@/lib/api/groups";
 import { fetchGroupExpenses } from "@/lib/api/expenses";
 import { fetchGroupSettlements } from "@/lib/api/settlements";
 import { fetchGroupActivity } from "@/lib/api/activity";
@@ -14,6 +14,18 @@ export function useGroup(groupId: string) {
     queryKey: ["group", groupId],
     queryFn: () => fetchGroup(groupId),
     enabled: !!groupId,
+  });
+}
+
+/** Rename a group / change its icon or currency - owner-only, enforced by the groups_update_owner RLS policy. */
+export function useUpdateGroup(groupId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateGroupInput) => updateGroup(groupId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["group", groupId] });
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+    },
   });
 }
 

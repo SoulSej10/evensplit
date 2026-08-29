@@ -52,6 +52,9 @@ export const createGroupSchema = z.object({
 });
 export type CreateGroupInput = z.infer<typeof createGroupSchema>;
 
+export const updateGroupSchema = createGroupSchema.partial();
+export type UpdateGroupInput = z.infer<typeof updateGroupSchema>;
+
 export const splitParticipantSchema = z.object({
   user_id: uuidSchema,
   value: z.number().finite().optional(),

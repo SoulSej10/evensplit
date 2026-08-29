@@ -31,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { InviteDialog } from "@/components/groups/invite-dialog";
+import { EditGroupDialog } from "@/components/groups/edit-group-dialog";
 import { OverviewTab } from "@/components/groups/overview-tab";
 import { ExpensesTab } from "@/components/expenses/expenses-tab";
 import { BalancesTab } from "@/components/balances/balances-tab";
@@ -41,7 +42,7 @@ import { useGroup, useGroupExpenses, useGroupRealtime, useGroupSettlements } fro
 import { archiveGroup, leaveGroup, removeMember } from "@/lib/api/groups";
 import { formatMoney, initials } from "@/lib/format";
 import { downloadGroupLedgerCsv } from "@/lib/csv";
-import { MoreVertical, UserPlus, UserMinus, Archive, LogOut, AlertCircle, Download } from "lucide-react";
+import { MoreVertical, UserPlus, UserMinus, Archive, LogOut, AlertCircle, Download, Pencil } from "lucide-react";
 
 function GroupDetailContent({ groupId }: { groupId: string }) {
   const router = useRouter();
@@ -176,6 +177,16 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {isOwner && (
+                  <EditGroupDialog
+                    group={group}
+                    trigger={
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <Pencil className="mr-2 h-4 w-4" /> Edit group
+                      </DropdownMenuItem>
+                    }
+                  />
+                )}
                 {isOwner && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>

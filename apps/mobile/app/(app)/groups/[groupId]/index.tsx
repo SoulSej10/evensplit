@@ -5,7 +5,7 @@ import { useColorScheme } from "nativewind";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
-import { Archive, ArrowLeft, ArrowLeftRight, Download, LogOut, MoreVertical, Plus, UserPlus } from "lucide-react-native";
+import { Archive, ArrowLeft, ArrowLeftRight, Download, LogOut, MoreVertical, Pencil, Plus, UserPlus } from "lucide-react-native";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { BottomSheet } from "@/components/ui/BottomSheet";
@@ -20,6 +20,7 @@ import { BalancesTabView } from "@/components/balances/BalancesTabView";
 import { ActivityTabView } from "@/components/activity/ActivityTabView";
 import { SettleUpSheet } from "@/components/settle-up/SettleUpSheet";
 import { InviteSheet } from "@/components/groups/InviteSheet";
+import { EditGroupSheet } from "@/components/groups/EditGroupSheet";
 import { useAuth } from "@/hooks/use-auth";
 import { useGroup, useGroupExpenses, useGroupRealtime, useGroupSettlements } from "@/hooks/use-group-detail";
 import { archiveGroup, leaveGroup } from "@/lib/api/groups";
@@ -45,6 +46,7 @@ export default function GroupDetailScreen() {
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithShares | null>(null);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithShares | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [editGroupOpen, setEditGroupOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [settleUp, setSettleUp] = useState<{ from: string; to: string; amount: number } | null>(null);
 
@@ -267,6 +269,8 @@ export default function GroupDetailScreen() {
 
       <InviteSheet visible={inviteOpen} onClose={() => setInviteOpen(false)} groupId={groupId} />
 
+      <EditGroupSheet visible={editGroupOpen} onClose={() => setEditGroupOpen(false)} group={group} />
+
       <BottomSheet visible={moreMenuOpen} onClose={() => setMoreMenuOpen(false)} title={group.name}>
         <Pressable
           onPress={() => {
@@ -278,6 +282,18 @@ export default function GroupDetailScreen() {
           <Download size={18} color="#16A88F" />
           <Text className="text-base text-neutral-900 dark:text-neutral-100">Export CSV</Text>
         </Pressable>
+        {isOwner && (
+          <Pressable
+            onPress={() => {
+              setMoreMenuOpen(false);
+              setEditGroupOpen(true);
+            }}
+            className="flex-row items-center gap-3 py-3"
+          >
+            <Pencil size={18} color="#16A88F" />
+            <Text className="text-base text-neutral-900 dark:text-neutral-100">Edit group</Text>
+          </Pressable>
+        )}
         {isOwner && (
           <Pressable
             onPress={() => {
