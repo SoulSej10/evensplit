@@ -72,10 +72,17 @@ export function TopBar() {
 
         <Breadcrumb />
 
-        <div className="ml-2 hidden max-w-sm flex-1 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground md:flex">
-          <Search className="h-4 w-4 shrink-0" />
+        <div
+          role="search"
+          aria-label="Search groups and expenses"
+          className="ml-2 hidden max-w-sm flex-1 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground md:flex"
+        >
+          <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="flex-1 truncate">Search groups, expenses…</span>
-          <kbd className="hidden shrink-0 rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline">
+          <kbd
+            aria-hidden="true"
+            className="hidden shrink-0 rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline"
+          >
             Ctrl K
           </kbd>
         </div>
