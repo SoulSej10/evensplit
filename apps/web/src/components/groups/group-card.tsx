@@ -2,44 +2,18 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { calculateUserBalances } from "@evensplit/shared";
 import type { GroupWithMembers } from "@/lib/api/groups";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatMoney, initials } from "@/lib/format";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useGroupNetBalance } from "@/hooks/use-group-balance-preview";
 
 export function GroupCard({ group }: { group: GroupWithMembers }) {
   const { authUser } = useAuth();
   const memberIds = useMemo(() => group.group_members.map((m) => m.user_id), [group]);
 
-  const { data: netBalance, isError: balanceError } = useQuery({
-    queryKey: ["group-card-balance", group.id, authUser?.id],
-    enabled: !!authUser?.id,
-    queryFn: async () => {
-      const supabase = getSupabaseBrowserClient();
-      const [{ data: expenses }, { data: shares }, { data: settlements }] = await Promise.all([
-        supabase.from("expenses").select("id, amount, paid_by").eq("group_id", group.id),
-        supabase
-          .from("expense_shares")
-          .select("expense_id, user_id, share_amount, expenses!inner(group_id)")
-          .eq("expenses.group_id", group.id),
-        supabase
-          .from("settlements")
-          .select("from_user, to_user, amount")
-          .eq("group_id", group.id),
-      ]);
-      const balances = calculateUserBalances(
-        memberIds,
-        expenses ?? [],
-        shares ?? [],
-        settlements ?? []
-      );
-      return balances.find((b) => b.user_id === authUser!.id)?.balance ?? 0;
-    },
-  });
+  const { data: netBalance, isError: balanceError } = useGroupNetBalance(group.id, memberIds, authUser?.id);
 
   const balance = netBalance ?? 0;
   const isPositive = balance > 0.005;

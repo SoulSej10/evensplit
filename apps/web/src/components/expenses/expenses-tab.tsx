@@ -28,6 +28,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ExpenseFormDialog } from "@/components/expenses/expense-form-dialog";
 import { deleteExpense, type ExpenseWithShares } from "@/lib/api/expenses";
 import { useGroupExpenses } from "@/hooks/use-group-detail";
@@ -147,20 +148,37 @@ export function ExpensesTab({
         </div>
       )}
 
-      <div className="space-y-2">
-        {!isError && filtered.map((expense) => (
-          <ExpenseRow
-            key={expense.id}
-            expense={expense}
-            groupId={groupId}
-            groupCurrency={groupCurrency}
-            members={members}
-            currentUserId={currentUserId}
-            payerName={memberName(expense.paid_by)}
-            onDelete={() => onDelete(expense.id)}
-          />
-        ))}
-      </div>
+      {!isError && filtered.length > 0 && (
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead>Paid by</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Your share</TableHead>
+                <TableHead className="w-10" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((expense) => (
+                <ExpenseRow
+                  key={expense.id}
+                  expense={expense}
+                  groupId={groupId}
+                  groupCurrency={groupCurrency}
+                  members={members}
+                  currentUserId={currentUserId}
+                  payerName={memberName(expense.paid_by)}
+                  onDelete={() => onDelete(expense.id)}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }
@@ -186,68 +204,76 @@ function ExpenseRow({
   const myShare = expense.expense_shares.find((s) => s.user_id === currentUserId)?.share_amount ?? 0;
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
-      <Avatar className="h-10 w-10">
-        <AvatarImage src={payer?.avatar_url ?? undefined} />
-        <AvatarFallback className="bg-primary-light text-primary">
-          {payer?.display_name ? initials(payer.display_name) : "?"}
-        </AvatarFallback>
-      </Avatar>
-
-      <ExpenseFormDialog
-        trigger={
-          <button className="min-w-0 flex-1 text-left">
-            <p className="flex items-center gap-1.5 truncate font-medium">
-              <span className="truncate">{expense.description}</span>
+    <TableRow>
+      <TableCell>
+        <ExpenseFormDialog
+          trigger={
+            <button className="flex min-w-0 items-center gap-1.5 text-left font-medium hover:text-primary">
+              <span className="max-w-[220px] truncate">{expense.description}</span>
               {expense.is_recurring && (
                 <Badge variant="secondary" className="shrink-0 gap-1">
                   <Repeat className="h-3 w-3" /> Recurring
                 </Badge>
               )}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {payerName} paid · {formatDate(expense.expense_date)}
-              {expense.category ? ` · ${expense.category}` : ""}
-            </p>
-          </button>
-        }
-        groupId={groupId}
-        groupCurrency={groupCurrency}
-        members={members}
-        currentUserId={currentUserId}
-        existingExpense={expense}
-      />
+            </button>
+          }
+          groupId={groupId}
+          groupCurrency={groupCurrency}
+          members={members}
+          currentUserId={currentUserId}
+          existingExpense={expense}
+        />
+      </TableCell>
 
-      <div className="text-right">
-        <p className="font-mono text-sm font-semibold tabular-nums">
-          {formatMoney(expense.amount, expense.currency)}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          your share {formatMoney(myShare, expense.currency)}
-        </p>
-      </div>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={payer?.avatar_url ?? undefined} />
+            <AvatarFallback className="bg-primary-light text-[10px] text-primary">
+              {payer?.display_name ? initials(payer.display_name) : "?"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-muted-foreground">{payerName}</span>
+        </div>
+      </TableCell>
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This recalculates balances for everyone in the group. This can&apos;t be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete} className="bg-destructive text-white">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+      <TableCell className="text-muted-foreground">
+        {expense.category ? <Badge variant="outline">{expense.category}</Badge> : "—"}
+      </TableCell>
+
+      <TableCell className="text-muted-foreground">{formatDate(expense.expense_date)}</TableCell>
+
+      <TableCell className="text-right font-mono font-semibold tabular-nums">
+        {formatMoney(expense.amount, expense.currency)}
+      </TableCell>
+
+      <TableCell className="text-right font-mono text-muted-foreground tabular-nums">
+        {formatMoney(myShare, expense.currency)}
+      </TableCell>
+
+      <TableCell>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This recalculates balances for everyone in the group. This can&apos;t be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onDelete} className="bg-destructive text-white">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </TableCell>
+    </TableRow>
   );
 }

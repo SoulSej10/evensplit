@@ -3,7 +3,9 @@
 import type { User } from "@evensplit/shared";
 import { AlertCircle, ArrowRightLeft, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useGroupActivity } from "@/hooks/use-group-detail";
 import { formatDateTime, formatMoney } from "@/lib/format";
 
@@ -55,37 +57,56 @@ export function ActivityTab({
   }
 
   return (
-    <div className="space-y-2">
-      {activity.map((item) => (
-        <div
-          key={`${item.type}-${item.id}`}
-          className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm"
-        >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-            {item.type === "expense_added" ? (
-              <Receipt className="h-4 w-4" />
-            ) : (
-              <ArrowRightLeft className="h-4 w-4" />
-            )}
-          </span>
-          <div className="min-w-0 flex-1 text-sm">
-            {item.type === "expense_added" ? (
-              <p>
-                <span className="font-medium">{name(item.paid_by)}</span> added{" "}
-                <span className="font-medium">{item.description}</span> ·{" "}
-                {formatMoney(item.amount, item.currency)}
-              </p>
-            ) : (
-              <p>
-                <span className="font-medium">{name(item.from_user)}</span> paid{" "}
-                <span className="font-medium">{name(item.to_user)}</span>{" "}
-                {formatMoney(item.amount, groupCurrency)}
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground">{formatDateTime(item.at)}</p>
-          </div>
-        </div>
-      ))}
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Type</TableHead>
+            <TableHead>Details</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="text-right">When</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {activity.map((item) => (
+            <TableRow key={`${item.type}-${item.id}`}>
+              <TableCell>
+                {item.type === "expense_added" ? (
+                  <Badge variant="secondary" className="gap-1">
+                    <Receipt className="h-3 w-3" /> Expense
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="gap-1 border-positive/30 bg-positive/10 text-positive">
+                    <ArrowRightLeft className="h-3 w-3" /> Settlement
+                  </Badge>
+                )}
+              </TableCell>
+
+              <TableCell className="text-sm">
+                {item.type === "expense_added" ? (
+                  <span>
+                    <span className="font-medium">{name(item.paid_by)}</span> added{" "}
+                    <span className="font-medium">{item.description}</span>
+                  </span>
+                ) : (
+                  <span>
+                    <span className="font-medium">{name(item.from_user)}</span> paid{" "}
+                    <span className="font-medium">{name(item.to_user)}</span>
+                  </span>
+                )}
+              </TableCell>
+
+              <TableCell className="text-right font-mono font-semibold tabular-nums">
+                {formatMoney(item.amount, item.type === "expense_added" ? item.currency : groupCurrency)}
+              </TableCell>
+
+              <TableCell className="text-right text-xs text-muted-foreground">
+                {formatDateTime(item.at)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

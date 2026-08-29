@@ -3,21 +3,32 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import {
+  computeAllAccountBalances,
   computeBudgetProgress,
   computeSharedBalancesSummary,
   filterTransactionsForCurrentMonth,
   type GroupBalanceInput,
 } from "@evensplit/shared";
-import { ArrowDownLeft, ArrowRight, ArrowRightLeft, ArrowUpRight, Clock, PiggyBank } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowRight,
+  ArrowRightLeft,
+  ArrowUpRight,
+  Clock,
+  PiggyBank,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/app-shell/top-nav";
 import { CreateGroupDialog } from "@/components/groups/create-group-dialog";
 import { GroupCard } from "@/components/groups/group-card";
-import { FinancesSummaryCard } from "@/components/personal/finances-summary-card";
 import { AddTransactionDialog } from "@/components/personal/add-transaction-dialog";
 import { SettlementReceiptBanner } from "@/components/personal/settlement-receipt-banner";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MetricCard, MetricCardGrid } from "@/components/ui/metric-card";
 import { useAuth } from "@/hooks/use-auth";
 import { useAllActivity, useAllExpenses, useAllSettlements, useMyGroups } from "@/hooks/use-groups";
 import { usePersonalAccounts, usePersonalBudgets, usePersonalCategories, usePersonalTransactions } from "@/hooks/use-personal";
@@ -70,6 +81,20 @@ function DashboardContent() {
     return progress.reduce((max, p) => (p.percent > max.percent ? p : max), progress[0]);
   }, [budgets, categories, transactions]);
 
+  const personalTotals = useMemo(() => {
+    if (!accounts || accounts.length === 0) return null;
+    const balances = computeAllAccountBalances(accounts, transactions ?? []);
+    const total = balances.reduce((sum, b) => sum + b.balance, 0);
+    let monthExpense = 0;
+    for (const tx of filterTransactionsForCurrentMonth(transactions ?? [])) {
+      if (tx.kind === "expense") monthExpense += tx.amount;
+    }
+    return { total, currency: accounts[0].currency, monthExpense };
+  }, [accounts, transactions]);
+
+  const primaryShared = sharedBalances[0] ?? null;
+  const sharedCurrency = primaryShared?.currency ?? profile?.default_currency ?? "PHP";
+
   const upcomingRecurring = useMemo(() => {
     return (allExpenses ?? [])
       .filter((e) => e.is_recurring && e.next_occurrence_date)
@@ -99,45 +124,43 @@ function DashboardContent() {
         <p className="text-sm text-muted-foreground">Your shared balances and personal finances, in one place.</p>
       </div>
 
-      <FinancesSummaryCard />
-
       <SettlementReceiptBanner
         unconfirmed={unconfirmedSettlements}
         groupName={(id) => groupById.get(id)?.name ?? "a group"}
         groupCurrency={(id) => groupById.get(id)?.currency ?? "PHP"}
       />
 
-      {sharedBalances.length > 0 && (
-        <div className="mb-6 grid gap-2 rounded-2xl border border-border bg-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Shared balances</p>
-          {sharedBalances.map((s) => (
-            <div key={s.currency} className="flex items-center justify-between">
-              <div className="flex gap-6">
-                <div>
-                  <p className="text-[11px] text-muted-foreground">People owe you</p>
-                  <p className="text-sm font-bold text-positive">{formatMoney(s.owedToYou, s.currency)}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground">You owe</p>
-                  <p className="text-sm font-bold text-negative">{formatMoney(s.youOwe, s.currency)}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-[11px] text-muted-foreground">Net</p>
-                <p className={`text-sm font-bold ${s.net >= 0 ? "text-positive" : "text-negative"}`}>
-                  {formatMoney(s.net, s.currency)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <MetricCardGrid className="mb-6">
+        <MetricCard
+          icon={ArrowDownLeft}
+          label="Owed to you"
+          value={formatMoney(primaryShared?.owedToYou ?? 0, sharedCurrency)}
+          tone="positive"
+        />
+        <MetricCard
+          icon={ArrowUpRight}
+          label="You owe"
+          value={formatMoney(primaryShared?.youOwe ?? 0, sharedCurrency)}
+          tone="negative"
+        />
+        <MetricCard
+          icon={Wallet}
+          label="Personal balance"
+          value={formatMoney(personalTotals?.total ?? 0, personalTotals?.currency ?? "PHP")}
+          tone="primary"
+          split={[
+            { label: "Spent this mo.", value: formatMoney(personalTotals?.monthExpense ?? 0, personalTotals?.currency ?? "PHP") },
+            { label: "Accounts", value: String(accounts?.length ?? 0) },
+          ]}
+        />
+        <MetricCard icon={Users} label="Groups" value={String(groups?.length ?? 0)} tone="muted" />
+      </MetricCardGrid>
 
       <div className="mb-6 grid grid-cols-3 gap-3">
         <AddTransactionDialog
           initialKind="income"
           trigger={
-            <button className="flex w-full flex-col items-center gap-1.5 rounded-2xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:bg-muted">
+            <button className="flex w-full flex-col items-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-medium shadow-sm transition-colors hover:bg-muted">
               <ArrowDownLeft className="h-4 w-4 text-positive" /> Income
             </button>
           }
@@ -145,7 +168,7 @@ function DashboardContent() {
         <AddTransactionDialog
           initialKind="expense"
           trigger={
-            <button className="flex w-full flex-col items-center gap-1.5 rounded-2xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:bg-muted">
+            <button className="flex w-full flex-col items-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-medium shadow-sm transition-colors hover:bg-muted">
               <ArrowUpRight className="h-4 w-4 text-negative" /> Expense
             </button>
           }
@@ -153,7 +176,7 @@ function DashboardContent() {
         <AddTransactionDialog
           initialKind="transfer"
           trigger={
-            <button className="flex w-full flex-col items-center gap-1.5 rounded-2xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:bg-muted">
+            <button className="flex w-full flex-col items-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-medium shadow-sm transition-colors hover:bg-muted">
               <ArrowRightLeft className="h-4 w-4 text-muted-foreground" /> Transfer
             </button>
           }
@@ -243,22 +266,40 @@ function DashboardContent() {
               See all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="grid gap-2">
-            {recentActivity.map((item) => (
-              <Card key={`${item.type}-${item.id}`} className="p-3">
-                {item.type === "expense_added" ? (
-                  <p className="truncate text-sm">
-                    {memberName(item.group_id, item.paid_by)} added{" "}
-                    <span className="font-semibold">{item.description}</span> ·{" "}
-                    {formatMoney(item.amount, item.currency)}
-                  </p>
-                ) : (
-                  <p className="truncate text-sm">
-                    {memberName(item.group_id, item.from_user)} paid {memberName(item.group_id, item.to_user)} ·{" "}
-                    {formatMoney(item.amount, groupById.get(item.group_id)?.currency ?? "PHP")}
-                  </p>
-                )}
-              </Card>
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            {recentActivity.map((item, i) => (
+              <div
+                key={`${item.type}-${item.id}`}
+                className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? "border-t border-border/60" : ""}`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                    item.type === "expense_added" ? "bg-primary" : "bg-positive"
+                  }`}
+                />
+                <div className="min-w-0 flex-1">
+                  {item.type === "expense_added" ? (
+                    <p className="truncate text-sm">
+                      {memberName(item.group_id, item.paid_by)} added{" "}
+                      <span className="font-semibold">{item.description}</span>
+                    </p>
+                  ) : (
+                    <p className="truncate text-sm">
+                      {memberName(item.group_id, item.from_user)} paid {memberName(item.group_id, item.to_user)}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">{groupById.get(item.group_id)?.name ?? "Group"}</p>
+                </div>
+                <Badge variant={item.type === "expense_added" ? "secondary" : "outline"} className="shrink-0">
+                  {item.type === "expense_added" ? "Expense" : "Settlement"}
+                </Badge>
+                <span className="w-20 shrink-0 text-right font-mono text-sm font-semibold tabular-nums">
+                  {formatMoney(
+                    item.amount,
+                    item.type === "expense_added" ? item.currency : (groupById.get(item.group_id)?.currency ?? "PHP")
+                  )}
+                </span>
+              </div>
             ))}
           </div>
         </div>

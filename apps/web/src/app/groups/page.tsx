@@ -3,9 +3,10 @@
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/app-shell/top-nav";
 import { CreateGroupDialog } from "@/components/groups/create-group-dialog";
-import { GroupCard } from "@/components/groups/group-card";
+import { GroupTableRow } from "@/components/groups/group-table-row";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMyGroups } from "@/hooks/use-groups";
 import { Users, AlertCircle } from "lucide-react";
 
@@ -67,11 +68,23 @@ function GroupsContent() {
         </div>
       )}
 
-      {!isLoading && !isError && (
-        <div className="grid gap-3">
-          {groups?.map((g) => (
-            <GroupCard key={g.id} group={g} />
-          ))}
+      {!isLoading && !isError && groups && groups.length > 0 && (
+        <div className="rounded-xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Group</TableHead>
+                <TableHead>Members</TableHead>
+                <TableHead>Currency</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {groups.map((g) => (
+                <GroupTableRow key={g.id} group={g} />
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </AppShell>

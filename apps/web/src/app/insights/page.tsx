@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { AlertCircle, Layers, PieChart as PieChartIcon, Receipt } from "lucide-react";
+import { AlertCircle, ArrowRightLeft, Layers, PieChart as PieChartIcon, Receipt, Wallet } from "lucide-react";
 import {
   computeCategoryBreakdown,
   computeDailyTotals,
@@ -15,6 +15,7 @@ import { AppShell } from "@/components/app-shell/top-nav";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MetricCard, MetricCardGrid } from "@/components/ui/metric-card";
 import { SegmentedTabs } from "@/components/personal/segmented-tabs";
 import { MonthCalendar } from "@/components/personal/month-calendar";
 import { useAuth } from "@/hooks/use-auth";
@@ -249,18 +250,22 @@ function InsightsContent() {
       )}
 
       {!isLoading && !isError && (
-        <div className="mb-6 grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4">
-            <Layers className="h-4 w-4 text-primary" />
-            <span className="text-lg font-bold">{groups?.length ?? 0}</span>
-            <span className="text-xs text-muted-foreground">Active groups</span>
-          </div>
-          <div className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4">
-            <Receipt className="h-4 w-4 text-primary" />
-            <span className="text-lg font-bold">{expenses?.length ?? 0}</span>
-            <span className="text-xs text-muted-foreground">Expenses logged</span>
-          </div>
-        </div>
+        <MetricCardGrid className="mb-6">
+          <MetricCard icon={Layers} label="Active groups" value={String(groups?.length ?? 0)} tone="muted" />
+          <MetricCard icon={Receipt} label="Expenses logged" value={String(expenses?.length ?? 0)} tone="primary" />
+          <MetricCard
+            icon={Wallet}
+            label="Spent this month"
+            value={formatMoney(personalMonthTotal, personalCurrency)}
+            tone="negative"
+          />
+          <MetricCard
+            icon={ArrowRightLeft}
+            label="Outstanding advances"
+            value={formatMoney(sharedSummary.outstanding, personalCurrency)}
+            tone="warning"
+          />
+        </MetricCardGrid>
       )}
 
       {!isLoading && !isError && view === "charts" && hasNarrative && (
