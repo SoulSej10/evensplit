@@ -1,15 +1,15 @@
 import { type ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, FadeOut, SlideInDown, SlideOutDown } from "react-native-reanimated";
 import { X } from "lucide-react-native";
 import { cn } from "@/lib/cn";
 
 /**
  * Bottom-sheet modal used for Add Expense / Settle Up instead of full-screen
- * forms, per PROJECT_PLAN §3.5. Slides up from the bottom with a soft
- * spring, dims the backdrop, and stays anchored to the bottom of the
- * screen with generous rounded corners.
+ * forms, per PROJECT_PLAN §3.5. Slides up from the bottom with a plain,
+ * non-bouncy timing animation, dims the backdrop, and stays anchored to the
+ * bottom of the screen with generous rounded corners.
  */
 export function BottomSheet({
   visible,
@@ -35,8 +35,8 @@ export function BottomSheet({
         <Pressable className="flex-1 bg-black/40" onPress={onClose} />
       </Animated.View>
       <Animated.View
-        entering={SlideInDown.springify().damping(22).stiffness(220)}
-        exiting={SlideOutDown.duration(200)}
+        entering={SlideInDown.duration(220).easing(Easing.out(Easing.cubic))}
+        exiting={SlideOutDown.duration(200).easing(Easing.in(Easing.cubic))}
         className="absolute bottom-0 left-0 right-0 max-h-[88%] rounded-t-[18px] bg-surface dark:bg-surface-dark"
       >
         <SafeAreaView edges={["bottom"]}>

@@ -1,6 +1,6 @@
 import { Dimensions, Modal, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeIn, FadeOut, SlideInLeft, SlideOutLeft } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideOutLeft } from "react-native-reanimated";
 import { useSettingsDrawer } from "@/context/settings-drawer";
 import { SettingsPanelContent } from "./SettingsPanelContent";
 
@@ -24,8 +24,8 @@ export function SettingsDrawer() {
     <Modal visible={visible} transparent animationType="none" onRequestClose={close}>
       <View style={{ flexDirection: "row", width: WINDOW.width, height: WINDOW.height }}>
         <Animated.View
-          entering={SlideInLeft.springify().damping(24).stiffness(220)}
-          exiting={SlideOutLeft.duration(200)}
+          entering={SlideInLeft.duration(220).easing(Easing.out(Easing.cubic))}
+          exiting={SlideOutLeft.duration(200).easing(Easing.in(Easing.cubic))}
           className="bg-surface dark:bg-surface-dark"
           style={{ width: PANEL_WIDTH, height: WINDOW.height }}
         >
