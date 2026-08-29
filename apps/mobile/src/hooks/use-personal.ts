@@ -4,6 +4,8 @@ import type {
   CreatePersonalBudgetInput,
   CreatePersonalCategoryInput,
   CreatePersonalTransactionInput,
+  UpdatePersonalAccountInput,
+  UpdatePersonalCategoryInput,
 } from "@evensplit/shared";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -18,6 +20,8 @@ import {
   fetchPersonalBudgets,
   fetchPersonalCategories,
   fetchPersonalTransactions,
+  updatePersonalAccount,
+  updatePersonalCategory,
   upsertPersonalBudget,
 } from "@/lib/api/personal";
 
@@ -66,6 +70,16 @@ export function useCreatePersonalAccount() {
   });
 }
 
+export function useUpdatePersonalAccount() {
+  const { authUser } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ accountId, input }: { accountId: string; input: UpdatePersonalAccountInput }) =>
+      updatePersonalAccount(accountId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["personal-accounts", authUser?.id] }),
+  });
+}
+
 export function useArchivePersonalAccount() {
   const { authUser } = useAuth();
   const queryClient = useQueryClient();
@@ -80,6 +94,16 @@ export function useCreatePersonalCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreatePersonalCategoryInput) => createPersonalCategory(authUser!.id, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["personal-categories", authUser?.id] }),
+  });
+}
+
+export function useUpdatePersonalCategory() {
+  const { authUser } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ categoryId, input }: { categoryId: string; input: UpdatePersonalCategoryInput }) =>
+      updatePersonalCategory(categoryId, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["personal-categories", authUser?.id] }),
   });
 }

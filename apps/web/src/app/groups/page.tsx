@@ -77,6 +77,7 @@ function GroupsContent() {
                 <TableHead>Members</TableHead>
                 <TableHead>Currency</TableHead>
                 <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="w-8" />
               </TableRow>
             </TableHeader>
             <TableBody>

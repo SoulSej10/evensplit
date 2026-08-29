@@ -7,6 +7,8 @@ import type {
   PersonalBudget,
   PersonalCategory,
   PersonalTransaction,
+  UpdatePersonalAccountInput,
+  UpdatePersonalCategoryInput,
 } from "@evensplit/shared";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ParsedPersonalRow } from "@/lib/csv";
@@ -35,6 +37,21 @@ export async function createPersonalAccount(
   const { data, error } = await supabase
     .from("personal_accounts")
     .insert({ user_id: userId, ...input })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as PersonalAccount;
+}
+
+export async function updatePersonalAccount(
+  accountId: string,
+  input: UpdatePersonalAccountInput
+): Promise<PersonalAccount> {
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("personal_accounts")
+    .update(input)
+    .eq("id", accountId)
     .select()
     .single();
   if (error) throw error;
@@ -73,6 +90,21 @@ export async function createPersonalCategory(
   const { data, error } = await supabase
     .from("personal_categories")
     .insert({ user_id: userId, ...input, icon: input.icon ?? null })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as PersonalCategory;
+}
+
+export async function updatePersonalCategory(
+  categoryId: string,
+  input: UpdatePersonalCategoryInput
+): Promise<PersonalCategory> {
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("personal_categories")
+    .update(input)
+    .eq("id", categoryId)
     .select()
     .single();
   if (error) throw error;

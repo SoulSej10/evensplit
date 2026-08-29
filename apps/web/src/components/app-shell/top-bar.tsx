@@ -7,34 +7,72 @@ import { useEffect, useState } from "react";
 import { ChevronRight, Menu, Moon, Search, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { NAV_SECTIONS, SidebarNav } from "@/components/app-shell/sidebar";
+import { useBreadcrumbLabel } from "@/components/app-shell/breadcrumb-context";
 
-function currentPageLabel(pathname: string): string {
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+/**
+ * Full hierarchical trail for the current route, e.g. Groups > Baguio Trip
+ * 2026, or Finances > Budgets - not just a single "current page" label.
+ * `dynamicLabel` fills in real data (a group's name) for routes with a
+ * param segment; falls back to a generic label while that data loads.
+ */
+function computeCrumbs(pathname: string, dynamicLabel: string | null): Crumb[] {
   for (const section of NAV_SECTIONS) {
     if (section.children) {
       const child = section.children.find((c) =>
         c.href === "/personal" ? pathname === "/personal" : pathname.startsWith(c.href)
       );
-      if (child) return `${section.label} · ${child.label}`;
-      if (pathname.startsWith("/personal")) return section.label;
+      if (child) {
+        return [{ label: section.label, href: section.href }, { label: child.label }];
+      }
+      if (pathname.startsWith("/personal")) {
+        return [{ label: section.label, href: section.href }];
+      }
     }
-    if (pathname === section.href) return section.label;
-    if (section.href === "/groups" && pathname.startsWith("/groups/")) return "Group details";
+
+    if (section.href === "/groups" && pathname.startsWith("/groups/")) {
+      return [{ label: "Groups", href: "/groups" }, { label: dynamicLabel ?? "Group" }];
+    }
+
+    if (pathname === section.href) {
+      return [{ label: section.label }];
+    }
   }
-  return "SplitEven";
+  return [];
 }
 
 function Breadcrumb() {
   const pathname = usePathname();
-  const label = currentPageLabel(pathname);
+  const dynamicLabel = useBreadcrumbLabel();
+  const crumbs = computeCrumbs(pathname, dynamicLabel);
 
   return (
-    <div className="flex min-w-0 items-center gap-1.5 text-sm">
+    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
       <Link href="/dashboard" className="shrink-0 font-medium text-muted-foreground hover:text-foreground">
         SplitEven
       </Link>
-      <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
-      <span className="truncate font-semibold text-foreground">{label}</span>
-    </div>
+      {crumbs.map((crumb, i) => {
+        const isLast = i === crumbs.length - 1;
+        return (
+          <span key={`${crumb.label}-${i}`} className="flex min-w-0 items-center gap-1.5">
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+            {crumb.href && !isLast ? (
+              <Link href={crumb.href} className="shrink-0 font-medium text-muted-foreground hover:text-foreground">
+                {crumb.label}
+              </Link>
+            ) : (
+              <span className={isLast ? "truncate font-semibold text-foreground" : "shrink-0 text-muted-foreground"}>
+                {crumb.label}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </nav>
   );
 }
 

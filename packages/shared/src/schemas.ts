@@ -168,6 +168,12 @@ export const createPersonalCategorySchema = z.object({
 });
 export type CreatePersonalCategoryInput = z.infer<typeof createPersonalCategorySchema>;
 
+export const updatePersonalAccountSchema = createPersonalAccountSchema.partial();
+export type UpdatePersonalAccountInput = z.infer<typeof updatePersonalAccountSchema>;
+
+export const updatePersonalCategorySchema = createPersonalCategorySchema.partial();
+export type UpdatePersonalCategoryInput = z.infer<typeof updatePersonalCategorySchema>;
+
 export const createPersonalTransactionSchema = z
   .object({
     account_id: uuidSchema,

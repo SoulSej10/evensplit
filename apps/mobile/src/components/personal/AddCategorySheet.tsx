@@ -1,28 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { createPersonalCategorySchema, type PersonalCategoryKind } from "@evensplit/shared";
+import {
+  createPersonalCategorySchema,
+  type PersonalCategory,
+  type PersonalCategoryKind,
+} from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
-import { useCreatePersonalCategory } from "@/hooks/use-personal";
+import { useCreatePersonalCategory, useUpdatePersonalCategory } from "@/hooks/use-personal";
 import { cn } from "@/lib/cn";
 
 const ICONS = ["🛒", "🍔", "🚗", "🏠", "💡", "🎬", "💊", "📚", "✈️", "💰", "🎁", "📱"];
 
+/** Pass `category` to edit an existing category in place instead of creating a new one. */
 export function AddCategorySheet({
   visible,
   onClose,
   defaultKind,
+  category,
 }: {
   visible: boolean;
   onClose: () => void;
   defaultKind: PersonalCategoryKind;
+  category?: PersonalCategory;
 }) {
+  const isEdit = !!category;
   const createCategory = useCreatePersonalCategory();
-  const [name, setName] = useState("");
-  const [kind, setKind] = useState<PersonalCategoryKind>(defaultKind);
-  const [icon, setIcon] = useState(ICONS[0]);
+  const updateCategory = useUpdatePersonalCategory();
+  const [name, setName] = useState(category?.name ?? "");
+  const [kind, setKind] = useState<PersonalCategoryKind>(category?.kind ?? defaultKind);
+  const [icon, setIcon] = useState(category?.icon ?? ICONS[0]);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setName(category?.name ?? "");
+      setKind(category?.kind ?? defaultKind);
+      setIcon(category?.icon ?? ICONS[0]);
+    }
+  }, [visible, category, defaultKind]);
 
   async function onSubmit() {
     const parsed = createPersonalCategorySchema.safeParse({ name, kind, icon });
@@ -32,11 +49,15 @@ export function AddCategorySheet({
     }
     setSubmitting(true);
     try {
-      await createCategory.mutateAsync(parsed.data);
+      if (isEdit) {
+        await updateCategory.mutateAsync({ categoryId: category.id, input: parsed.data });
+      } else {
+        await createCategory.mutateAsync(parsed.data);
+      }
       onClose();
       setName("");
     } catch (err) {
-      Alert.alert("Could not add category", err instanceof Error ? err.message : "Try again");
+      Alert.alert(`Could not ${isEdit ? "update" : "add"} category`, err instanceof Error ? err.message : "Try again");
     } finally {
       setSubmitting(false);
     }
@@ -46,10 +67,10 @@ export function AddCategorySheet({
     <BottomSheet
       visible={visible}
       onClose={onClose}
-      title="Add a category"
+      title={isEdit ? "Edit category" : "Add a category"}
       footer={
         <Button onPress={onSubmit} loading={submitting} size="lg">
-          Add category
+          {isEdit ? "Save changes" : "Add category"}
         </Button>
       }
     >

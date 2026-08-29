@@ -2,9 +2,10 @@
 
 import { toast } from "sonner";
 import { Tag, Trash2 } from "lucide-react";
+import type { PersonalCategory } from "@evensplit/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { AddCategoryDialog } from "@/components/personal/add-category-dialog";
+import { AddCategoryDialog, EditCategoryButton } from "@/components/personal/add-category-dialog";
 import { useDeletePersonalCategory, usePersonalCategories } from "@/hooks/use-personal";
 
 function CategoryGroup({
@@ -15,7 +16,7 @@ function CategoryGroup({
 }: {
   title: string;
   kind: "income" | "expense";
-  categories: { id: string; name: string; icon: string | null }[];
+  categories: PersonalCategory[];
   onDelete: (id: string, name: string) => void;
 }) {
   return (
@@ -34,13 +35,16 @@ function CategoryGroup({
                 <span className="text-lg">{c.icon ?? "🏷️"}</span>
                 {c.name}
               </span>
-              <button
-                onClick={() => onDelete(c.id, c.name)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
-                aria-label={`Delete ${c.name}`}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <EditCategoryButton category={c} />
+                <button
+                  onClick={() => onDelete(c.id, c.name)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  aria-label={`Delete ${c.name}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </Card>
           ))}
         </div>

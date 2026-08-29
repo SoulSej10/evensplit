@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { computeAllAccountBalances } from "@evensplit/shared";
-import { Wallet, MoreVertical } from "lucide-react";
+import { Wallet, MoreVertical, Pencil, Archive } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -70,17 +70,31 @@ export default function PersonalAccountsPage() {
                 <p className="font-medium">{account.name}</p>
                 <p className="text-xs capitalize text-muted-foreground">{account.type}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold tabular-nums">{formatMoney(balance, account.currency)}</p>
+              <div className="flex items-center gap-1">
+                <p className="mr-2 font-semibold tabular-nums">{formatMoney(balance, account.currency)}</p>
+                <AddAccountDialog
+                  account={account}
+                  trigger={
+                    <button
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary-light hover:text-primary"
+                      aria-label={`Edit ${account.name}`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  }
+                />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted">
+                    <button
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                      aria-label={`More actions for ${account.name}`}
+                    >
                       <MoreVertical className="h-4 w-4" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onArchive(account.id, account.name)}>
-                      Archive
+                      <Archive className="mr-2 h-4 w-4" /> Archive
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

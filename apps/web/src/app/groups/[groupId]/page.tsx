@@ -7,6 +7,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/app-shell/top-nav";
+import { BackLink } from "@/components/app-shell/back-link";
+import { useSetBreadcrumbLabel } from "@/components/app-shell/breadcrumb-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,6 +51,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   const { data: expenses } = useGroupExpenses(groupId);
   const { data: settlements } = useGroupSettlements(groupId);
   useGroupRealtime(groupId);
+  useSetBreadcrumbLabel(group?.name ?? null);
 
   const members = group?.group_members ?? [];
   const memberIds = useMemo(() => members.map((m) => m.user_id), [members]);
@@ -97,6 +100,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   if (isError) {
     return (
       <AppShell>
+        <BackLink href="/groups" label="Back to groups" />
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-destructive/40 py-16 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
             <AlertCircle className="h-6 w-6" />
@@ -116,6 +120,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   if (isLoading || !group) {
     return (
       <AppShell>
+        <BackLink href="/groups" label="Back to groups" />
         <Skeleton className="h-24 rounded-2xl" />
       </AppShell>
     );
@@ -126,6 +131,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
 
   return (
     <AppShell>
+      <BackLink href="/groups" label="Back to groups" />
       <div className="mb-6 rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">

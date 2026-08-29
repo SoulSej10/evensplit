@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { ChevronRight } from "lucide-react";
 import type { GroupWithMembers } from "@/lib/api/groups";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -69,6 +70,16 @@ export function GroupTableRow({ group }: { group: GroupWithMembers }) {
             {(isPositive || isNegative) && formatMoney(Math.abs(balance), group.currency)}
           </Badge>
         )}
+      </TableCell>
+
+      <TableCell className="w-8 pl-0">
+        <Link
+          href={`/groups/${group.id}`}
+          aria-label={`Open ${group.name}`}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Link>
       </TableCell>
     </TableRow>
   );

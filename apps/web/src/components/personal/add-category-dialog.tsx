@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
-import { createPersonalCategorySchema, type CreatePersonalCategoryInput } from "@evensplit/shared";
+import { Pencil, Plus } from "lucide-react";
+import {
+  createPersonalCategorySchema,
+  type CreatePersonalCategoryInput,
+  type PersonalCategory,
+} from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,41 +23,74 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreatePersonalCategory } from "@/hooks/use-personal";
+import { useCreatePersonalCategory, useUpdatePersonalCategory } from "@/hooks/use-personal";
 
 const ICONS = ["🛒", "🍔", "🚗", "🏠", "💡", "🎬", "💊", "📚", "✈️", "💰", "🎁", "📱"];
 
-export function AddCategoryDialog({ defaultKind }: { defaultKind: "income" | "expense" }) {
+/**
+ * Handles both creating a new category and editing an existing one - pass
+ * `category` to edit it in place instead of creating a new one. Mirrors the
+ * ExpenseFormDialog create/edit pattern.
+ */
+export function AddCategoryDialog({
+  defaultKind,
+  category,
+  trigger,
+}: {
+  defaultKind: "income" | "expense";
+  category?: PersonalCategory;
+  trigger?: ReactNode;
+}) {
+  const isEdit = !!category;
   const [open, setOpen] = useState(false);
-  const [icon, setIcon] = useState(ICONS[0]);
+  const [icon, setIcon] = useState(category?.icon ?? ICONS[0]);
   const createCategory = useCreatePersonalCategory();
+  const updateCategory = useUpdatePersonalCategory();
+  const submitting = createCategory.isPending || updateCategory.isPending;
 
   const { register, handleSubmit, reset, watch, setValue, formState } = useForm<CreatePersonalCategoryInput>({
     resolver: zodResolver(createPersonalCategorySchema),
-    defaultValues: { name: "", kind: defaultKind, icon: ICONS[0] },
+    defaultValues: {
+      name: category?.name ?? "",
+      kind: category?.kind ?? defaultKind,
+      icon: category?.icon ?? ICONS[0],
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      reset({ name: category?.name ?? "", kind: category?.kind ?? defaultKind, icon: category?.icon ?? ICONS[0] });
+      setIcon(category?.icon ?? ICONS[0]);
+    }
+  }, [open, category, defaultKind, reset]);
 
   async function onSubmit(values: CreatePersonalCategoryInput) {
     try {
-      await createCategory.mutateAsync({ ...values, icon });
-      toast.success(`${values.name} added`);
+      if (isEdit) {
+        await updateCategory.mutateAsync({ categoryId: category.id, input: { ...values, icon } });
+        toast.success(`${values.name} updated`);
+      } else {
+        await createCategory.mutateAsync({ ...values, icon });
+        toast.success(`${values.name} added`);
+      }
       setOpen(false);
-      reset();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not add category");
+      toast.error(err instanceof Error ? err.message : `Could not ${isEdit ? "update" : "add"} category`);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="rounded-lg">
-          <Plus className="mr-1 h-4 w-4" /> Add category
-        </Button>
+        {trigger ?? (
+          <Button className="rounded-lg font-semibold shadow-sm">
+            <Plus className="mr-1 h-4 w-4" /> Add category
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="rounded-2xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add a category</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit category" : "Add a category"}</DialogTitle>
           <DialogDescription>Used to group your transactions and set budgets.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -92,12 +129,30 @@ export function AddCategoryDialog({ defaultKind }: { defaultKind: "income" | "ex
           </div>
 
           <DialogFooter>
-            <Button type="submit" className="w-full" disabled={createCategory.isPending}>
-              Add category
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {isEdit ? "Save changes" : "Add category"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** Small icon-button trigger for editing an existing category from a list row. */
+export function EditCategoryButton({ category }: { category: PersonalCategory }) {
+  return (
+    <AddCategoryDialog
+      defaultKind={category.kind}
+      category={category}
+      trigger={
+        <button
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary-light hover:text-primary"
+          aria-label={`Edit ${category.name}`}
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+      }
+    />
   );
 }

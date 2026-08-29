@@ -254,7 +254,12 @@ function ExpenseRow({
       <TableCell>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              aria-label={`Delete ${expense.description}`}
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>

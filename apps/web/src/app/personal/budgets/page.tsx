@@ -90,7 +90,7 @@ export default function PersonalBudgetsPage() {
                   </p>
                   <button
                     onClick={() => onDelete(budget.id)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Remove budget"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

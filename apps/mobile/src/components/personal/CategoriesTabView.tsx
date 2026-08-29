@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { Tag, Trash2 } from "lucide-react-native";
+import { Pencil, Tag, Trash2 } from "lucide-react-native";
+import type { PersonalCategory } from "@evensplit/shared";
 import { Card } from "@/components/ui/Card";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useDeletePersonalCategory, usePersonalCategories } from "@/hooks/use-personal";
+import { AddCategorySheet } from "@/components/personal/AddCategorySheet";
 
-/** The "Add" action lives in finances.tsx's floating action button, not inline here. */
+/** The "Add" action lives in finances.tsx's floating action button, not inline here - editing an existing category is inline. */
 export function CategoriesTabView() {
   const { data: categories, isLoading, isError, refetch } = usePersonalCategories();
   const deleteCategory = useDeletePersonalCategory();
+  const [editing, setEditing] = useState<PersonalCategory | null>(null);
 
   function onDelete(id: string, name: string) {
     Alert.alert(`Delete ${name}?`, "This category will be removed.", [
@@ -36,9 +40,14 @@ export function CategoriesTabView() {
                 {c.icon ? `${c.icon} ` : ""}
                 {c.name}
               </Text>
-              <Pressable onPress={() => onDelete(c.id, c.name)} hitSlop={10}>
-                <Trash2 color="#D95F5F" size={16} />
-              </Pressable>
+              <View className="flex-row items-center gap-4">
+                <Pressable onPress={() => setEditing(c)} hitSlop={10}>
+                  <Pencil color="#6B7169" size={16} />
+                </Pressable>
+                <Pressable onPress={() => onDelete(c.id, c.name)} hitSlop={10}>
+                  <Trash2 color="#D95F5F" size={16} />
+                </Pressable>
+              </View>
             </Card>
           ))
         )}
@@ -58,6 +67,13 @@ export function CategoriesTabView() {
       )}
       <Group title="Expense categories" items={expenseCategories} />
       <Group title="Income categories" items={incomeCategories} />
+
+      <AddCategorySheet
+        visible={!!editing}
+        onClose={() => setEditing(null)}
+        defaultKind={editing?.kind ?? "expense"}
+        category={editing ?? undefined}
+      />
     </View>
   );
 }

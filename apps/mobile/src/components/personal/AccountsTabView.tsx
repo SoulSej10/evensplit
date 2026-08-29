@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { computeAllAccountBalances } from "@evensplit/shared";
-import { Wallet } from "lucide-react-native";
+import { computeAllAccountBalances, type PersonalAccount } from "@evensplit/shared";
+import { Pencil, Wallet } from "lucide-react-native";
 import { Card } from "@/components/ui/Card";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
@@ -10,12 +11,14 @@ import {
   usePersonalAccounts,
   usePersonalTransactions,
 } from "@/hooks/use-personal";
+import { AddAccountSheet } from "@/components/personal/AddAccountSheet";
 
-/** The "Add account" action lives in finances.tsx's floating action button, not inline here. */
+/** The "Add account" action lives in finances.tsx's floating action button, not inline here - editing an existing account is inline (tap the pencil), archiving is a long-press. */
 export function AccountsTabView() {
   const { data: accounts, isLoading, isError, refetch } = usePersonalAccounts();
   const { data: transactions } = usePersonalTransactions();
   const archiveAccount = useArchivePersonalAccount();
+  const [editing, setEditing] = useState<PersonalAccount | null>(null);
 
   const balances = computeAllAccountBalances(accounts ?? [], transactions ?? []);
 
@@ -53,10 +56,15 @@ export function AccountsTabView() {
                 <Text className="text-xs capitalize text-neutral-500">{account.type}</Text>
               </View>
               <MoneyText amount={balance} currency={account.currency} tone="neutral" />
+              <Pressable onPress={() => setEditing(account)} hitSlop={10} className="ml-1">
+                <Pencil color="#6B7169" size={16} />
+              </Pressable>
             </Card>
           </Pressable>
         );
       })}
+
+      <AddAccountSheet visible={!!editing} onClose={() => setEditing(null)} account={editing ?? undefined} />
     </View>
   );
 }

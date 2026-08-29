@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
-import { createPersonalAccountSchema, type CreatePersonalAccountInput } from "@evensplit/shared";
+import { createPersonalAccountSchema, type CreatePersonalAccountInput, type PersonalAccount } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
-import { useCreatePersonalAccount } from "@/hooks/use-personal";
+import { useCreatePersonalAccount, useUpdatePersonalAccount } from "@/hooks/use-personal";
 import { CURRENCIES } from "@/lib/format";
 
 const ACCOUNT_TYPES = [
@@ -33,39 +33,67 @@ const ACCOUNT_TYPES = [
 
 const ACCOUNT_ICONS = ["💵", "💳", "👛", "🏦", "🐷", "📈", "💰", "🪙", "🏧", "💎", "🧾", "🎯"];
 
-export function AddAccountDialog() {
+/** Handles both creating a new account and editing an existing one - pass `account` to edit it in place. */
+export function AddAccountDialog({ account, trigger }: { account?: PersonalAccount; trigger?: ReactNode }) {
+  const isEdit = !!account;
   const { profile } = useAuth();
   const [open, setOpen] = useState(false);
-  const [icon, setIcon] = useState(ACCOUNT_ICONS[0]);
+  const [icon, setIcon] = useState(account?.icon ?? ACCOUNT_ICONS[0]);
   const createAccount = useCreatePersonalAccount();
+  const updateAccount = useUpdatePersonalAccount();
+  const submitting = createAccount.isPending || updateAccount.isPending;
 
   const { register, handleSubmit, reset, watch, setValue, formState } = useForm<CreatePersonalAccountInput>({
     resolver: zodResolver(createPersonalAccountSchema),
-    defaultValues: { name: "", type: "cash", currency: profile?.default_currency ?? "PHP", starting_balance: 0, icon: ACCOUNT_ICONS[0] },
+    defaultValues: {
+      name: account?.name ?? "",
+      type: account?.type ?? "cash",
+      currency: account?.currency ?? profile?.default_currency ?? "PHP",
+      starting_balance: account?.starting_balance ?? 0,
+      icon: account?.icon ?? ACCOUNT_ICONS[0],
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: account?.name ?? "",
+        type: account?.type ?? "cash",
+        currency: account?.currency ?? profile?.default_currency ?? "PHP",
+        starting_balance: account?.starting_balance ?? 0,
+        icon: account?.icon ?? ACCOUNT_ICONS[0],
+      });
+      setIcon(account?.icon ?? ACCOUNT_ICONS[0]);
+    }
+  }, [open, account, profile, reset]);
 
   async function onSubmit(values: CreatePersonalAccountInput) {
     try {
-      await createAccount.mutateAsync({ ...values, icon });
-      toast.success(`${values.name} added`);
+      if (isEdit) {
+        await updateAccount.mutateAsync({ accountId: account.id, input: { ...values, icon } });
+        toast.success(`${values.name} updated`);
+      } else {
+        await createAccount.mutateAsync({ ...values, icon });
+        toast.success(`${values.name} added`);
+      }
       setOpen(false);
-      reset();
-      setIcon(ACCOUNT_ICONS[0]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not add account");
+      toast.error(err instanceof Error ? err.message : `Could not ${isEdit ? "update" : "add"} account`);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-lg">
-          <Plus className="mr-1 h-4 w-4" /> Add account
-        </Button>
+        {trigger ?? (
+          <Button className="rounded-lg">
+            <Plus className="mr-1 h-4 w-4" /> Add account
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="rounded-2xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add an account</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit account" : "Add an account"}</DialogTitle>
           <DialogDescription>Cash, a card, savings — wherever your money lives.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -137,8 +165,8 @@ export function AddAccountDialog() {
           </div>
 
           <DialogFooter>
-            <Button type="submit" className="w-full" disabled={createAccount.isPending}>
-              Add account
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {isEdit ? "Save changes" : "Add account"}
             </Button>
           </DialogFooter>
         </form>
