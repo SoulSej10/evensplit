@@ -19,9 +19,8 @@ const TABS = [
 
 /**
  * Sub-nav for Finances' own tabs (Records/Analysis/Budgets/Accounts/
- * Categories). The top-level "Finances" destination is now the persistent
- * TopNav (via AppShell), not a page-local header - so this only needs to
- * own the second-level tab row, not a title or back button.
+ * Categories). The top-level "Finances" destination lives in the sidebar
+ * (via AppShell) - this only owns the second-level tab row, not a title.
  */
 function PersonalSubNav() {
   const pathname = usePathname();
@@ -52,7 +51,10 @@ export default function PersonalLayout({ children }: { children: React.ReactNode
   return (
     <AuthGuard>
       <AppShell>
-        <h1 className="mb-4 text-2xl font-semibold tracking-tight">Finances</h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight">Finances</h1>
+          <p className="text-sm text-muted-foreground">Your personal accounts, budgets, and spending, kept separate from group balances.</p>
+        </div>
         <FinancesSummaryCard />
         <PersonalSubNav />
         {children}
