@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Link, router } from "expo-router";
+import * as Linking from "expo-linking";
 import { useColorScheme } from "nativewind";
 import { ArrowLeft } from "lucide-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,15 +26,21 @@ export default function SignUpScreen() {
     setSubmitting(true);
     try {
       const supabase = getSupabaseClient();
-      const { data, error } = await supabase.auth.signUp(values);
+      const { data, error } = await supabase.auth.signUp({
+        ...values,
+        options: { emailRedirectTo: Linking.createURL("auth/callback") },
+      });
       if (error) throw error;
       if (!data.session) {
         // Email confirmation is required: signUp() succeeds but returns no
         // session, so there's no authenticated user yet to run profile
-        // setup for. Send them to log in instead of a dead-end screen.
+        // setup for. The confirmation link now points back at
+        // evensplit://auth/callback (app/auth/callback.tsx), which signs
+        // them straight in - but they may confirm from another device, so
+        // send them to log in as a fallback in the meantime.
         Alert.alert(
           "Check your email",
-          "We've sent a confirmation link to your email. Confirm it, then log in to finish setting up your account."
+          "We've sent a confirmation link to your email. Tap it to finish creating your account."
         );
         router.replace("/(auth)/login");
         return;

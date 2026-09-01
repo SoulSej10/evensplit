@@ -4,6 +4,7 @@ import { useColorScheme } from "nativewind";
 import { BarChart3, Home, Users, Wallet } from "lucide-react-native";
 import { SettingsDrawerProvider } from "@/context/settings-drawer";
 import { SettingsDrawer } from "@/components/settings/SettingsDrawer";
+import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 
 /**
  * A standard fixed, full-width bottom tab bar — not floating with side
@@ -76,6 +77,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="activity" options={{ href: null }} />
       </Tabs>
       <SettingsDrawer />
+      <OnboardingTour />
     </SettingsDrawerProvider>
   );
 }

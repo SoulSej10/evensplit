@@ -75,7 +75,7 @@ export default function ProfileSetupScreen() {
 
       <View className="items-center gap-3">
         <Pressable onPress={pickAvatar}>
-          <Avatar name={watch("display_name") || "?"} uri={avatarUri} size={88} />
+          <Avatar name={watch("display_name") || "?"} uri={avatarUri} size={88} logoFallback />
         </Pressable>
         <Pressable onPress={pickAvatar}>
           <Text className="font-medium text-primary">Upload photo</Text>

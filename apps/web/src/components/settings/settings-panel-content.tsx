@@ -38,7 +38,7 @@ import { upsertProfile, uploadAvatar } from "@/lib/api/profile";
 import { importPersonalLedgerRows } from "@/lib/api/personal";
 import { downloadPersonalLedgerCsv, parsePersonalLedgerCsv, summarizePersonalImport } from "@/lib/csv";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { CURRENCIES, initials } from "@/lib/format";
+import { CURRENCIES } from "@/lib/format";
 
 /** Shared between the /settings page and the left-sliding Sheet opened from the avatar menu. */
 export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
@@ -198,7 +198,8 @@ export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
               <Avatar className="h-16 w-16">
                 <AvatarImage src={avatarPreview ?? undefined} />
                 <AvatarFallback className="bg-primary-light text-lg text-primary">
-                  {initials(watch("display_name") || "?")}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- small local asset, not worth next/image's overhead here */}
+                  <img src="/logo-mark.png" alt="" className="h-full w-full object-cover" />
                 </AvatarFallback>
               </Avatar>
               <label className="cursor-pointer text-sm text-primary hover:underline">

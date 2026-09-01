@@ -48,7 +48,7 @@ export default function GroupsListScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="px-5 pb-4 pt-3" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-24 pt-3" showsVerticalScrollIndicator={false}>
         <Text className="mb-1 text-2xl font-extrabold text-neutral-900 dark:text-neutral-100">
           {groups?.length ? "Your groups" : "Groups"}
         </Text>
@@ -103,7 +103,7 @@ export default function GroupsListScreen() {
 
       <Pressable
         onPress={() => setSheetOpen(true)}
-        className="absolute bottom-28 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
+        className="absolute bottom-5 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
         style={{
           shadowColor: "#16A88F",
           shadowOpacity: 0.35,

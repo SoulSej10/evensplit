@@ -3,6 +3,7 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import { Button } from "@/components/ui/Button";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { applyAuthCallbackUrl } from "@/lib/supabase/authDeepLink";
 
 /**
  * Google OAuth sign-in. Opens Supabase's OAuth URL in the system browser
@@ -20,7 +21,15 @@ export function GoogleButton() {
       });
       if (error) throw error;
       if (data?.url) {
-        await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+        const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+        // The client is created with `detectSessionInUrl: false`, so the
+        // returned redirect URL's session tokens are never picked up
+        // automatically - without this, the browser session closes
+        // "successfully" but the user is never actually signed in.
+        if (result.type === "success" && result.url) {
+          const applied = await applyAuthCallbackUrl(result.url);
+          if (!applied) Alert.alert("Could not sign in with Google", "Try again");
+        }
       }
     } catch (err) {
       Alert.alert("Could not sign in with Google", err instanceof Error ? err.message : "Try again");

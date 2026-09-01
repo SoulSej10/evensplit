@@ -255,7 +255,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
         showsVerticalScrollIndicator={false}
       >
         <Card className="flex-row items-center gap-4">
-          <Avatar name={profile?.display_name} uri={profile?.avatar_url} size={52} />
+          <Avatar name={profile?.display_name} uri={profile?.avatar_url} size={52} logoFallback />
           <View className="flex-1">
             <Text className="text-base font-semibold text-neutral-900 dark:text-neutral-100" numberOfLines={1}>
               {profile?.display_name ?? "—"}

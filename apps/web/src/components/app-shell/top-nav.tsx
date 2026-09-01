@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/app-shell/sidebar";
 import { TopBar } from "@/components/app-shell/top-bar";
 import { BreadcrumbLabelProvider } from "@/components/app-shell/breadcrumb-context";
+import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
 
 /**
  * The authenticated app's chrome: a persistent left sidebar (desktop) /
@@ -19,6 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
         </div>
       </div>
+      <OnboardingTour />
     </BreadcrumbLabelProvider>
   );
 }

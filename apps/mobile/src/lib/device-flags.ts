@@ -16,6 +16,17 @@ export async function setPrivacyPolicyAccepted(): Promise<void> {
   await AsyncStorage.setItem(PRIVACY_POLICY_KEY, "true");
 }
 
+const ONBOARDING_TOUR_KEY = "evensplit:onboarding-tour-shown";
+
+/** Whether the one-time first-launch welcome tour has already been shown on this device. */
+export async function hasSeenOnboardingTour(): Promise<boolean> {
+  return (await AsyncStorage.getItem(ONBOARDING_TOUR_KEY)) === "true";
+}
+
+export async function setOnboardingTourShown(): Promise<void> {
+  await AsyncStorage.setItem(ONBOARDING_TOUR_KEY, "true");
+}
+
 const NOTIF_NUDGE_KEY = "evensplit:notification-nudge-shown";
 
 /** Whether the one-time "enable notifications?" nudge has already been shown on this device. */

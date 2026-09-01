@@ -103,7 +103,7 @@ export default function FinancesScreen() {
 
       <PillTabs options={TABS} value={tab} onChange={setTab} />
 
-      <ScrollView contentContainerClassName="px-5 pb-4" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="px-5 pb-24" showsVerticalScrollIndicator={false}>
         {tab === "overview" && <OverviewTabView onNavigateTab={setTab} />}
         {tab === "records" && <RecordsTabView />}
         {tab === "analysis" && <AnalysisTabView />}
@@ -117,7 +117,7 @@ export default function FinancesScreen() {
         <Pressable
           onPress={onFabPress}
           accessibilityLabel={CREATE_LABEL[tab]}
-          className="absolute bottom-28 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
+          className="absolute bottom-5 right-5 h-16 w-16 items-center justify-center rounded-full bg-primary active:opacity-90"
           style={{
             shadowColor: "#16A88F",
             shadowOpacity: 0.35,

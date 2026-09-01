@@ -21,7 +21,6 @@ import { Logo } from "@/components/brand/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { initials } from "@/lib/format";
 
 export interface NavLeaf {
   href: string;
@@ -163,7 +162,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           <Avatar className="h-9 w-9">
             <AvatarImage src={profile?.avatar_url ?? undefined} alt={profile?.display_name} />
             <AvatarFallback className="bg-primary-light text-primary">
-              {profile?.display_name ? initials(profile.display_name) : "?"}
+              {/* eslint-disable-next-line @next/next/no-img-element -- small local asset, not worth next/image's overhead here */}
+              <img src="/logo-mark.png" alt="" className="h-full w-full object-cover" />
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">

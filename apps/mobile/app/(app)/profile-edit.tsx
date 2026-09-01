@@ -77,7 +77,7 @@ export default function ProfileEditScreen() {
       <ScrollView contentContainerClassName="gap-4 px-5 py-6">
         <View className="items-center gap-3">
           <Pressable onPress={pickAvatar}>
-            <Avatar name={watch("display_name")} uri={avatarUri} size={88} />
+            <Avatar name={watch("display_name")} uri={avatarUri} size={88} logoFallback />
           </Pressable>
           <Pressable onPress={pickAvatar}>
             <Text className="font-medium text-primary">Change photo</Text>
