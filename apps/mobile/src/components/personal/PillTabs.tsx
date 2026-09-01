@@ -28,7 +28,7 @@ export function PillTabs<T extends string>({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerClassName="items-center gap-2 px-5 pb-3"
+        contentContainerClassName="items-center gap-1.5 px-5 pb-3"
       >
         {options.map((opt) => {
           const active = opt.value === value;
@@ -36,11 +36,11 @@ export function PillTabs<T extends string>({
             <Pressable
               key={opt.value}
               onPress={() => onChange(opt.value)}
-              className="flex-row items-center gap-1.5 rounded-lg px-4 py-2"
+              className="flex-row items-center gap-1 rounded-lg px-3 py-1.5"
               style={{ backgroundColor: active ? "#16A88F" : inactiveBg }}
             >
-              {opt.icon && <opt.icon color={active ? "white" : "#6B7169"} size={14} />}
-              <Text className={cn("text-sm font-semibold", active ? "text-white" : "text-neutral-500")}>
+              {opt.icon && <opt.icon color={active ? "white" : "#6B7169"} size={12} />}
+              <Text className={cn("text-xs font-semibold", active ? "text-white" : "text-neutral-500")}>
                 {opt.label}
               </Text>
             </Pressable>
