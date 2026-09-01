@@ -80,15 +80,6 @@ export default function LoginPage() {
     }
   }
 
-  async function onGoogle() {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (error) toast.error(error.message);
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
@@ -189,9 +180,9 @@ export default function LoginPage() {
               <Separator className="flex-1" />
             </div>
 
-            <Button variant="outline" className="w-full" onClick={onGoogle}>
+            <Button variant="outline" className="w-full" disabled title="Google sign-in isn't fully working yet">
               <GoogleIcon />
-              Continue with Google
+              Continue with Google (coming soon)
             </Button>
           </CardContent>
         </Card>

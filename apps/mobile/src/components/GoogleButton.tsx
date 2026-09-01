@@ -1,44 +1,17 @@
-import { Alert, Text } from "react-native";
-import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
+import { Text } from "react-native";
 import { Button } from "@/components/ui/Button";
-import { getSupabaseClient } from "@/lib/supabase/client";
-import { applyAuthCallbackUrl } from "@/lib/supabase/authDeepLink";
 
 /**
- * Google OAuth sign-in. Opens Supabase's OAuth URL in the system browser
- * and relies on the `evensplit://` deep link scheme (see app.json) to
- * bounce back into the app once the provider redirects.
+ * Google OAuth sign-in - disabled for now. The flow itself (Supabase
+ * signInWithOAuth + deep-link callback) is implemented in git history,
+ * but it isn't reliably working end-to-end yet, so the button is greyed
+ * out rather than left live and misleading users with a broken sign-in.
+ * Re-enable by restoring the onPress handler once OAuth is verified.
  */
 export function GoogleButton() {
-  async function onPress() {
-    try {
-      const supabase = getSupabaseClient();
-      const redirectTo = Linking.createURL("auth/callback");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo, skipBrowserRedirect: true },
-      });
-      if (error) throw error;
-      if (data?.url) {
-        const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-        // The client is created with `detectSessionInUrl: false`, so the
-        // returned redirect URL's session tokens are never picked up
-        // automatically - without this, the browser session closes
-        // "successfully" but the user is never actually signed in.
-        if (result.type === "success" && result.url) {
-          const applied = await applyAuthCallbackUrl(result.url);
-          if (!applied) Alert.alert("Could not sign in with Google", "Try again");
-        }
-      }
-    } catch (err) {
-      Alert.alert("Could not sign in with Google", err instanceof Error ? err.message : "Try again");
-    }
-  }
-
   return (
-    <Button variant="outline" size="lg" onPress={onPress}>
-      <Text className="font-semibold text-neutral-900 dark:text-neutral-100">Continue with Google</Text>
+    <Button variant="outline" size="lg" disabled>
+      <Text className="font-semibold text-neutral-500">Continue with Google (coming soon)</Text>
     </Button>
   );
 }

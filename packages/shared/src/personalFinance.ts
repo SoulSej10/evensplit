@@ -183,6 +183,55 @@ export function computeBudgetProgress(
   });
 }
 
+export interface BudgetSuggestion {
+  category_id: UUID;
+  category_name: string;
+  /** What was actually spent in this category last calendar month. */
+  last_month_spent: number;
+  /** Last month's spend rounded up to the nearest 100, for a bit of headroom. */
+  suggested_limit: number;
+}
+
+/**
+ * Expense categories with no budget yet, ranked by how much was actually
+ * spent in them last calendar month - the basis for both "recommended
+ * budgets" (the suggested_limit) and "carry over last month's spending as
+ * this month's budget" (last_month_spent), since budgets in this schema
+ * are a single standing limit per category rather than a per-month row -
+ * there's nothing to literally "copy from last month" other than the
+ * spend itself.
+ */
+export function computeBudgetSuggestions(
+  categories: Pick<PersonalCategory, "id" | "name" | "kind">[],
+  budgets: Pick<PersonalBudget, "category_id">[],
+  transactions: Pick<PersonalTransaction, "category_id" | "kind" | "amount" | "occurred_at">[]
+): BudgetSuggestion[] {
+  const now = new Date();
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthKey = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
+  const budgetedCategoryIds = new Set(budgets.map((b) => b.category_id));
+
+  const spentByCategory = new Map<UUID, number>();
+  for (const tx of transactions) {
+    if (tx.kind !== "expense" || !tx.category_id) continue;
+    if (tx.occurred_at.slice(0, 7) !== prevMonthKey) continue;
+    spentByCategory.set(tx.category_id, (spentByCategory.get(tx.category_id) ?? 0) + tx.amount);
+  }
+
+  return categories
+    .filter((c) => c.kind === "expense" && !budgetedCategoryIds.has(c.id) && (spentByCategory.get(c.id) ?? 0) > 0)
+    .map((c) => {
+      const spent = round2(spentByCategory.get(c.id) ?? 0);
+      return {
+        category_id: c.id,
+        category_name: c.name,
+        last_month_spent: spent,
+        suggested_limit: Math.ceil(spent / 100) * 100,
+      };
+    })
+    .sort((a, b) => b.last_month_spent - a.last_month_spent);
+}
+
 export interface DailyTotal {
   /** YYYY-MM-DD */
   date: string;

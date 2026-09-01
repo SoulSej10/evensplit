@@ -2,11 +2,12 @@
 
 import { useMemo } from "react";
 import { toast } from "sonner";
-import { computeBudgetProgress, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { PiggyBank, WarningCircle as AlertCircle, CheckCircle, ArrowUpRight, Trash as Trash2 } from "@phosphor-icons/react";
+import { computeBudgetProgress, computeBudgetSuggestions, filterTransactionsForCurrentMonth } from "@evensplit/shared";
+import { PiggyBank, WarningCircle as AlertCircle, CheckCircle, ArrowUpRight, Sparkle, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { MetricCard, MetricCardGrid } from "@/components/ui/metric-card";
 import { AddBudgetDialog } from "@/components/personal/add-budget-dialog";
 import {
@@ -15,6 +16,7 @@ import {
   usePersonalBudgets,
   usePersonalCategories,
   usePersonalTransactions,
+  useUpsertPersonalBudget,
 } from "@/hooks/use-personal";
 import { formatMoney } from "@/lib/format";
 
@@ -24,6 +26,7 @@ export default function PersonalBudgetsPage() {
   const { data: transactions } = usePersonalTransactions();
   const { data: accounts } = usePersonalAccounts();
   const deleteBudget = useDeletePersonalBudget();
+  const upsertBudget = useUpsertPersonalBudget();
   const currency = accounts?.[0]?.currency ?? "USD";
 
   const thisMonthTransactions = useMemo(
@@ -32,6 +35,20 @@ export default function PersonalBudgetsPage() {
   );
 
   const progress = computeBudgetProgress(budgets ?? [], categories ?? [], thisMonthTransactions);
+
+  const suggestions = useMemo(
+    () => computeBudgetSuggestions(categories ?? [], budgets ?? [], transactions ?? []),
+    [categories, budgets, transactions]
+  );
+
+  async function onAddSuggestion(categoryId: string, limit: number) {
+    try {
+      await upsertBudget.mutateAsync({ category_id: categoryId, monthly_limit: limit });
+      toast.success("Budget added");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not add budget");
+    }
+  }
 
   const totals = useMemo(() => {
     const totalLimit = progress.reduce((sum, p) => sum + p.limit, 0);
@@ -72,6 +89,34 @@ export default function PersonalBudgetsPage() {
         </MetricCardGrid>
       )}
 
+      {!isLoading && suggestions.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <Sparkle className="h-3.5 w-3.5" /> Suggested, based on last month
+          </h2>
+          <div className="grid gap-2">
+            {suggestions.map((s) => (
+              <Card key={s.category_id} className="flex-row items-center justify-between gap-3 p-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{s.category_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Spent {formatMoney(s.last_month_spent, currency)} last month
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onAddSuggestion(s.category_id, s.suggested_limit)}
+                  disabled={upsertBudget.isPending}
+                >
+                  Set {formatMoney(s.suggested_limit, currency)}
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {isLoading && (
         <div className="grid gap-3">
           <Skeleton className="h-20 rounded-2xl" />
@@ -79,7 +124,7 @@ export default function PersonalBudgetsPage() {
         </div>
       )}
 
-      {!isLoading && progress.length === 0 && (
+      {!isLoading && progress.length === 0 && suggestions.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light text-primary">
             <PiggyBank className="h-6 w-6" />

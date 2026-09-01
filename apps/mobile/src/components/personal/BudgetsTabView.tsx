@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { computeBudgetProgress, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { PiggyBank, Trash as Trash2 } from "phosphor-react-native";
+import { computeBudgetProgress, computeBudgetSuggestions, filterTransactionsForCurrentMonth } from "@evensplit/shared";
+import { PiggyBank, Sparkle, Trash as Trash2 } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import {
@@ -11,6 +12,7 @@ import {
   usePersonalBudgets,
   usePersonalCategories,
   usePersonalTransactions,
+  useUpsertPersonalBudget,
 } from "@/hooks/use-personal";
 import { formatMoney } from "@/lib/format";
 
@@ -21,6 +23,7 @@ export function BudgetsTabView() {
   const { data: transactions } = usePersonalTransactions();
   const { data: accounts } = usePersonalAccounts();
   const deleteBudget = useDeletePersonalBudget();
+  const upsertBudget = useUpsertPersonalBudget();
   const currency = accounts?.[0]?.currency ?? "USD";
 
   const thisMonthTransactions = useMemo(
@@ -30,6 +33,11 @@ export function BudgetsTabView() {
 
   const progress = computeBudgetProgress(budgets ?? [], categories ?? [], thisMonthTransactions);
 
+  const suggestions = useMemo(
+    () => computeBudgetSuggestions(categories ?? [], budgets ?? [], transactions ?? []),
+    [categories, budgets, transactions]
+  );
+
   function onDelete(id: string) {
     Alert.alert("Remove this budget?", "", [
       { text: "Cancel", style: "cancel" },
@@ -37,12 +45,46 @@ export function BudgetsTabView() {
     ]);
   }
 
+  function onAddSuggestion(categoryId: string, limit: number) {
+    upsertBudget.mutate(
+      { category_id: categoryId, monthly_limit: limit },
+      { onError: (err) => Alert.alert("Could not add budget", err instanceof Error ? err.message : "Try again") }
+    );
+  }
+
   if (isLoading) return <SkeletonCardRows count={3} />;
   if (isError) return <ErrorState message="Couldn't load budgets." onRetry={() => refetch()} />;
 
   return (
     <View className="gap-3">
-      {progress.length === 0 && (
+      {suggestions.length > 0 && (
+        <View className="gap-2">
+          <View className="flex-row items-center gap-1.5">
+            <Sparkle color="#6B7169" size={13} />
+            <Text className="text-xs font-medium text-neutral-500">Suggested, based on last month</Text>
+          </View>
+          {suggestions.map((s) => (
+            <Card key={s.category_id} className="flex-row items-center justify-between gap-3 py-3">
+              <View className="flex-1">
+                <Text className="font-medium text-neutral-900 dark:text-neutral-100">{s.category_name}</Text>
+                <Text className="text-xs text-neutral-500">
+                  Spent {formatMoney(s.last_month_spent, currency)} last month
+                </Text>
+              </View>
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => onAddSuggestion(s.category_id, s.suggested_limit)}
+                disabled={upsertBudget.isPending}
+              >
+                <Text className="text-sm font-semibold text-primary">Set {formatMoney(s.suggested_limit, currency)}</Text>
+              </Button>
+            </Card>
+          ))}
+        </View>
+      )}
+
+      {progress.length === 0 && suggestions.length === 0 && (
         <View className="items-center gap-2 py-14">
           <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-light">
             <PiggyBank color="#16A88F" size={22} />

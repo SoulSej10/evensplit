@@ -3,6 +3,7 @@ import {
   computeAccountBalance,
   computeAllAccountBalances,
   computeBudgetProgress,
+  computeBudgetSuggestions,
   computeCategoryBreakdown,
   computeDailyTotals,
   computeExpenseTrend,
@@ -174,6 +175,61 @@ describe("computeBudgetProgress", () => {
       percent: 150,
       remaining: -25,
     });
+  });
+});
+
+describe("computeBudgetSuggestions", () => {
+  const now = new Date();
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 15);
+  const prevMonthDate = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}-15T00:00:00Z`;
+  const thisMonthDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01T00:00:00Z`;
+  const categories = [
+    { id: FOOD, name: "Food", kind: "expense" as const },
+    { id: BILLS, name: "Bills", kind: "expense" as const },
+  ];
+
+  it("suggests categories with last month's spend but no existing budget, rounded up to the nearest 100", () => {
+    const suggestions = computeBudgetSuggestions(
+      categories,
+      [],
+      [{ category_id: FOOD, kind: "expense", amount: 340, occurred_at: prevMonthDate }]
+    );
+    expect(suggestions).toEqual([
+      { category_id: FOOD, category_name: "Food", last_month_spent: 340, suggested_limit: 400 },
+    ]);
+  });
+
+  it("excludes categories that already have a budget", () => {
+    const suggestions = computeBudgetSuggestions(
+      categories,
+      [{ category_id: FOOD }],
+      [{ category_id: FOOD, kind: "expense", amount: 340, occurred_at: prevMonthDate }]
+    );
+    expect(suggestions).toEqual([]);
+  });
+
+  it("ignores this month's transactions and income", () => {
+    const suggestions = computeBudgetSuggestions(
+      categories,
+      [],
+      [
+        { category_id: FOOD, kind: "expense", amount: 999, occurred_at: thisMonthDate },
+        { category_id: BILLS, kind: "income", amount: 500, occurred_at: prevMonthDate },
+      ]
+    );
+    expect(suggestions).toEqual([]);
+  });
+
+  it("sorts by last month's spend, highest first", () => {
+    const suggestions = computeBudgetSuggestions(
+      categories,
+      [],
+      [
+        { category_id: FOOD, kind: "expense", amount: 100, occurred_at: prevMonthDate },
+        { category_id: BILLS, kind: "expense", amount: 500, occurred_at: prevMonthDate },
+      ]
+    );
+    expect(suggestions.map((s) => s.category_id)).toEqual([BILLS, FOOD]);
   });
 });
 
