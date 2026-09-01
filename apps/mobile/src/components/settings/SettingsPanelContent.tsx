@@ -17,6 +17,7 @@ import { getSupabaseClient } from "@/lib/supabase/client";
 import { ensureNotificationPermission, registerForPushTokenAsync } from "@/lib/notifications";
 import { hasShownNotificationNudge, setNotificationNudgeShown } from "@/lib/device-flags";
 import { upsertProfile } from "@/lib/api/profile";
+import { EditProfileSheet } from "./EditProfileSheet";
 import {
   usePersonalAccounts,
   usePersonalCategories,
@@ -50,6 +51,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
   const [changingPassword, setChangingPassword] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [editProfileVisible, setEditProfileVisible] = useState(false);
 
   const { data: transactions } = usePersonalTransactions();
   const { data: accounts } = usePersonalAccounts();
@@ -251,12 +253,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
               {authUser?.email}
             </Text>
           </View>
-          <Pressable
-            onPress={() => {
-              onClose();
-              router.push("/(app)/profile-edit");
-            }}
-          >
+          <Pressable onPress={() => setEditProfileVisible(true)}>
             <ChevronRight color="#6B7169" size={20} />
           </Pressable>
         </Card>
@@ -467,6 +464,8 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
           </Button>
         </View>
       </ScrollView>
+
+      <EditProfileSheet visible={editProfileVisible} onClose={() => setEditProfileVisible(false)} />
     </View>
   );
 }
