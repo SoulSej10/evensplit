@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { computeAllAccountBalances } from "@evensplit/shared";
 import { Wallet, DotsThreeVertical as MoreVertical, Pencil, Archive } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AddAccountDialog } from "@/components/personal/add-account-dialog";
 import { usePersonalAccounts, usePersonalTransactions, useArchivePersonalAccount } from "@/hooks/use-personal";
@@ -58,51 +58,71 @@ export default function PersonalAccountsPage() {
         </div>
       )}
 
-      <div className="grid gap-3">
-        {accounts?.map((account) => {
-          const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
-          return (
-            <Card key={account.id} className="flex items-center gap-3 p-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-light text-base">
-                {account.icon ?? "💵"}
-              </span>
-              <div className="flex-1">
-                <p className="font-medium">{account.name}</p>
-                <p className="text-xs capitalize text-muted-foreground">{account.type}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <p className="mr-2 font-semibold tabular-nums">{formatMoney(balance, account.currency)}</p>
-                <AddAccountDialog
-                  account={account}
-                  trigger={
-                    <button
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary-light hover:text-primary"
-                      aria-label={`Edit ${account.name}`}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                  }
-                />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
-                      aria-label={`More actions for ${account.name}`}
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onArchive(account.id, account.name)}>
-                      <Archive className="mr-2 h-4 w-4" /> Archive
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+      {!isLoading && (accounts?.length ?? 0) > 0 && (
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Account</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="w-20" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {accounts?.map((account) => {
+                const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
+                return (
+                  <TableRow key={account.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-light text-base">
+                          {account.icon ?? "💵"}
+                        </span>
+                        <p className="font-medium">{account.name}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="capitalize text-muted-foreground">{account.type}</TableCell>
+                    <TableCell className="text-right font-mono font-semibold tabular-nums">
+                      {formatMoney(balance, account.currency)}
+                    </TableCell>
+                    <TableCell className="pl-0">
+                      <div className="flex items-center justify-end gap-1">
+                        <AddAccountDialog
+                          account={account}
+                          trigger={
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary-light hover:text-primary"
+                              aria-label={`Edit ${account.name}`}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          }
+                        />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                              aria-label={`More actions for ${account.name}`}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onArchive(account.id, account.name)}>
+                              <Archive className="mr-2 h-4 w-4" /> Archive
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import {
 import { ArrowDownLeft, ArrowsLeftRight as ArrowLeftRight, ArrowUpRight, PiggyBank } from "@phosphor-icons/react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   usePersonalAccounts,
   usePersonalBudgets,
@@ -70,23 +71,40 @@ export default function PersonalOverviewPage() {
         {!accountsLoading && (accounts ?? []).length === 0 && (
           <p className="text-sm text-muted-foreground">No accounts yet.</p>
         )}
-        <div className="grid gap-2">
-          {(accounts ?? []).map((account) => {
-            const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
-            return (
-              <Card key={account.id} className="flex items-center gap-3 p-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-sm">
-                  {account.icon ?? "💵"}
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{account.name}</p>
-                  <p className="text-xs capitalize text-muted-foreground">{account.type}</p>
-                </div>
-                <p className="font-semibold tabular-nums">{formatMoney(balance, account.currency)}</p>
-              </Card>
-            );
-          })}
-        </div>
+        {!accountsLoading && (accounts ?? []).length > 0 && (
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Account</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="text-right">Balance</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(accounts ?? []).map((account) => {
+                  const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
+                  return (
+                    <TableRow key={account.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-sm">
+                            {account.icon ?? "💵"}
+                          </span>
+                          <p className="font-medium">{account.name}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="capitalize text-muted-foreground">{account.type}</TableCell>
+                      <TableCell className="text-right font-mono font-semibold tabular-nums">
+                        {formatMoney(balance, account.currency)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {budgetHighlight && (
@@ -127,45 +145,58 @@ export default function PersonalOverviewPage() {
         {!transactionsLoading && recentTransactions.length === 0 && (
           <p className="text-sm text-muted-foreground">No transactions yet.</p>
         )}
-        <div className="grid gap-2">
-          {recentTransactions.map((tx) => {
-            const account = accounts?.find((a) => a.id === tx.account_id);
-            return (
-              <Card key={tx.id} className="flex items-center gap-3 p-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                  <TransactionIcon kind={tx.kind} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {tx.kind === "transfer"
-                      ? `${accountName(tx.account_id)} → ${accountName(tx.transfer_account_id ?? "")}`
-                      : tx.kind === "group_advance"
-                        ? "Advanced for others"
-                        : tx.kind === "group_reimbursement"
-                          ? "Reimbursement received"
-                          : tx.kind === "income"
-                            ? "Income"
-                            : "Expense"}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {formatDate(tx.occurred_at)} · {accountName(tx.account_id)}
-                  </p>
-                </div>
-                <p
-                  className={`text-sm font-semibold tabular-nums ${
-                    tx.kind === "income" || tx.kind === "group_reimbursement"
-                      ? "text-positive"
-                      : tx.kind === "transfer"
-                        ? ""
-                        : "text-negative"
-                  }`}
-                >
-                  {formatMoney(tx.amount, account?.currency ?? "PHP")}
-                </p>
-              </Card>
-            );
-          })}
-        </div>
+        {!transactionsLoading && recentTransactions.length > 0 && (
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Transaction</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Account</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentTransactions.map((tx) => {
+                  const account = accounts?.find((a) => a.id === tx.account_id);
+                  const isCredit = tx.kind === "income" || tx.kind === "group_reimbursement";
+                  const isDebit = tx.kind === "expense" || tx.kind === "group_advance";
+                  return (
+                    <TableRow key={tx.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                            <TransactionIcon kind={tx.kind} />
+                          </span>
+                          <p className="font-medium">
+                            {tx.kind === "transfer"
+                              ? `${accountName(tx.account_id)} → ${accountName(tx.transfer_account_id ?? "")}`
+                              : tx.kind === "group_advance"
+                                ? "Advanced for others"
+                                : tx.kind === "group_reimbursement"
+                                  ? "Reimbursement received"
+                                  : tx.kind === "income"
+                                    ? "Income"
+                                    : "Expense"}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(tx.occurred_at)}</TableCell>
+                      <TableCell className="text-muted-foreground">{accountName(tx.account_id)}</TableCell>
+                      <TableCell
+                        className={`text-right font-mono font-semibold tabular-nums ${
+                          isCredit ? "text-positive" : isDebit ? "text-negative" : ""
+                        }`}
+                      >
+                        {formatMoney(tx.amount, account?.currency ?? "PHP")}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
     </div>
   );

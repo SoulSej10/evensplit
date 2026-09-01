@@ -3,10 +3,11 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { computeBudgetProgress, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { PiggyBank, Trash as Trash2 } from "@phosphor-icons/react";
+import { PiggyBank, WarningCircle as AlertCircle, CheckCircle, ArrowUpRight, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { MetricCard, MetricCardGrid } from "@/components/ui/metric-card";
 import { AddBudgetDialog } from "@/components/personal/add-budget-dialog";
 import {
   useDeletePersonalBudget,
@@ -32,6 +33,13 @@ export default function PersonalBudgetsPage() {
 
   const progress = computeBudgetProgress(budgets ?? [], categories ?? [], thisMonthTransactions);
 
+  const totals = useMemo(() => {
+    const totalLimit = progress.reduce((sum, p) => sum + p.limit, 0);
+    const totalSpent = progress.reduce((sum, p) => sum + p.spent, 0);
+    const overCount = progress.filter((p) => p.percent > 100).length;
+    return { totalLimit, totalSpent, overCount };
+  }, [progress]);
+
   async function onDelete(id: string) {
     try {
       await deleteBudget.mutateAsync(id);
@@ -50,6 +58,19 @@ export default function PersonalBudgetsPage() {
         </div>
         <AddBudgetDialog />
       </div>
+
+      {!isLoading && progress.length > 0 && (
+        <MetricCardGrid className="mb-6 grid-cols-3">
+          <MetricCard icon={PiggyBank} label="Budgeted" value={formatMoney(totals.totalLimit, currency)} tone="primary" />
+          <MetricCard icon={ArrowUpRight} label="Spent" value={formatMoney(totals.totalSpent, currency)} tone="muted" />
+          <MetricCard
+            icon={totals.overCount > 0 ? AlertCircle : CheckCircle}
+            label="Over budget"
+            value={String(totals.overCount)}
+            tone={totals.overCount > 0 ? "negative" : "positive"}
+          />
+        </MetricCardGrid>
+      )}
 
       {isLoading && (
         <div className="grid gap-3">

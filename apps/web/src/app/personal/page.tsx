@@ -4,7 +4,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { ArrowDownLeft, ArrowUpRight, ArrowsLeftRight as ArrowLeftRight, Receipt, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AddTransactionDialog } from "@/components/personal/add-transaction-dialog";
 import {
   useDeletePersonalTransaction,
@@ -93,51 +93,71 @@ export default function PersonalRecordsPage() {
         </div>
       )}
 
-      <div className="grid gap-2">
-        {transactions?.map((tx) => {
-          const account = accounts?.find((a) => a.id === tx.account_id);
-          const category = categoryLabel(tx.category_id);
-          const isCredit = tx.kind === "income" || tx.kind === "group_reimbursement";
-          const isDebit = tx.kind === "expense" || tx.kind === "group_advance";
-          return (
-            <Card key={tx.id} className="flex items-center gap-3 p-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                <TransactionIcon kind={tx.kind} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{transactionLabel(tx, category, accountName)}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {formatDate(tx.occurred_at)} · {accountName(tx.account_id)}
-                  {tx.note ? ` · ${tx.note}` : ""}
-                </p>
-                {tx.groups && tx.linked_group_id && (
-                  <Link
-                    href={`/groups/${tx.linked_group_id}`}
-                    className="mt-0.5 block truncate text-xs font-medium text-primary hover:underline"
-                  >
-                    From {tx.groups.name}
-                  </Link>
-                )}
-              </div>
-              <p
-                className={`font-semibold tabular-nums ${
-                  isCredit ? "text-positive" : isDebit ? "text-negative" : ""
-                }`}
-              >
-                {isCredit ? "+" : isDebit ? "-" : ""}
-                {formatMoney(tx.amount, account?.currency ?? "USD")}
-              </p>
-              <button
-                onClick={() => onDelete(tx.id)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
-                aria-label="Delete transaction"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </Card>
-          );
-        })}
-      </div>
+      {!isLoading && (accounts?.length ?? 0) > 0 && (transactions?.length ?? 0) > 0 && (
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Transaction</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Account</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-10" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions?.map((tx) => {
+                const account = accounts?.find((a) => a.id === tx.account_id);
+                const category = categoryLabel(tx.category_id);
+                const isCredit = tx.kind === "income" || tx.kind === "group_reimbursement";
+                const isDebit = tx.kind === "expense" || tx.kind === "group_advance";
+                return (
+                  <TableRow key={tx.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                          <TransactionIcon kind={tx.kind} />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{transactionLabel(tx, category, accountName)}</p>
+                          {tx.note && <p className="truncate text-xs text-muted-foreground">{tx.note}</p>}
+                          {tx.groups && tx.linked_group_id && (
+                            <Link
+                              href={`/groups/${tx.linked_group_id}`}
+                              className="block truncate text-xs font-medium text-primary hover:underline"
+                            >
+                              From {tx.groups.name}
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(tx.occurred_at)}</TableCell>
+                    <TableCell className="text-muted-foreground">{accountName(tx.account_id)}</TableCell>
+                    <TableCell
+                      className={`text-right font-mono font-semibold tabular-nums ${
+                        isCredit ? "text-positive" : isDebit ? "text-negative" : ""
+                      }`}
+                    >
+                      {isCredit ? "+" : isDebit ? "-" : ""}
+                      {formatMoney(tx.amount, account?.currency ?? "USD")}
+                    </TableCell>
+                    <TableCell className="pl-0">
+                      <button
+                        onClick={() => onDelete(tx.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+                        aria-label="Delete transaction"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

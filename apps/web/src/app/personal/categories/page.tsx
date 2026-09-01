@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Tag, Trash as Trash2 } from "@phosphor-icons/react";
 import type { PersonalCategory } from "@evensplit/shared";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { AddCategoryDialog, EditCategoryButton } from "@/components/personal/add-category-dialog";
 import { useDeletePersonalCategory, usePersonalCategories } from "@/hooks/use-personal";
 
@@ -28,25 +28,33 @@ function CategoryGroup({
       {categories.length === 0 ? (
         <p className="text-sm text-muted-foreground">No categories yet.</p>
       ) : (
-        <div className="grid gap-2">
-          {categories.map((c) => (
-            <Card key={c.id} className="flex items-center justify-between p-3">
-              <span className="flex items-center gap-2">
-                <span className="text-lg">{c.icon ?? "🏷️"}</span>
-                {c.name}
-              </span>
-              <div className="flex items-center gap-1">
-                <EditCategoryButton category={c} />
-                <button
-                  onClick={() => onDelete(c.id, c.name)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                  aria-label={`Delete ${c.name}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </Card>
-          ))}
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableBody>
+              {categories.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell className="w-full">
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">{c.icon ?? "🏷️"}</span>
+                      {c.name}
+                    </span>
+                  </TableCell>
+                  <TableCell className="pl-0">
+                    <div className="flex items-center justify-end gap-1">
+                      <EditCategoryButton category={c} />
+                      <button
+                        onClick={() => onDelete(c.id, c.name)}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={`Delete ${c.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
