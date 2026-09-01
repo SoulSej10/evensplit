@@ -151,5 +151,11 @@
   }
   html {
     @apply font-sans;
+    /* Text was reading too small site-wide. A root font-size bump (not a
+       fixed px override, so it still respects a user's browser font-size
+       preference) scales every rem-based Tailwind text-* class ~12.5%
+       automatically, instead of editing every call site individually.
+       Mirrors the equivalent fontSize scale bump on mobile. */
+    font-size: 112.5%;
   }
 }

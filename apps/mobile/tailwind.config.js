@@ -46,6 +46,21 @@ module.exports = {
         bold: ["PlusJakartaSans_700Bold"],
         extrabold: ["PlusJakartaSans_800ExtraBold"],
       },
+      // Text was reading too small across the app - the whole scale is
+      // bumped ~12.5% over Tailwind's RN defaults (e.g. text-sm 14->16,
+      // text-base 16->18) so every existing `text-*` class picks this up
+      // automatically instead of editing every call site individually.
+      // Mirrors the equivalent root font-size bump on web.
+      fontSize: {
+        xs: ["13px", { lineHeight: "17px" }],
+        sm: ["16px", { lineHeight: "21px" }],
+        base: ["18px", { lineHeight: "26px" }],
+        lg: ["20px", { lineHeight: "28px" }],
+        xl: ["22px", { lineHeight: "29px" }],
+        "2xl": ["27px", { lineHeight: "33px" }],
+        "3xl": ["34px", { lineHeight: "38px" }],
+        "4xl": ["40px", { lineHeight: "44px" }],
+      },
       // v3: less "stadium pill", more geometric edge per feedback - buttons
       // and chips now use a modest rounded-rect instead of a full capsule.
       // Circles (avatars, FABs) are unaffected since those use `rounded-full`
