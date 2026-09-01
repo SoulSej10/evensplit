@@ -5,6 +5,7 @@ import type { User } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { AmountField } from "@/components/ui/AmountField";
 import { recordSettlement } from "@/lib/api/settlements";
 import { fetchPersonalAccounts } from "@/lib/api/personal";
 import { cn } from "@/lib/cn";
@@ -107,12 +108,7 @@ export function SettleUpSheet({
         {fromName} pays {toName}
       </Text>
 
-      <TextField
-        label={`Amount (${groupCurrency})`}
-        keyboardType="decimal-pad"
-        value={amount}
-        onChangeText={setAmount}
-      />
+      <AmountField label={`Amount (${groupCurrency})`} value={amount} onChangeText={setAmount} />
 
       <View className="gap-1.5">
         <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Method</Text>

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { computeSplitShares, SplitError, type SplitType, type User } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/amount-input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -252,14 +253,7 @@ export function ExpenseFormDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="amount">Amount ({groupCurrency})</Label>
-              <Input
-                id="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
+              <AmountInput id="amount" value={Number(amount) || 0} onChange={(v) => setAmount(String(v))} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="date">Date</Label>

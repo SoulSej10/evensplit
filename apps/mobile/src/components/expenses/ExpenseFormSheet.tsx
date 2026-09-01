@@ -8,6 +8,7 @@ import { computeSplitShares, SplitError, type SplitType, type User } from "@even
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { AmountField } from "@/components/ui/AmountField";
 import { Avatar } from "@/components/ui/Avatar";
 import { createExpense, updateExpense, uploadReceipt, type ExpenseWithShares } from "@/lib/api/expenses";
 import { fetchPersonalAccounts } from "@/lib/api/personal";
@@ -219,9 +220,8 @@ export function ExpenseFormSheet({
       />
 
       <View className="flex-row gap-3">
-        <TextField
+        <AmountField
           label={`Amount (${groupCurrency})`}
-          keyboardType="decimal-pad"
           value={amount}
           onChangeText={setAmount}
           containerClassName="flex-1"

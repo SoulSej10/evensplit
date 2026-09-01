@@ -3,7 +3,7 @@ import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { createPersonalBudgetSchema } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
-import { TextField } from "@/components/ui/TextField";
+import { AmountField } from "@/components/ui/AmountField";
 import { usePersonalCategories, useUpsertPersonalBudget } from "@/hooks/use-personal";
 import { cn } from "@/lib/cn";
 
@@ -76,7 +76,7 @@ export function AddBudgetSheet({ visible, onClose }: { visible: boolean; onClose
         )}
       </View>
 
-      <TextField label="Monthly limit" keyboardType="decimal-pad" value={monthlyLimit} onChangeText={setMonthlyLimit} />
+      <AmountField label="Monthly limit" value={monthlyLimit} onChangeText={setMonthlyLimit} />
     </BottomSheet>
   );
 }

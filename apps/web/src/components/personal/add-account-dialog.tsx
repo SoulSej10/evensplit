@@ -8,6 +8,7 @@ import { Plus } from "@phosphor-icons/react";
 import { createPersonalAccountSchema, type CreatePersonalAccountInput, type PersonalAccount } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/amount-input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -155,11 +156,10 @@ export function AddAccountDialog({ account, trigger }: { account?: PersonalAccou
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="starting-balance">Starting balance</Label>
-              <Input
+              <AmountInput
                 id="starting-balance"
-                type="number"
-                step="0.01"
-                {...register("starting_balance", { valueAsNumber: true })}
+                value={watch("starting_balance")}
+                onChange={(v) => setValue("starting_balance", v, { shouldValidate: true })}
               />
             </div>
           </div>

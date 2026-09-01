@@ -4,6 +4,7 @@ import { createPersonalAccountSchema, type PersonalAccount, type PersonalAccount
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { AmountField } from "@/components/ui/AmountField";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreatePersonalAccount, useUpdatePersonalAccount } from "@/hooks/use-personal";
 import { CURRENCIES } from "@/lib/format";
@@ -147,12 +148,7 @@ export function AddAccountSheet({
         </View>
       </View>
 
-      <TextField
-        label="Starting balance"
-        keyboardType="decimal-pad"
-        value={startingBalance}
-        onChangeText={setStartingBalance}
-      />
+      <AmountField label="Starting balance" value={startingBalance} onChangeText={setStartingBalance} />
     </BottomSheet>
   );
 }

@@ -8,6 +8,7 @@ import { Plus } from "@phosphor-icons/react";
 import { createPersonalTransactionSchema, type CreatePersonalTransactionInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/amount-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -177,7 +178,12 @@ export function AddTransactionDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="amount">Amount</Label>
-              <Input id="amount" type="number" step="0.01" {...register("amount", { valueAsNumber: true })} />
+              <AmountInput
+                id="amount"
+                value={watch("amount")}
+                onChange={(v) => setValue("amount", v, { shouldValidate: true })}
+                ariaInvalid={!!formState.errors.amount}
+              />
               {formState.errors.amount && <p className="text-xs text-destructive">{formState.errors.amount.message}</p>}
             </div>
             <div className="space-y-1.5">

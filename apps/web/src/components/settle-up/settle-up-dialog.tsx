@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/amount-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -117,14 +117,7 @@ export function SettleUpDialog({
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="settle-amount">Amount ({groupCurrency})</Label>
-            <Input
-              id="settle-amount"
-              type="number"
-              min="0"
-              step="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
+            <AmountInput id="settle-amount" value={Number(amount) || 0} onChange={(v) => setAmount(String(v))} />
           </div>
 
           <div className="space-y-1.5">

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Plus } from "@phosphor-icons/react";
 import { createPersonalBudgetSchema, type CreatePersonalBudgetInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/amount-input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -27,7 +27,7 @@ export function AddBudgetDialog() {
   const upsertBudget = useUpsertPersonalBudget();
   const expenseCategories = categories?.filter((c) => c.kind === "expense") ?? [];
 
-  const { register, handleSubmit, reset, watch, setValue, formState } = useForm<CreatePersonalBudgetInput>({
+  const { handleSubmit, reset, watch, setValue, formState } = useForm<CreatePersonalBudgetInput>({
     resolver: zodResolver(createPersonalBudgetSchema),
     defaultValues: { category_id: "", monthly_limit: 0 },
   });
@@ -78,7 +78,12 @@ export function AddBudgetDialog() {
 
           <div className="space-y-1.5">
             <Label htmlFor="monthly-limit">Monthly limit</Label>
-            <Input id="monthly-limit" type="number" step="0.01" {...register("monthly_limit", { valueAsNumber: true })} />
+            <AmountInput
+              id="monthly-limit"
+              value={watch("monthly_limit")}
+              onChange={(v) => setValue("monthly_limit", v, { shouldValidate: true })}
+              ariaInvalid={!!formState.errors.monthly_limit}
+            />
             {formState.errors.monthly_limit && (
               <p className="text-xs text-destructive">{formState.errors.monthly_limit.message}</p>
             )}

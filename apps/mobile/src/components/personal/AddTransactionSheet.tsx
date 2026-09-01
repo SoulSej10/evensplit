@@ -5,6 +5,7 @@ import { createPersonalTransactionSchema } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { AmountField } from "@/components/ui/AmountField";
 import { usePersonalAccounts, usePersonalCategories, useCreatePersonalTransaction } from "@/hooks/use-personal";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -180,13 +181,7 @@ export function AddTransactionSheet({
       )}
 
       <View className="flex-row gap-3">
-        <TextField
-          label="Amount"
-          keyboardType="decimal-pad"
-          value={amount}
-          onChangeText={setAmount}
-          containerClassName="flex-1"
-        />
+        <AmountField value={amount} onChangeText={setAmount} containerClassName="flex-1" />
         <View className="flex-1 gap-1.5">
           <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Date</Text>
           <Pressable
