@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Bell, GridFour as LayoutGrid, ListChecks, ChartPie as PieChart, PiggyBank, Plus, Tag, Wallet } from "phosphor-react-native";
 import { Avatar } from "@/components/ui/Avatar";
-import { EdgeFade } from "@/components/ui/EdgeFade";
 import { PillTabs } from "@/components/personal/PillTabs";
 import { FinancesSummaryCard } from "@/components/personal/FinancesSummaryCard";
 import { OverviewTabView } from "@/components/personal/OverviewTabView";
@@ -111,7 +110,6 @@ export default function FinancesScreen() {
         {tab === "accounts" && <AccountsTabView />}
         {tab === "categories" && <CategoriesTabView />}
       </ScrollView>
-      <EdgeFade edge="bottom" />
 
       {CREATE_LABEL[tab] && (
         <Pressable

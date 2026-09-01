@@ -46,20 +46,21 @@ module.exports = {
         bold: ["PlusJakartaSans_700Bold"],
         extrabold: ["PlusJakartaSans_800ExtraBold"],
       },
-      // Text was reading too small across the app - the whole scale is
-      // bumped ~12.5% over Tailwind's RN defaults (e.g. text-sm 14->16,
-      // text-base 16->18) so every existing `text-*` class picks this up
-      // automatically instead of editing every call site individually.
-      // Mirrors the equivalent root font-size bump on web.
+      // Text was reading too small across the app, so the whole scale was
+      // bumped ~12.5% over Tailwind's RN defaults - that turned out to be
+      // too much ("overdid it"), so this dials it back to roughly half
+      // that bump (~6%) instead of reverting all the way to the
+      // unreadably-small defaults. Mirrors the equivalent, also-halved
+      // root font-size bump on web.
       fontSize: {
         xs: ["13px", { lineHeight: "17px" }],
-        sm: ["16px", { lineHeight: "21px" }],
-        base: ["18px", { lineHeight: "26px" }],
-        lg: ["20px", { lineHeight: "28px" }],
-        xl: ["22px", { lineHeight: "29px" }],
-        "2xl": ["27px", { lineHeight: "33px" }],
-        "3xl": ["34px", { lineHeight: "38px" }],
-        "4xl": ["40px", { lineHeight: "44px" }],
+        sm: ["15px", { lineHeight: "20px" }],
+        base: ["17px", { lineHeight: "25px" }],
+        lg: ["19px", { lineHeight: "27px" }],
+        xl: ["21px", { lineHeight: "28px" }],
+        "2xl": ["26px", { lineHeight: "31px" }],
+        "3xl": ["32px", { lineHeight: "36px" }],
+        "4xl": ["38px", { lineHeight: "42px" }],
       },
       // v3: less "stadium pill", more geometric edge per feedback - buttons
       // and chips now use a modest rounded-rect instead of a full capsule.

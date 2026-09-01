@@ -10,7 +10,6 @@ import { JoinGroupSheet } from "@/components/groups/JoinGroupSheet";
 import { QuickActions } from "@/components/groups/QuickActions";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { EdgeFade } from "@/components/ui/EdgeFade";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettingsDrawer } from "@/context/settings-drawer";
 import { useMyGroups } from "@/hooks/use-groups";
@@ -99,7 +98,6 @@ export default function GroupsListScreen() {
           <Text className="mt-2 text-center text-xs text-neutral-500">Refreshing…</Text>
         )}
       </ScrollView>
-      <EdgeFade edge="bottom" />
 
       <Pressable
         onPress={() => setSheetOpen(true)}

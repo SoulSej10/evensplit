@@ -14,7 +14,6 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
-import { EdgeFade } from "@/components/ui/EdgeFade";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { DonutChart } from "@/components/ui/DonutChart";
 import { MonthCalendar } from "@/components/ui/MonthCalendar";
@@ -368,7 +367,6 @@ export default function InsightsScreen() {
           </>
         )}
       </ScrollView>
-      <EdgeFade edge="bottom" />
     </SafeAreaView>
   );
 }

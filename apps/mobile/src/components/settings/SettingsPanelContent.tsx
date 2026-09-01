@@ -451,15 +451,15 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
         <View className="flex-row gap-3">
           <Button variant="outline" size="sm" className="flex-1" onPress={onSignOut}>
             <View className="flex-row items-center gap-1.5">
-              <LogOut size={15} color="#0A0A0A" />
-              <Text className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Sign out</Text>
+              <LogOut size={13} color="#0A0A0A" />
+              <Text className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">Sign out</Text>
             </View>
           </Button>
 
           <Button variant="outline" size="sm" className="flex-1 border-negative/40" onPress={onDeleteAccount}>
             <View className="flex-row items-center gap-1.5">
-              <Trash2 size={15} color="#D95F5F" />
-              <Text className="text-sm font-semibold text-negative">Delete account</Text>
+              <Trash2 size={13} color="#D95F5F" />
+              <Text className="text-xs font-semibold text-negative">Delete account</Text>
             </View>
           </Button>
         </View>

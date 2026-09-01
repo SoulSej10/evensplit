@@ -17,7 +17,6 @@ import { FinancesSummaryCard } from "@/components/personal/FinancesSummaryCard";
 import { AddTransactionSheet } from "@/components/personal/AddTransactionSheet";
 import { SettlementReceiptBanner } from "@/components/personal/SettlementReceiptBanner";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
-import { EdgeFade } from "@/components/ui/EdgeFade";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettingsDrawer } from "@/context/settings-drawer";
 import { useAllActivity, useAllExpenses, useAllSettlements, useMyGroups } from "@/hooks/use-groups";
@@ -282,7 +281,6 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
-      <EdgeFade edge="bottom" />
 
       <CreateGroupSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} />
       <JoinGroupSheet visible={joinSheetOpen} onClose={() => setJoinSheetOpen(false)} />
