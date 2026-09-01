@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import type { User } from "@evensplit/shared";
 import { simplifyDebts } from "@evensplit/shared";
-import { Receipt } from "lucide-react-native";
+import { Receipt } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { MoneyText } from "@/components/ui/MoneyText";

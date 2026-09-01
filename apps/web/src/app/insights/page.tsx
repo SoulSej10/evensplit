@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { AlertCircle, ArrowRightLeft, Layers, PieChart as PieChartIcon, Receipt, Wallet } from "lucide-react";
+import { WarningCircle as AlertCircle, ArrowsLeftRight as ArrowRightLeft, Stack as Layers, ChartPie as PieChartIcon, Receipt, Wallet } from "@phosphor-icons/react";
 import {
   computeCategoryBreakdown,
   computeDailyTotals,

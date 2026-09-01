@@ -9,16 +9,7 @@ import {
   filterTransactionsForCurrentMonth,
   type GroupBalanceInput,
 } from "@evensplit/shared";
-import {
-  ArrowDownLeft,
-  ArrowRight,
-  ArrowRightLeft,
-  ArrowUpRight,
-  Clock,
-  PiggyBank,
-  Users,
-  Wallet,
-} from "lucide-react";
+import { ArrowDownLeft, ArrowRight, ArrowsLeftRight as ArrowRightLeft, ArrowUpRight, Clock, PiggyBank, Users, Wallet } from "@phosphor-icons/react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/app-shell/top-nav";
 import { CreateGroupDialog } from "@/components/groups/create-group-dialog";

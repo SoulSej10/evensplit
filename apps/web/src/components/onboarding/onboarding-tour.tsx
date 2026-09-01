@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, Sparkles, Users, Wallet, type LucideIcon } from "lucide-react";
+import { ChartBar as BarChart3, Sparkle as Sparkles, Users, Wallet, type Icon as LucideIcon } from "@phosphor-icons/react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 

@@ -42,7 +42,7 @@ import { useGroup, useGroupExpenses, useGroupRealtime, useGroupSettlements } fro
 import { archiveGroup, leaveGroup, removeMember } from "@/lib/api/groups";
 import { formatMoney, initials } from "@/lib/format";
 import { downloadGroupLedgerCsv } from "@/lib/csv";
-import { MoreVertical, UserPlus, UserMinus, Archive, LogOut, AlertCircle, Download, Pencil } from "lucide-react";
+import { DotsThreeVertical as MoreVertical, UserPlus, UserMinus, Archive, SignOut as LogOut, WarningCircle as AlertCircle, Download, Pencil } from "@phosphor-icons/react";
 
 function GroupDetailContent({ groupId }: { groupId: string }) {
   const router = useRouter();

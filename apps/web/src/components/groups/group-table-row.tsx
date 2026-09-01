@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ChevronRight } from "lucide-react";
+import { CaretRight as ChevronRight } from "@phosphor-icons/react";
 import type { GroupWithMembers } from "@/lib/api/groups";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableCell, TableRow } from "@/components/ui/table";

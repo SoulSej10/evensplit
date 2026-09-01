@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { Pencil, Tag, Trash2 } from "lucide-react-native";
+import { Pencil, Tag, Trash as Trash2 } from "phosphor-react-native";
 import type { PersonalCategory } from "@evensplit/shared";
 import { Card } from "@/components/ui/Card";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Share, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
-import { Copy, Send, UserPlus } from "lucide-react-native";
+import { Copy, PaperPlaneTilt as Send, UserPlus } from "phosphor-react-native";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/use-auth";

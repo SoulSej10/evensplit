@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
-import { Users } from "lucide-react-native";
+import { Users } from "phosphor-react-native";
 import { Button } from "@/components/ui/Button";
 import { AuthGuard } from "@/components/AuthGuard";
 import { useAuth } from "@/hooks/use-auth";

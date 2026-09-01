@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import { AlertCircle } from "lucide-react-native";
+import { WarningCircle as AlertCircle } from "phosphor-react-native";
 import { Button } from "@/components/ui/Button";
 
 /**

@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { ChevronRight, Download, KeyRound, ListChecks, LogOut, PiggyBank, ShieldCheck, Tag, Trash2, Upload, Wallet } from "lucide-react";
+import { CaretRight as ChevronRight, Download, Key as KeyRound, ListChecks, SignOut as LogOut, PiggyBank, ShieldCheck, Tag, Trash as Trash2, Upload, Wallet } from "@phosphor-icons/react";
 import {
   passwordResetSchema,
   profileSetupSchema,

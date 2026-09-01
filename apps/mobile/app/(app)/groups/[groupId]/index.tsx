@@ -5,7 +5,7 @@ import { useColorScheme } from "nativewind";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateUserBalances } from "@evensplit/shared";
-import { Archive, ArrowLeft, ArrowLeftRight, Download, LogOut, MoreVertical, Pencil, Plus, UserPlus } from "lucide-react-native";
+import { Archive, ArrowLeft, ArrowsLeftRight as ArrowLeftRight, Download, SignOut as LogOut, DotsThreeVertical as MoreVertical, Pencil, Plus, UserPlus } from "phosphor-react-native";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { BottomSheet } from "@/components/ui/BottomSheet";

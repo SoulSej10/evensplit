@@ -1,7 +1,7 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { BarChart3, Home, Users, Wallet } from "lucide-react-native";
+import { ChartBar as BarChart3, House as Home, Users, Wallet } from "phosphor-react-native";
 import { SettingsDrawerProvider } from "@/context/settings-drawer";
 import { SettingsDrawer } from "@/components/settings/SettingsDrawer";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
@@ -50,28 +50,28 @@ export default function TabsLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+            tabBarIcon: ({ color, size }) => <Home color={String(color)} size={size} />,
           }}
         />
         <Tabs.Screen
           name="groups"
           options={{
             title: "Groups",
-            tabBarIcon: ({ color, size }) => <Users color={color} size={size} />,
+            tabBarIcon: ({ color, size }) => <Users color={String(color)} size={size} />,
           }}
         />
         <Tabs.Screen
           name="finances"
           options={{
             title: "Finances",
-            tabBarIcon: ({ color, size }) => <Wallet color={color} size={size} />,
+            tabBarIcon: ({ color, size }) => <Wallet color={String(color)} size={size} />,
           }}
         />
         <Tabs.Screen
           name="insights"
           options={{
             title: "Insights",
-            tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
+            tabBarIcon: ({ color, size }) => <BarChart3 color={String(color)} size={size} />,
           }}
         />
         <Tabs.Screen name="activity" options={{ href: null }} />

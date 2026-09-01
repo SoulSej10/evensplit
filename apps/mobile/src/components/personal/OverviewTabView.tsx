@@ -6,7 +6,7 @@ import {
   computeBudgetProgress,
   filterTransactionsForCurrentMonth,
 } from "@evensplit/shared";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, PiggyBank } from "lucide-react-native";
+import { ArrowDownLeft, ArrowsLeftRight as ArrowLeftRight, ArrowUpRight, PiggyBank } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import {
   usePersonalAccounts,

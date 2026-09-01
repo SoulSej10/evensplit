@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import type { User } from "@evensplit/shared";
-import { Receipt, Repeat } from "lucide-react-native";
+import { Receipt, Repeat } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { MoneyText } from "@/components/ui/MoneyText";

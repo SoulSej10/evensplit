@@ -1,7 +1,7 @@
 "use client";
 
 import type { DailyTotal } from "@evensplit/shared";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/format";
 

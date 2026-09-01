@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChevronLeft, ChevronRight, Receipt } from "lucide-react-native";
+import { ArrowDownLeft, ArrowsLeftRight as ArrowLeftRight, ArrowUpRight, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Receipt } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";

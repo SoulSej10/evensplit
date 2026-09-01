@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Bell, Layers, Receipt } from "lucide-react-native";
+import { Bell, Stack as Layers, Receipt } from "phosphor-react-native";
 import {
   computeCategoryBreakdown,
   computeDailyTotals,

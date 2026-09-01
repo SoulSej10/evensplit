@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowLeftRight,
-  Receipt,
-  SlidersHorizontal,
-  Users,
-} from "lucide-react";
+import { ArrowRight, ArrowsLeftRight as ArrowLeftRight, Receipt, SlidersHorizontal, Users } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Logo } from "@/components/brand/logo";

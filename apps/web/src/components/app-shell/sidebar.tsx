@@ -2,20 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  BarChart3,
-  ChevronDown,
-  LayoutDashboard,
-  LayoutGrid,
-  ListChecks,
-  LogOut,
-  PieChart,
-  PiggyBank,
-  Settings,
-  Tag,
-  Users,
-  Wallet,
-} from "lucide-react";
+import { ChartBar as BarChart3, CaretDown as ChevronDown, SquaresFour as LayoutDashboard, GridFour as LayoutGrid, ListChecks, SignOut as LogOut, ChartPie as PieChart, PiggyBank, Gear as Settings, Tag, Users, Wallet } from "@phosphor-icons/react";
 import { useState, type ComponentType } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

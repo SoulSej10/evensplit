@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
-import { Bell, LayoutGrid, ListChecks, PieChart, PiggyBank, Plus, Tag, Wallet } from "lucide-react-native";
+import { Bell, GridFour as LayoutGrid, ListChecks, ChartPie as PieChart, PiggyBank, Plus, Tag, Wallet } from "phosphor-react-native";
 import { Avatar } from "@/components/ui/Avatar";
 import { EdgeFade } from "@/components/ui/EdgeFade";
 import { PillTabs } from "@/components/personal/PillTabs";

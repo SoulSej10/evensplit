@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, ListChecks, PieChart, PiggyBank, Tag, Wallet } from "lucide-react";
+import { GridFour as LayoutGrid, ListChecks, ChartPie as PieChart, PiggyBank, Tag, Wallet } from "@phosphor-icons/react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AppShell } from "@/components/app-shell/top-nav";
 import { FinancesSummaryCard } from "@/components/personal/finances-summary-card";

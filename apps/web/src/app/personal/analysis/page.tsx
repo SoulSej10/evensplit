@@ -16,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ChevronLeft, ChevronRight, PieChart as PieChartIcon } from "lucide-react";
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, ChartPie as PieChartIcon } from "@phosphor-icons/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MonthCalendar } from "@/components/personal/month-calendar";

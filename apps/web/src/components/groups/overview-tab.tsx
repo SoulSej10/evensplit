@@ -2,7 +2,7 @@
 
 import type { User } from "@evensplit/shared";
 import { simplifyDebts } from "@evensplit/shared";
-import { Receipt } from "lucide-react";
+import { Receipt } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { SettleUpDialog } from "@/components/settle-up/settle-up-dialog";

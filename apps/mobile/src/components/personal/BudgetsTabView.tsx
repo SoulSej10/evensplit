@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { computeBudgetProgress, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { PiggyBank, Trash2 } from "lucide-react-native";
+import { PiggyBank, Trash as Trash2 } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";

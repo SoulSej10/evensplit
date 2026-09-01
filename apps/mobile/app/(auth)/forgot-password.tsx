@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { ArrowLeft, Mail } from "lucide-react-native";
+import { ArrowLeft, Envelope as Mail } from "phosphor-react-native";
 import * as Linking from "expo-linking";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

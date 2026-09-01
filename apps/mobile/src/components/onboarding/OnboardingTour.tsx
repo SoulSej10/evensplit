@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
-import { BarChart3, Users, Wallet, Sparkles, type LucideIcon } from "lucide-react-native";
+import { ChartBar as BarChart3, Users, Wallet, Sparkle as Sparkles, type Icon as LucideIcon } from "phosphor-react-native";
 import { Button } from "@/components/ui/Button";
 import { hasSeenOnboardingTour, setOnboardingTourShown } from "@/lib/device-flags";
 

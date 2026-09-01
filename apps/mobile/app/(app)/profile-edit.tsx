@@ -3,7 +3,7 @@ import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { router, Stack } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useColorScheme } from "nativewind";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft } from "phosphor-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { profileSetupSchema, type ProfileSetupInput } from "@evensplit/shared";

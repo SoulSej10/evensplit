@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { Tag, Trash2 } from "lucide-react";
+import { Tag, Trash as Trash2 } from "@phosphor-icons/react";
 import type { PersonalCategory } from "@evensplit/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";

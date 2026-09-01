@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Settlement } from "@evensplit/shared";
-import { CheckCircle2 } from "lucide-react-native";
+import { CheckCircle as CheckCircle2 } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { confirmSettlementReceipt } from "@/lib/api/settlements";
 import { usePersonalAccounts } from "@/hooks/use-personal";

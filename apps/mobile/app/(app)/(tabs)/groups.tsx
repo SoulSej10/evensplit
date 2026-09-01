@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { Bell, Plus, Users } from "lucide-react-native";
+import { Bell, Plus, Users } from "phosphor-react-native";
 import { Avatar } from "@/components/ui/Avatar";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { CreateGroupSheet } from "@/components/groups/CreateGroupSheet";

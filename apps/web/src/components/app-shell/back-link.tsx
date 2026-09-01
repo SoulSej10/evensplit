@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "@phosphor-icons/react";
 
 /** Back-to-parent affordance for pages that aren't a main nav destination (e.g. a single group's detail page). */
 export function BackLink({ href, label }: { href: string; label: string }) {

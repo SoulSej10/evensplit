@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "@evensplit/shared";
-import { AlertCircle, Plus, Receipt, Trash2, Repeat } from "lucide-react";
+import { WarningCircle as AlertCircle, Plus, Receipt, Trash as Trash2, Repeat } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

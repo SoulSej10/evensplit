@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowRightLeft, Receipt } from "lucide-react-native";
+import { ArrowsLeftRight as ArrowRightLeft, Receipt } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/ErrorState";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "@evensplit/shared";
-import { Trash2, Pencil } from "lucide-react-native";
+import { Trash as Trash2, Pencil } from "phosphor-react-native";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react";
 import { createPersonalBudgetSchema, type CreatePersonalBudgetInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

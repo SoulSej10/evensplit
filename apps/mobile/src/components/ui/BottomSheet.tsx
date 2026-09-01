@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { Easing, FadeIn, FadeOut, SlideInDown, SlideOutDown } from "react-native-reanimated";
-import { X } from "lucide-react-native";
+import { X } from "phosphor-react-native";
 import { cn } from "@/lib/cn";
 
 /**

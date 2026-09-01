@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { computeAllAccountBalances, type PersonalAccount } from "@evensplit/shared";
-import { Pencil, Wallet } from "lucide-react-native";
+import { Pencil, Wallet } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";

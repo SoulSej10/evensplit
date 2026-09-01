@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft } from "phosphor-react-native";
 import { PrivacyPolicyContent } from "@/components/legal/PrivacyPolicyContent";
 
 /** Read-only view of the same policy shown at the first-run gate, reachable anytime from Settings. */

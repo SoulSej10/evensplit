@@ -6,20 +6,7 @@ import { useColorScheme } from "nativewind";
 import * as DocumentPicker from "expo-document-picker";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import {
-  ChevronRight,
-  Download,
-  KeyRound,
-  ListChecks,
-  LogOut,
-  PiggyBank,
-  ShieldCheck,
-  Tag,
-  Trash2,
-  Upload,
-  Wallet,
-  X,
-} from "lucide-react-native";
+import { CaretRight as ChevronRight, Download, Key as KeyRound, ListChecks, SignOut as LogOut, PiggyBank, ShieldCheck, Tag, Trash as Trash2, Upload, Wallet, X } from "phosphor-react-native";
 import { CURRENCIES } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
 import { Card } from "@/components/ui/Card";

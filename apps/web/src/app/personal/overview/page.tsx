@@ -7,7 +7,7 @@ import {
   computeBudgetProgress,
   filterTransactionsForCurrentMonth,
 } from "@evensplit/shared";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, PiggyBank } from "lucide-react";
+import { ArrowDownLeft, ArrowsLeftRight as ArrowLeftRight, ArrowUpRight, PiggyBank } from "@phosphor-icons/react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {

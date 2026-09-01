@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { computeCategoryBreakdown, computeDailyTotals } from "@evensplit/shared";
-import { ChevronDown, ChevronLeft, ChevronRight, PieChart } from "lucide-react-native";
+import { CaretDown as ChevronDown, CaretLeft as ChevronLeft, CaretRight as ChevronRight, ChartPie as PieChart } from "phosphor-react-native";
 import { Card } from "@/components/ui/Card";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { SkeletonCardRows } from "@/components/ui/Skeleton";

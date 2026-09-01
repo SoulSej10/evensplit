@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useState, useSyncExternalStore } from "react";
-import { ChevronRight, Menu, Moon, Search, Sun } from "lucide-react";
+import { CaretRight as ChevronRight, List as Menu, Moon, MagnifyingGlass as Search, Sun } from "@phosphor-icons/react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { NAV_SECTIONS, SidebarNav } from "@/components/app-shell/sidebar";
 import { useBreadcrumbLabel } from "@/components/app-shell/breadcrumb-context";

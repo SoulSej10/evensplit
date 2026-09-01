@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
-import { Check, Image as ImageIcon, Repeat } from "lucide-react-native";
+import { Check, Image as ImageIcon, Repeat } from "phosphor-react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { computeSplitShares, SplitError, type SplitType, type User } from "@evensplit/shared";
 import { BottomSheet } from "@/components/ui/BottomSheet";

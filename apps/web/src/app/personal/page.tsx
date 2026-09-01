@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Receipt, Trash2 } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, ArrowsLeftRight as ArrowLeftRight, Receipt, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { AddTransactionDialog } from "@/components/personal/add-transaction-dialog";

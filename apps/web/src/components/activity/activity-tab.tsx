@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "@evensplit/shared";
-import { AlertCircle, ArrowRightLeft, Receipt } from "lucide-react";
+import { WarningCircle as AlertCircle, ArrowsLeftRight as ArrowRightLeft, Receipt } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Plus, UserPlus } from "lucide-react-native";
+import { Plus, UserPlus } from "phosphor-react-native";
 
 interface QuickAction {
   label: string;

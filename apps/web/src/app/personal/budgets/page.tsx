@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { computeBudgetProgress, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { PiggyBank, Trash2 } from "lucide-react";
+import { PiggyBank, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

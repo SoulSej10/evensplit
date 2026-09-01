@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { computeAllAccountBalances } from "@evensplit/shared";
-import { Wallet, MoreVertical, Pencil, Archive } from "lucide-react";
+import { Wallet, DotsThreeVertical as MoreVertical, Pencil, Archive } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

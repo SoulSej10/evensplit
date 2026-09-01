@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Text, View } from "react-native";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react-native";
+import { ArrowDownLeft, ArrowUpRight } from "phosphor-react-native";
 import { computeAllAccountBalances, filterTransactionsForCurrentMonth } from "@evensplit/shared";
 import { formatMoney } from "@/lib/format";
 import { usePersonalAccounts, usePersonalTransactions } from "@/hooks/use-personal";

@@ -3,7 +3,7 @@ import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Te
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
 import { useColorScheme } from "nativewind";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft } from "phosphor-react-native";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema, type SignUpInput } from "@evensplit/shared";

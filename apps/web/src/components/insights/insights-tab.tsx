@@ -16,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AlertCircle, PieChart as PieChartIcon } from "lucide-react";
+import { WarningCircle as AlertCircle, ChartPie as PieChartIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGroupExpenses } from "@/hooks/use-group-detail";

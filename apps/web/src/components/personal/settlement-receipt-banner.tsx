@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Settlement } from "@evensplit/shared";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle as CheckCircle2 } from "@phosphor-icons/react";
 import { Card } from "@/components/ui/card";
 import { confirmSettlementReceipt } from "@/lib/api/settlements";
 import { usePersonalAccounts } from "@/hooks/use-personal";

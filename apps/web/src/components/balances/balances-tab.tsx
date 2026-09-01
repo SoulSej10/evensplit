@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { User } from "@evensplit/shared";
 import { simplifyDebts } from "@evensplit/shared";
-import { AlertCircle } from "lucide-react";
+import { WarningCircle as AlertCircle } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

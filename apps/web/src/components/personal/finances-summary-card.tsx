@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { computeAllAccountBalances, filterTransactionsForCurrentMonth } from "@evensplit/shared";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight } from "@phosphor-icons/react";
 import { usePersonalAccounts, usePersonalTransactions } from "@/hooks/use-personal";
 import { formatMoney } from "@/lib/format";
 

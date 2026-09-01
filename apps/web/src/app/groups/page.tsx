@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMyGroups } from "@/hooks/use-groups";
-import { Users, AlertCircle } from "lucide-react";
+import { Users, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 
 /**
  * The "Groups" destination - every group the user belongs to, plus the

@@ -2,15 +2,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import {
-  ArrowDownLeft,
-  ArrowRight,
-  ArrowRightLeft,
-  ArrowUpRight,
-  Bell,
-  Clock,
-  PiggyBank,
-} from "lucide-react-native";
+import { ArrowDownLeft, ArrowRight, ArrowsLeftRight as ArrowRightLeft, ArrowUpRight, Bell, Clock, PiggyBank } from "phosphor-react-native";
 import {
   computeBudgetProgress,
   computeSharedBalancesSummary,
