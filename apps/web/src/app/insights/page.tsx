@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { WarningCircle as AlertCircle, ArrowsLeftRight as ArrowRightLeft, Stack as Layers, ChartPie as PieChartIcon, Receipt, Wallet } from "@phosphor-icons/react";
 import {
   computeCategoryBreakdown,
@@ -51,15 +51,15 @@ function CategoryPieChart({
         <h2 className="text-sm font-semibold">{title}</h2>
         <span className="text-sm font-semibold">{formatMoney(total, currency)}</span>
       </div>
-      <div className="h-56">
+      <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={categories.map((c) => ({ name: c.label, value: c.amount }))}
               dataKey="value"
               nameKey="name"
-              innerRadius={50}
-              outerRadius={80}
+              innerRadius={65}
+              outerRadius={105}
             >
               {categories.map((_, i) => (
                 <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
@@ -177,6 +177,22 @@ function InsightsContent() {
       }))
       .sort((a, b) => b.total - a.total);
   }, [expenses]);
+
+  /** Total expense activity per group, for the "By group" comparison chart. */
+  const byGroup = useMemo(() => {
+    const groupById = new Map((groups ?? []).map((g) => [g.id, g]));
+    const totals = new Map<string, number>();
+    for (const e of expenses ?? []) {
+      totals.set(e.group_id, (totals.get(e.group_id) ?? 0) + e.amount);
+    }
+    return [...totals.entries()]
+      .map(([groupId, total]) => ({
+        name: groupById.get(groupId)?.name ?? "Group",
+        total,
+        currency: groupById.get(groupId)?.currency ?? personalCurrency,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [expenses, groups, personalCurrency]);
 
   /** All free-text group-expense category labels seen, for the calendar filter pills. */
   const groupCategoryLabels = useMemo(() => {
@@ -316,19 +332,37 @@ function InsightsContent() {
         </div>
       )}
 
-      {view === "charts" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {!isLoading &&
-            !isError &&
-            byCurrency.map(({ currency, total, categories }) => (
-              <CategoryPieChart
-                key={currency}
-                title={`Spending by category · ${currency}`}
-                total={total}
-                currency={currency}
-                categories={categories}
+      {view === "charts" && !isLoading && !isError && byCurrency.length > 0 && (
+        <div className={byCurrency.length > 1 ? "mb-6 grid gap-4 sm:grid-cols-2" : "mb-6"}>
+          {byCurrency.map(({ currency, total, categories }) => (
+            <CategoryPieChart
+              key={currency}
+              title={`Spending by category · ${currency}`}
+              total={total}
+              currency={currency}
+              categories={categories}
+            />
+          ))}
+        </div>
+      )}
+
+      {view === "charts" && !isLoading && !isError && byGroup.length > 1 && (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <h2 className="mb-1 text-sm font-semibold">By group</h2>
+          <p className="mb-3 text-[11px] text-muted-foreground">
+            Total expenses logged per group — currencies aren&apos;t converted, so bars compare activity, not exact totals.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(180, byGroup.length * 48)}>
+            <BarChart data={byGroup} layout="vertical" margin={{ left: 24 }}>
+              <XAxis type="number" tick={{ fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={140} />
+              <Tooltip
+                contentStyle={TOOLTIP_STYLE}
+                formatter={(value, _name, item) => formatMoney(Number(value), item.payload.currency)}
               />
-            ))}
+              <Bar dataKey="total" name="Total" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 

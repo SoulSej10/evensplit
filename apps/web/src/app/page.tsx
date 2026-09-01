@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, ArrowsLeftRight as ArrowLeftRight, Receipt, SlidersHorizontal, Users } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";

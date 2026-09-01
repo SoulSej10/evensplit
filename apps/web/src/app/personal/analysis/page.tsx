@@ -182,16 +182,23 @@ export default function PersonalAnalysisPage() {
             <p className="py-16 text-center text-sm text-muted-foreground">No {kind} records this month.</p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2">
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie data={breakdown} dataKey="amount" nameKey="category_name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                    {breakdown.map((entry, i) => (
-                      <Cell key={entry.category_id ?? "none"} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => formatMoney(Number(value), currency)} />
-                </PieChart>
-              </ResponsiveContainer>
+              {/* min-h (not h) lets this cell stretch to match the legend
+                  column's real height (grid's default align-items: stretch)
+                  instead of staying pinned to a fixed 220px and floating,
+                  visibly too small, in whatever extra space a long legend
+                  list creates beside it. */}
+              <div className="flex min-h-[260px] items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={breakdown} dataKey="amount" nameKey="category_name" innerRadius={70} outerRadius={120} paddingAngle={2}>
+                      {breakdown.map((entry, i) => (
+                        <Cell key={entry.category_id ?? "none"} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => formatMoney(Number(value), currency)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
               <div className="flex flex-col justify-center gap-3">
                 {breakdown.map((c, i) => (
                   <div key={c.category_id ?? "none"} className="space-y-1">

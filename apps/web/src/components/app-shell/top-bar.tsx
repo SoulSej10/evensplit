@@ -101,7 +101,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
-      <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
+      <div className="relative flex h-16 items-center gap-3 px-4 lg:px-6">
         <button
           type="button"
           aria-label="Open navigation"
@@ -113,10 +113,13 @@ export function TopBar() {
 
         <Breadcrumb />
 
+        {/* Fixed to the header's true center regardless of breadcrumb length,
+            not just "next in the flex row" - absolute + translate so it
+            doesn't drift left/right as the breadcrumb grows or shrinks. */}
         <div
           role="search"
           aria-label="Search groups and expenses"
-          className="ml-2 hidden max-w-sm flex-1 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground md:flex"
+          className="absolute left-1/2 top-1/2 hidden w-full max-w-sm -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground md:flex"
         >
           <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="flex-1 truncate">Search groups, expenses…</span>
