@@ -5,9 +5,11 @@ import { computeAllAccountBalances } from "@evensplit/shared";
 import { Wallet, DotsThreeVertical as MoreVertical, Pencil, Archive } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AddAccountDialog } from "@/components/personal/add-account-dialog";
 import { usePersonalAccounts, usePersonalTransactions, useArchivePersonalAccount } from "@/hooks/use-personal";
+import { usePagination } from "@/hooks/use-pagination";
 import { formatMoney } from "@/lib/format";
 
 export default function PersonalAccountsPage() {
@@ -17,6 +19,7 @@ export default function PersonalAccountsPage() {
 
   const balances = computeAllAccountBalances(accounts ?? [], transactions ?? []);
   const total = balances.reduce((sum, b) => sum + b.balance, 0);
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(accounts ?? [], 10);
 
   async function onArchive(accountId: string, name: string) {
     try {
@@ -70,7 +73,7 @@ export default function PersonalAccountsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {accounts?.map((account) => {
+              {pageItems.map((account) => {
                 const balance = balances.find((b) => b.account_id === account.id)?.balance ?? 0;
                 return (
                   <TableRow key={account.id}>
@@ -121,6 +124,13 @@ export default function PersonalAccountsPage() {
               })}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowDownLeft, ArrowUpRight, ArrowsLeftRight as ArrowLeftRight, Receipt, Trash as Trash2 } from "@phosphor-icons/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { AddTransactionDialog } from "@/components/personal/add-transaction-dialog";
 import {
   useDeletePersonalTransaction,
@@ -12,6 +13,7 @@ import {
   usePersonalCategories,
   usePersonalTransactions,
 } from "@/hooks/use-personal";
+import { usePagination } from "@/hooks/use-pagination";
 import { formatDate, formatMoney } from "@/lib/format";
 import type { PersonalTransaction } from "@evensplit/shared";
 
@@ -33,6 +35,7 @@ export default function PersonalRecordsPage() {
   const { data: accounts } = usePersonalAccounts();
   const { data: categories } = usePersonalCategories();
   const deleteTransaction = useDeletePersonalTransaction();
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(transactions ?? [], 10);
 
   function accountName(id: string) {
     return accounts?.find((a) => a.id === id)?.name ?? "Account";
@@ -106,7 +109,7 @@ export default function PersonalRecordsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions?.map((tx) => {
+              {pageItems.map((tx) => {
                 const account = accounts?.find((a) => a.id === tx.account_id);
                 const category = categoryLabel(tx.category_id);
                 const isCredit = tx.kind === "income" || tx.kind === "group_reimbursement";
@@ -156,6 +159,13 @@ export default function PersonalRecordsPage() {
               })}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

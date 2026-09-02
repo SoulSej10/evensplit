@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { useGroupActivity } from "@/hooks/use-group-detail";
+import { usePagination } from "@/hooks/use-pagination";
 import { formatDateTime, formatMoney } from "@/lib/format";
 
 export function ActivityTab({
@@ -21,6 +23,7 @@ export function ActivityTab({
   currentUserId: string;
 }) {
   const { data: activity, isLoading, isError, refetch, isRefetching } = useGroupActivity(groupId);
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(activity ?? [], 10);
 
   function name(userId: string) {
     if (userId === currentUserId) return "You";
@@ -68,7 +71,7 @@ export function ActivityTab({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {activity.map((item) => (
+          {pageItems.map((item) => (
             <TableRow key={`${item.type}-${item.id}`}>
               <TableCell>
                 {item.type === "expense_added" ? (
@@ -107,6 +110,13 @@ export function ActivityTab({
           ))}
         </TableBody>
       </Table>
+      <TablePagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

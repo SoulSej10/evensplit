@@ -5,8 +5,10 @@ import { Tag, Trash as Trash2 } from "@phosphor-icons/react";
 import type { PersonalCategory } from "@evensplit/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { AddCategoryDialog, EditCategoryButton } from "@/components/personal/add-category-dialog";
 import { useDeletePersonalCategory, usePersonalCategories } from "@/hooks/use-personal";
+import { usePagination } from "@/hooks/use-pagination";
 
 function CategoryGroup({
   title,
@@ -19,6 +21,8 @@ function CategoryGroup({
   categories: PersonalCategory[];
   onDelete: (id: string, name: string) => void;
 }) {
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(categories, 10);
+
   return (
     <div className="mb-6">
       <div className="mb-2 flex items-center justify-between">
@@ -31,7 +35,7 @@ function CategoryGroup({
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           <Table>
             <TableBody>
-              {categories.map((c) => (
+              {pageItems.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="w-full">
                     <span className="flex items-center gap-2">
@@ -55,6 +59,13 @@ function CategoryGroup({
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

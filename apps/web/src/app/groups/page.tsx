@@ -7,7 +7,9 @@ import { GroupTableRow } from "@/components/groups/group-table-row";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { useMyGroups } from "@/hooks/use-groups";
+import { usePagination } from "@/hooks/use-pagination";
 import { Users, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 
 /**
@@ -18,6 +20,7 @@ import { Users, WarningCircle as AlertCircle } from "@phosphor-icons/react";
  */
 function GroupsContent() {
   const { data: groups, isLoading, isError, refetch, isRefetching } = useMyGroups();
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(groups ?? [], 10);
 
   return (
     <AppShell>
@@ -81,11 +84,18 @@ function GroupsContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {groups.map((g) => (
+              {pageItems.map((g) => (
                 <GroupTableRow key={g.id} group={g} />
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </AppShell>

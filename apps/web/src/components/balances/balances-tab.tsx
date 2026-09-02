@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { SettleUpDialog } from "@/components/settle-up/settle-up-dialog";
 import { useGroupExpenses, useGroupBalances, useGroupSettlements } from "@/hooks/use-group-detail";
+import { usePagination } from "@/hooks/use-pagination";
 import { formatMoney, initials } from "@/lib/format";
 
 type DebtView = "all" | "simplified";
@@ -51,6 +53,8 @@ export function BalancesTab({
   );
   const simplifiedDebts = simplifyDebts(balances);
   const debtsToShow = view === "simplified" ? simplifiedDebts : pairwiseDebts;
+  const balancesPagination = usePagination(balances, 10);
+  const debtsPagination = usePagination(debtsToShow, 10);
 
   function name(userId: string) {
     return members.find((m) => m.user_id === userId)?.users?.display_name ?? "Someone";
@@ -103,7 +107,7 @@ export function BalancesTab({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {balances.map((b) => {
+              {balancesPagination.pageItems.map((b) => {
                 const isPositive = b.balance > 0.005;
                 const isNegative = b.balance < -0.005;
                 return (
@@ -146,6 +150,13 @@ export function BalancesTab({
               })}
             </TableBody>
           </Table>
+          <TablePagination
+            page={balancesPagination.page}
+            pageCount={balancesPagination.pageCount}
+            pageSize={balancesPagination.pageSize}
+            totalCount={balancesPagination.totalCount}
+            onPageChange={balancesPagination.setPage}
+          />
         </div>
       </div>
 
@@ -197,7 +208,7 @@ export function BalancesTab({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {debtsToShow.map((debt, i) => (
+                {debtsPagination.pageItems.map((debt, i) => (
                   <TableRow key={`${debt.from_user}-${debt.to_user}-${i}`}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -244,6 +255,13 @@ export function BalancesTab({
                 ))}
               </TableBody>
             </Table>
+            <TablePagination
+              page={debtsPagination.page}
+              pageCount={debtsPagination.pageCount}
+              pageSize={debtsPagination.pageSize}
+              totalCount={debtsPagination.totalCount}
+              onPageChange={debtsPagination.setPage}
+            />
           </div>
         )}
       </div>

@@ -29,9 +29,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { ExpenseFormDialog } from "@/components/expenses/expense-form-dialog";
 import { deleteExpense, type ExpenseWithShares } from "@/lib/api/expenses";
 import { useGroupExpenses } from "@/hooks/use-group-detail";
+import { usePagination } from "@/hooks/use-pagination";
 import { formatDate, formatMoney, initials } from "@/lib/format";
 
 const CATEGORY_ALL = "__all__";
@@ -64,6 +66,8 @@ export function ExpensesTab({
       return matchesSearch && matchesCategory;
     });
   }, [expenses, search, category]);
+
+  const { page, setPage, pageCount, pageItems, totalCount, pageSize } = usePagination(filtered, 10);
 
   function memberName(userId: string) {
     return members.find((m) => m.user_id === userId)?.users?.display_name ?? "Someone";
@@ -163,7 +167,7 @@ export function ExpensesTab({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((expense) => (
+              {pageItems.map((expense) => (
                 <ExpenseRow
                   key={expense.id}
                   expense={expense}
@@ -177,6 +181,13 @@ export function ExpensesTab({
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>
