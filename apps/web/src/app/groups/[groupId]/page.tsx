@@ -44,6 +44,19 @@ import { formatMoney, initials } from "@/lib/format";
 import { downloadGroupLedgerCsv } from "@/lib/csv";
 import { DotsThreeVertical as MoreVertical, UserPlus, UserMinus, Archive, SignOut as LogOut, WarningCircle as AlertCircle, Download, Pencil } from "@phosphor-icons/react";
 
+/**
+ * useSetBreadcrumbLabel reads BreadcrumbLabelProvider from context, which
+ * AppShell only provides to its own children - it can't be called directly
+ * in GroupDetailContent's top-level render, since that render happens
+ * before/outside the <AppShell> this component returns as JSX (AppShell is
+ * this component's child, not its ancestor). Rendering this as an actual
+ * child of <AppShell> instead gives the hook a real provider to read from.
+ */
+function BreadcrumbSync({ label }: { label: string | null }) {
+  useSetBreadcrumbLabel(label);
+  return null;
+}
+
 function GroupDetailContent({ groupId }: { groupId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -52,7 +65,6 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   const { data: expenses } = useGroupExpenses(groupId);
   const { data: settlements } = useGroupSettlements(groupId);
   useGroupRealtime(groupId);
-  useSetBreadcrumbLabel(group?.name ?? null);
 
   const members = group?.group_members ?? [];
   const memberIds = useMemo(() => members.map((m) => m.user_id), [members]);
@@ -101,6 +113,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   if (isError) {
     return (
       <AppShell>
+        <BreadcrumbSync label={null} />
         <BackLink href="/groups" label="Back to groups" />
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-destructive/40 py-16 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
@@ -121,6 +134,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
   if (isLoading || !group) {
     return (
       <AppShell>
+        <BreadcrumbSync label={null} />
         <BackLink href="/groups" label="Back to groups" />
         <Skeleton className="h-24 rounded-2xl" />
       </AppShell>
@@ -132,6 +146,7 @@ function GroupDetailContent({ groupId }: { groupId: string }) {
 
   return (
     <AppShell>
+      <BreadcrumbSync label={group.name} />
       <BackLink href="/groups" label="Back to groups" />
       <div className="mb-6 rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
         <div className="flex items-start justify-between gap-3">
