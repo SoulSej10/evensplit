@@ -309,31 +309,28 @@ function InsightsContent() {
         </Card>
       )}
 
-      {!isLoading && !isError && view === "charts" && personalBreakdown.length > 0 && (
-        <div className="mb-6">
-          <CategoryPieChart
-            title="Personal spending by category"
-            total={personalMonthTotal}
-            currency={personalCurrency}
-            categories={personalBreakdown.map((c) => ({ label: c.category_name, amount: c.amount }))}
-          />
-        </div>
-      )}
-
-      {!isLoading && !isError && view === "charts" && byCurrency.length === 0 && (
+      {!isLoading && !isError && view === "charts" && personalBreakdown.length === 0 && byCurrency.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light text-primary">
             <PieChartIcon className="h-6 w-6" />
           </span>
           <p className="font-medium">No expenses yet</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Once you add some group expenses, spending by category shows up here.
+            Once you add some personal or group expenses, spending by category shows up here.
           </p>
         </div>
       )}
 
-      {view === "charts" && !isLoading && !isError && byCurrency.length > 0 && (
-        <div className={byCurrency.length > 1 ? "mb-6 grid gap-4 sm:grid-cols-2" : "mb-6"}>
+      {!isLoading && !isError && view === "charts" && (personalBreakdown.length > 0 || byCurrency.length > 0) && (
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          {personalBreakdown.length > 0 && (
+            <CategoryPieChart
+              title="Personal spending by category"
+              total={personalMonthTotal}
+              currency={personalCurrency}
+              categories={personalBreakdown.map((c) => ({ label: c.category_name, amount: c.amount }))}
+            />
+          )}
           {byCurrency.map(({ currency, total, categories }) => (
             <CategoryPieChart
               key={currency}
