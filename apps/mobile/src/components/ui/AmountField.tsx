@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { Calculator as CalculatorIcon } from "phosphor-react-native";
 import {
   CALCULATOR_INITIAL_STATE,
   calculatorPressBackspace,
@@ -14,7 +13,6 @@ import {
   type CalculatorState,
 } from "@evensplit/shared";
 import { TextField } from "@/components/ui/TextField";
-import { BottomSheet } from "@/components/ui/BottomSheet";
 import { cn } from "@/lib/cn";
 
 type ButtonTone = "digit" | "op" | "muted" | "primary";
@@ -76,7 +74,7 @@ const ROWS: { label: string; tone: ButtonTone; kind: "digit" | "decimal" | "op" 
 ];
 
 /**
- * A money-amount field with a small embedded calculator (see
+ * A money-amount field with an always-visible calculator keypad (see
  * packages/shared/calculator.ts for the shared evaluation logic) so users
  * can work out a split, a sum of receipts, etc. right in the field instead
  * of doing the math elsewhere and re-typing the result. Used everywhere an
@@ -96,42 +94,32 @@ export function AmountField({
   error?: string;
   containerClassName?: string;
 }) {
-  const [visible, setVisible] = useState(false);
   const [calc, setCalc] = useState<CalculatorState>(CALCULATOR_INITIAL_STATE);
-
-  function openCalculator() {
-    const seed = value && Number(value) > 0 ? value : "0";
-    setCalc({ ...CALCULATOR_INITIAL_STATE, display: seed });
-    setVisible(true);
-  }
 
   function update(next: CalculatorState) {
     setCalc(next);
     onChangeText(String(calculatorValue(next)));
   }
 
+  function handleTyped(text: string) {
+    onChangeText(text);
+    // Keep the calculator's running state in sync so the next keypad press
+    // continues from whatever was typed, instead of a stale prior value.
+    const n = Number(text);
+    setCalc({ ...CALCULATOR_INITIAL_STATE, display: text && n > 0 ? text : "0" });
+  }
+
   return (
     <View className={containerClassName}>
-      <View className="relative">
-        <TextField
-          label={label}
-          keyboardType="decimal-pad"
-          value={value}
-          onChangeText={onChangeText}
-          error={error}
-          className="pr-11"
-        />
-        <Pressable
-          onPress={openCalculator}
-          hitSlop={8}
-          className={cn("absolute right-2 h-8 w-8 items-center justify-center rounded-lg active:opacity-70", label ? "top-9" : "top-2")}
-          accessibilityLabel="Open calculator"
-        >
-          <CalculatorIcon size={18} color="#6B7169" />
-        </Pressable>
-      </View>
+      <TextField
+        label={label}
+        keyboardType="decimal-pad"
+        value={value}
+        onChangeText={handleTyped}
+        error={error}
+      />
 
-      <BottomSheet visible={visible} onClose={() => setVisible(false)} title="Calculator">
+      <View className="mt-2 gap-2 rounded-card border border-neutral-200 p-2.5 dark:border-white/10">
         <View className="items-end justify-center rounded-card bg-neutral-100 px-4 py-3 dark:bg-white/5">
           <Text className="font-mono text-2xl font-bold tabular-nums text-neutral-900 dark:text-neutral-100">
             {calc.display}
@@ -167,7 +155,7 @@ export function AmountField({
             </View>
           ))}
         </View>
-      </BottomSheet>
+      </View>
     </View>
   );
 }
