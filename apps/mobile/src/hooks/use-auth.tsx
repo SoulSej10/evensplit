@@ -28,18 +28,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    try {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userId)
-        .maybeSingle();
-      if (error) throw error;
-      setProfile(data as EvenSplitUser | null);
-    } catch (err) {
-      console.error("EvenSplit: failed to load profile", err);
-      setProfile(null);
+    const supabase = getSupabaseClient();
+    // A cold-booted emulator/device clock can briefly lag real time before it
+    // syncs, which makes Supabase reject an otherwise-valid session token
+    // with "JWT issued at future" (PGRST303). That's transient, so retry a
+    // couple of times before giving up and surfacing it as a real failure.
+    const attempts = 3;
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        const { data, error } = await supabase.from("users").select("*").eq("id", userId).maybeSingle();
+        if (error) throw error;
+        setProfile(data as EvenSplitUser | null);
+        return;
+      } catch (err) {
+        if (attempt === attempts) {
+          console.error("EvenSplit: failed to load profile", err);
+          setProfile(null);
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 500));
+        }
+      }
     }
   }, []);
 

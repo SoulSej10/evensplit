@@ -180,27 +180,27 @@ export function AddTransactionSheet({
         </View>
       )}
 
-      <View className="flex-row gap-3">
-        <AmountField value={amount} onChangeText={setAmount} containerClassName="flex-1" />
-        <View className="flex-1 gap-1.5">
-          <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Date</Text>
-          <Pressable
-            onPress={() => setShowDatePicker(true)}
-            className="h-12 justify-center rounded-card border border-neutral-500/20 bg-surface px-4 dark:bg-surface-dark"
-          >
-            <Text className="text-neutral-900 dark:text-neutral-100">{formatDate(date.toISOString())}</Text>
-          </Pressable>
-        </View>
+      <AmountField value={amount} onChangeText={setAmount} />
+
+      <View className="gap-1.5">
+        <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Date</Text>
+        <Pressable
+          onPress={() => setShowDatePicker(true)}
+          className="h-12 justify-center rounded-card border border-neutral-500/20 bg-surface px-4 dark:bg-surface-dark"
+        >
+          <Text className="text-neutral-900 dark:text-neutral-100">{formatDate(date.toISOString())}</Text>
+        </Pressable>
       </View>
       {showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
           display="default"
-          onChange={(_, selectedDate) => {
+          onValueChange={(_, selectedDate) => {
             setShowDatePicker(false);
             if (selectedDate) setDate(selectedDate);
           }}
+          onDismiss={() => setShowDatePicker(false)}
         />
       )}
 

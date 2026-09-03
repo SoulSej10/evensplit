@@ -31,18 +31,39 @@ const TONE_TEXT_CLASSES: Record<ButtonTone, string> = {
   primary: "text-white",
 };
 
-function CalcButton({ label, onPress, tone = "digit" }: { label: string; onPress: () => void; tone?: ButtonTone }) {
+function CalcButton({
+  label,
+  onPress,
+  tone = "digit",
+  wide = false,
+}: {
+  label: string;
+  onPress: () => void;
+  tone?: ButtonTone;
+  wide?: boolean;
+}) {
   return (
     <Pressable
       onPress={onPress}
-      className={cn("h-12 flex-1 items-center justify-center rounded-card active:opacity-70", TONE_CLASSES[tone])}
+      className={cn(
+        "h-12 items-center justify-center rounded-card active:opacity-70",
+        wide ? "flex-[2]" : "flex-1",
+        TONE_CLASSES[tone]
+      )}
     >
       <Text className={cn("text-base font-semibold tabular-nums", TONE_TEXT_CLASSES[tone])}>{label}</Text>
     </Pressable>
   );
 }
 
-const ROWS: { label: string; tone: ButtonTone; kind: "digit" | "decimal" | "op" | "clear" | "backspace" | "equals" }[][] = [
+type CalcButtonSpec = {
+  label: string;
+  tone: ButtonTone;
+  kind: "digit" | "decimal" | "op" | "clear" | "backspace" | "equals";
+  wide?: boolean;
+};
+
+const ROWS: CalcButtonSpec[][] = [
   [
     { label: "C", tone: "muted", kind: "clear" },
     { label: "⌫", tone: "muted", kind: "backspace" },
@@ -68,7 +89,7 @@ const ROWS: { label: string; tone: ButtonTone; kind: "digit" | "decimal" | "op" 
     { label: "=", tone: "primary", kind: "equals" },
   ],
   [
-    { label: "0", tone: "digit", kind: "digit" },
+    { label: "0", tone: "digit", kind: "digit", wide: true },
     { label: ".", tone: "digit", kind: "decimal" },
   ],
 ];
@@ -134,6 +155,7 @@ export function AmountField({
                   key={btn.label}
                   label={btn.label}
                   tone={btn.tone}
+                  wide={btn.wide}
                   onPress={() => {
                     switch (btn.kind) {
                       case "clear":
@@ -152,6 +174,7 @@ export function AmountField({
                   }}
                 />
               ))}
+              {row.length < 4 && <View className="flex-1" />}
             </View>
           ))}
         </View>

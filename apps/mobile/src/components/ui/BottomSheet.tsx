@@ -6,6 +6,12 @@ import { X } from "phosphor-react-native";
 import { cn } from "@/lib/cn";
 
 const SHEET_HEIGHT = Dimensions.get("window").height;
+// A percentage maxHeight string on this absolutely-positioned (bottom-anchored,
+// no `top`) container doesn't resolve to a definite size for Yoga, so a
+// flex: 1 ScrollView inside it fills the whole screen instead of stopping at
+// the cap - pushing the footer/Save button off-screen. A plain pixel number
+// is a definite constraint and clamps correctly.
+const MAX_SHEET_HEIGHT = SHEET_HEIGHT * 0.88;
 const OPEN_DURATION = 220;
 const CLOSE_DURATION = 200;
 
@@ -65,12 +71,12 @@ export function BottomSheet({
       </Animated.View>
       <Animated.View
         style={[
-          { position: "absolute", bottom: 0, left: 0, right: 0, maxHeight: "88%" },
+          { position: "absolute", bottom: 0, left: 0, right: 0, maxHeight: MAX_SHEET_HEIGHT },
           sheetStyle,
         ]}
         className="rounded-t-[18px] bg-surface dark:bg-surface-dark"
       >
-        <SafeAreaView edges={["bottom"]}>
+        <SafeAreaView edges={["bottom"]} style={{ flexShrink: 1, flexBasis: "auto" }}>
           <View className="items-center pt-2.5">
             <View className="h-1.5 w-10 rounded-full bg-neutral-500/25" />
           </View>
@@ -92,13 +98,21 @@ export function BottomSheet({
 
           <ScrollView
             className={cn("px-5")}
+            style={{ flexGrow: 0, flexShrink: 1, flexBasis: "auto" }}
             contentContainerClassName="gap-4 pb-4"
             keyboardShouldPersistTaps="handled"
           >
             {children}
           </ScrollView>
 
-          {footer && <View className="border-t border-neutral-500/10 px-5 py-4">{footer}</View>}
+          {footer && (
+            <View
+              style={{ flexShrink: 0 }}
+              className="border-t border-neutral-500/10 px-5 py-4"
+            >
+              {footer}
+            </View>
+          )}
         </SafeAreaView>
       </Animated.View>
     </Modal>
