@@ -12,7 +12,6 @@ import {
   calculatorValue,
   type CalculatorState,
 } from "@evensplit/shared";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type ButtonTone = "digit" | "op" | "muted" | "primary";
@@ -48,9 +47,11 @@ function CalcButton({
 }
 
 /**
- * A money-amount input with an always-visible calculator keypad (see
- * packages/shared/calculator.ts for the shared evaluation logic) so users
- * can work out a split, a sum of receipts, etc. right in the field instead
+ * A money-amount input whose own display doubles as both the typable amount
+ * field and the calculator's running readout (see packages/shared/calculator.ts
+ * for the shared evaluation logic) - one field, not a text input stacked on
+ * top of a separate calculator screen. An always-visible keypad below it lets
+ * users work out a split, a sum of receipts, etc. right in the field instead
  * of doing the math elsewhere and re-typing the result. Used everywhere an
  * amount/limit is entered - transactions, expenses, settle up, accounts,
  * budgets.
@@ -70,7 +71,20 @@ export function AmountInput({
   className?: string;
   ariaInvalid?: boolean;
 }) {
-  const [calc, setCalc] = useState<CalculatorState>(CALCULATOR_INITIAL_STATE);
+  const [calc, setCalc] = useState<CalculatorState>(() => ({
+    ...CALCULATOR_INITIAL_STATE,
+    display: value > 0 ? String(value) : "0",
+  }));
+
+  // Adjust state during render (React's recommended alternative to an effect
+  // for this) when the external value genuinely diverges from what the
+  // calculator holds - the dialog opened with an existing/suggested amount,
+  // or reset the field after submit. A normal keystroke already updates both
+  // `calc` and `value` together in handleTyped/update, so this condition is
+  // false on every render caused by our own typing and never loops.
+  if (calculatorValue(calc) !== value) {
+    setCalc({ ...CALCULATOR_INITIAL_STATE, display: value > 0 ? String(value) : "0" });
+  }
 
   function update(next: CalculatorState) {
     setCalc(next);
@@ -78,28 +92,30 @@ export function AmountInput({
   }
 
   function handleTyped(e: React.ChangeEvent<HTMLInputElement>) {
-    const next = e.target.valueAsNumber || 0;
-    onChange(next);
+    const raw = e.target.value;
+    // Only accept what a person typing a number would produce - keeps the
+    // field from getting stuck on invalid characters mid-keystroke.
+    if (!/^\d*\.?\d*$/.test(raw)) return;
+    onChange(Number(raw) || 0);
     // Keep the calculator's running state in sync so the next keypad press
     // continues from whatever was typed, instead of a stale prior value.
-    setCalc({ ...CALCULATOR_INITIAL_STATE, display: next > 0 ? String(next) : "0" });
+    setCalc({ ...CALCULATOR_INITIAL_STATE, display: raw });
   }
 
   return (
     <div className={cn("space-y-2", className)}>
-      <Input
-        id={id}
-        type="number"
-        step="0.01"
-        inputMode="decimal"
-        placeholder={placeholder}
-        value={Number.isNaN(value) || value === 0 ? "" : value}
-        onChange={handleTyped}
-        aria-invalid={ariaInvalid}
-      />
       <div className="rounded-lg border border-border bg-card p-2.5">
         <div className="mb-2 flex items-center justify-between rounded-md bg-muted px-3 py-2">
-          <span className="truncate font-mono text-lg font-semibold tabular-nums">{calc.display}</span>
+          <input
+            id={id}
+            type="text"
+            inputMode="decimal"
+            placeholder={placeholder ?? "0"}
+            value={calc.display}
+            onChange={handleTyped}
+            aria-invalid={ariaInvalid}
+            className="w-full truncate bg-transparent font-mono text-lg font-semibold tabular-nums outline-none"
+          />
           {calc.pendingOp && <span className="pl-1 text-xs text-muted-foreground">{calc.pendingOp}</span>}
         </div>
         <div className="grid grid-cols-4 gap-1.5">

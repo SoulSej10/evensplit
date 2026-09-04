@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Stack } from "expo-router";
+import * as Sentry from "@sentry/react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { colorScheme } from "nativewind";
@@ -16,6 +17,17 @@ import "../global.css";
 import { Providers } from "@/components/Providers";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// No-ops entirely if EXPO_PUBLIC_SENTRY_DSN isn't set (e.g. local dev, or
+// before a Sentry project exists) - drop a DSN in .env.local (or the EAS
+// project's env vars) whenever a Sentry project exists to turn this on, no
+// code change needed.
+if (process.env.EXPO_PUBLIC_SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+    tracesSampleRate: 0.1,
+  });
+}
 
 // This app has no RTL design at all - force LTR unconditionally so a
 // stale forceRTL(true) from an earlier debugging session (persisted
@@ -35,7 +47,7 @@ if (I18nManager.isRTL) {
 // this only changes the starting point each cold launch.
 colorScheme.set("dark");
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
@@ -62,3 +74,5 @@ export default function RootLayout() {
     </Providers>
   );
 }
+
+export default Sentry.wrap(RootLayout);

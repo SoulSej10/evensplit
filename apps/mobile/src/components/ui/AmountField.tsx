@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import {
   CALCULATOR_INITIAL_STATE,
   calculatorPressBackspace,
@@ -12,7 +12,6 @@ import {
   type CalculatorOperator,
   type CalculatorState,
 } from "@evensplit/shared";
-import { TextField } from "@/components/ui/TextField";
 import { cn } from "@/lib/cn";
 
 type ButtonTone = "digit" | "op" | "muted" | "primary";
@@ -95,9 +94,11 @@ const ROWS: CalcButtonSpec[][] = [
 ];
 
 /**
- * A money-amount field with an always-visible calculator keypad (see
- * packages/shared/calculator.ts for the shared evaluation logic) so users
- * can work out a split, a sum of receipts, etc. right in the field instead
+ * A money-amount field whose own display doubles as both the typable amount
+ * field and the calculator's running readout (see packages/shared/calculator.ts
+ * for the shared evaluation logic) - one field, not a text field stacked on
+ * top of a separate calculator screen. An always-visible keypad below it lets
+ * users work out a split, a sum of receipts, etc. right in the field instead
  * of doing the math elsewhere and re-typing the result. Used everywhere an
  * amount/limit is entered - transactions, expenses, settle up, accounts,
  * budgets.
@@ -115,7 +116,21 @@ export function AmountField({
   error?: string;
   containerClassName?: string;
 }) {
-  const [calc, setCalc] = useState<CalculatorState>(CALCULATOR_INITIAL_STATE);
+  const [calc, setCalc] = useState<CalculatorState>(() => ({
+    ...CALCULATOR_INITIAL_STATE,
+    display: value && Number(value) > 0 ? value : "0",
+  }));
+
+  // Adjust state during render (React's recommended alternative to an effect
+  // for this) when the external value genuinely diverges from what the
+  // calculator holds - the sheet opened with an existing/suggested amount,
+  // or reset the field after submit. A normal keystroke already updates both
+  // `calc` and `value` together in handleTyped/update, so this condition is
+  // false on every render caused by our own typing and never loops.
+  const externalValue = Number(value) || 0;
+  if (calculatorValue(calc) !== externalValue) {
+    setCalc({ ...CALCULATOR_INITIAL_STATE, display: value && externalValue > 0 ? value : "0" });
+  }
 
   function update(next: CalculatorState) {
     setCalc(next);
@@ -123,29 +138,30 @@ export function AmountField({
   }
 
   function handleTyped(text: string) {
+    // Only accept what a person typing a number would produce - keeps the
+    // field from getting stuck on invalid characters mid-keystroke.
+    if (!/^\d*\.?\d*$/.test(text)) return;
     onChangeText(text);
     // Keep the calculator's running state in sync so the next keypad press
     // continues from whatever was typed, instead of a stale prior value.
-    const n = Number(text);
-    setCalc({ ...CALCULATOR_INITIAL_STATE, display: text && n > 0 ? text : "0" });
+    setCalc({ ...CALCULATOR_INITIAL_STATE, display: text });
   }
 
   return (
     <View className={containerClassName}>
-      <TextField
-        label={label}
-        keyboardType="decimal-pad"
-        value={value}
-        onChangeText={handleTyped}
-        error={error}
-      />
-
-      <View className="mt-2 gap-2 rounded-card border border-neutral-200 p-2.5 dark:border-white/10">
-        <View className="items-end justify-center rounded-card bg-neutral-100 px-4 py-3 dark:bg-white/5">
-          <Text className="font-mono text-2xl font-bold tabular-nums text-neutral-900 dark:text-neutral-100">
-            {calc.display}
-          </Text>
-        </View>
+      <View className="gap-2 rounded-card border border-neutral-200 p-2.5 dark:border-white/10">
+        {label && (
+          <Text className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{label}</Text>
+        )}
+        <TextInput
+          keyboardType="decimal-pad"
+          value={calc.display}
+          onChangeText={handleTyped}
+          className={cn(
+            "rounded-card bg-neutral-100 px-4 py-3 text-right font-mono text-2xl font-bold tabular-nums text-neutral-900 dark:bg-white/5 dark:text-neutral-100",
+            error && "border border-negative"
+          )}
+        />
 
         <View className="gap-2">
           {ROWS.map((row, i) => (
@@ -179,6 +195,7 @@ export function AmountField({
           ))}
         </View>
       </View>
+      {error && <Text className="mt-1 text-xs text-negative">{error}</Text>}
     </View>
   );
 }
