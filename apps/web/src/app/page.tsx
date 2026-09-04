@@ -1,7 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ArrowsLeftRight as ArrowLeftRight, Receipt, SlidersHorizontal, Users } from "@phosphor-icons/react";
+import {
+  ArrowRight,
+  ArrowsLeftRight as ArrowLeftRight,
+  Calculator,
+  ChartPieSlice,
+  DownloadSimple,
+  PiggyBank,
+  Receipt,
+  ShieldCheck,
+  SlidersHorizontal,
+  Users,
+  Wallet,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Logo } from "@/components/brand/logo";
@@ -48,8 +60,46 @@ const faqs = [
       "Instead of everyone paying everyone, SplitEven simplifies the group's debts down to the fewest transactions that get everyone back to even.",
   },
   {
+    question: "Can I track my own spending, not just group expenses?",
+    answer:
+      "Yes. Personal accounts, budgets, categories, and transactions live alongside your groups, completely separate from anyone else's view.",
+  },
+  {
+    question: "Is my personal finance data shared with my groups?",
+    answer:
+      "Never. Group data (expenses, balances, settlements) is visible to that group's members - that's the point of a shared ledger. Your personal accounts, budgets, and transactions are private to you, always.",
+  },
+  {
+    question: "Can I get my data out?",
+    answer:
+      "Yes, export your full personal or group ledger to CSV any time from Settings - no lock-in.",
+  },
+  {
     question: "Is it free?",
     answer: "Yes, SplitEven is free to use for any group size.",
+  },
+];
+
+const financeFeatures = [
+  {
+    icon: Wallet,
+    title: "Multiple accounts",
+    detail: "Cash, cards, bank - track balances across everywhere your money actually sits.",
+  },
+  {
+    icon: PiggyBank,
+    title: "Budgets by category",
+    detail: "Set a monthly limit per category and watch progress as you spend.",
+  },
+  {
+    icon: Calculator,
+    title: "Calculator built into every amount",
+    detail: "Work out a split or a sum of receipts right where you type the number - no switching apps.",
+  },
+  {
+    icon: ChartPieSlice,
+    title: "Spending insights",
+    detail: "See where your money goes by category, and how your group spending breaks down too.",
   },
 ];
 
@@ -87,7 +137,8 @@ export default function LandingPage() {
             </h1>
             <p className="max-w-md text-lg text-muted-foreground">
               SplitEven keeps every shared expense in one ledger and settles the math in real
-              time, so nobody has to be the one who brings it up.
+              time, so nobody has to be the one who brings it up - plus tracks your own accounts,
+              budgets, and spending right alongside it.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button size="lg" asChild className="rounded-full px-7">
@@ -259,6 +310,112 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Personal finance: 4-up feature grid with a live-styled dashboard preview, distinct from the group bento above */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+          <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-12">
+            <div>
+              <h2 className="max-w-md text-2xl font-semibold tracking-tight sm:text-3xl">
+                Your own money, tracked right alongside your groups
+              </h2>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                SplitEven isn&apos;t just for splitting bills. It&apos;s a personal finance app
+                too - private to you, never visible to anyone you split expenses with.
+              </p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {financeFeatures.map((feature) => (
+                  <div key={feature.title} className="rounded-lg border border-border/60 bg-card p-5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light text-primary">
+                      <feature.icon className="h-4 w-4" />
+                    </span>
+                    <h3 className="mt-3 text-sm font-medium">{feature.title}</h3>
+                    <p className="mt-1 text-xs text-muted-foreground">{feature.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Live-styled preview, matching the hero card's "real product, not a fake screenshot" approach */}
+            <div className="rounded-lg border border-border/60 bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total balance</p>
+                  <p className="mt-1 font-mono text-2xl font-semibold tabular-nums">₱42,180.50</p>
+                </div>
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light text-primary">
+                  <Wallet className="h-5 w-5" />
+                </span>
+              </div>
+
+              <div className="mt-5 space-y-3 border-t border-border/60 pt-4">
+                <div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Groceries budget</span>
+                    <span className="font-mono tabular-nums">₱4,200 / ₱6,000</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full w-[70%] rounded-full bg-primary" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Transport budget</span>
+                    <span className="font-mono tabular-nums">₱1,850 / ₱2,500</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full w-[74%] rounded-full bg-primary" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-border/60 pt-4">
+                <p className="text-sm text-muted-foreground">Spending by category</p>
+                <div className="mt-2 flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div className="h-full w-[45%] bg-primary" />
+                  <div className="h-full w-[30%] bg-primary/50" />
+                  <div className="h-full w-[25%] bg-primary/20" />
+                </div>
+                <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <span className="h-2 w-2 rounded-full bg-primary" /> Housing 45%
+                  </span>
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <span className="h-2 w-2 rounded-full bg-primary/50" /> Food 30%
+                  </span>
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <span className="h-2 w-2 rounded-full bg-primary/20" /> Other 25%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust strip: privacy + platform availability, single row of two cards */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-border/60 bg-card p-6">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light text-primary">
+                <ShieldCheck className="h-5 w-5" />
+              </span>
+              <h3 className="mt-4 font-medium">Your data, protected</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Row-level security means only you and your groupmates can ever see your data.
+                Nothing is sold, and nothing is used for advertising.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border/60 bg-card p-6">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light text-primary">
+                <DownloadSimple className="h-5 w-5" />
+              </span>
+              <h3 className="mt-4 font-medium">On the web today, Android on the way</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Use SplitEven right in your browser now - a native Android app is on its way to
+                Google Play.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ: 2-column list, a layout family distinct from every section above */}
         <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
           <h2 className="max-w-md text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -295,7 +452,17 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground">
-        Built with Next.js, Supabase, and shadcn/ui.
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-3 px-4 sm:flex-row sm:justify-between sm:px-6">
+          <span>Built with Next.js, Supabase, and shadcn/ui.</span>
+          <nav className="flex items-center gap-4">
+            <Link href="/privacy-policy" className="hover:text-foreground hover:underline">
+              Privacy Policy
+            </Link>
+            <Link href="/terms-of-service" className="hover:text-foreground hover:underline">
+              Terms of Service
+            </Link>
+          </nav>
+        </div>
       </footer>
     </div>
   );

@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "SplitEven - Split expenses, stay even",
   description:
-    "Track shared expenses with roommates, trips, and groups. See who owes whom in real time, and settle up in a tap.",
+    "Track shared expenses with roommates, trips, and groups, and manage your own accounts, budgets, and spending alongside them. See who owes whom in real time, settle up in a tap, and stay on top of your money either way.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

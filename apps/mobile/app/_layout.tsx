@@ -75,4 +75,8 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+// Only wrap when Sentry is actually initialized above - Sentry.wrap()
+// unconditionally expects a prior Sentry.init() and warns ("App Start Span
+// could not be finished") if it never ran, which is the normal case in dev
+// without a DSN configured.
+export default process.env.EXPO_PUBLIC_SENTRY_DSN ? Sentry.wrap(RootLayout) : RootLayout;
