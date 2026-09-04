@@ -49,8 +49,10 @@ export default function PrivacyPolicyPage() {
 
         <Section title="Your controls">
           You can export your personal ledger as a CSV at any time from Settings, and you can permanently
-          delete your account and its data from Settings as well. Deleting your account removes your
-          profile and group memberships.
+          delete your account from Settings as well. That disables your login and erases your personal
+          accounts, transactions, budgets, and categories. Group expenses and settlements you were part of
+          stay visible to your former group members (with your name replaced by &quot;Deleted user&quot;) so
+          their shared ledger isn&apos;t left broken — see Terms of Service for details.
         </Section>
 
         <Section title="Contact">

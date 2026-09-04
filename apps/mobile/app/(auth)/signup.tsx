@@ -10,7 +10,6 @@ import { signUpSchema, type SignUpInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { BottomActionBar } from "@/components/ui/BottomActionBar";
-import { GoogleButton } from "@/components/GoogleButton";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function SignUpScreen() {
@@ -104,12 +103,23 @@ export default function SignUpScreen() {
         <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg">
           Create account
         </Button>
-        <View className="flex-row items-center gap-3">
-          <View className="h-px flex-1 bg-neutral-500/20" />
-          <Text className="text-xs text-neutral-500">or</Text>
-          <View className="h-px flex-1 bg-neutral-500/20" />
-        </View>
-        <GoogleButton />
+        <Text className="text-center text-xs text-neutral-500">
+          By creating an account, you agree to our{" "}
+          <Text
+            className="font-semibold text-primary"
+            onPress={() => Linking.openURL("https://evensplit-eight.vercel.app/terms-of-service")}
+          >
+            Terms of Service
+          </Text>{" "}
+          and{" "}
+          <Text
+            className="font-semibold text-primary"
+            onPress={() => Linking.openURL("https://evensplit-eight.vercel.app/privacy-policy")}
+          >
+            Privacy Policy
+          </Text>
+          .
+        </Text>
       </BottomActionBar>
     </KeyboardAvoidingView>
   );

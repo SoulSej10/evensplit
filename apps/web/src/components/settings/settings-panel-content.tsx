@@ -172,8 +172,8 @@ export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
     if (!authUser) return;
     try {
       const supabase = getSupabaseBrowserClient();
-      await supabase.from("group_members").delete().eq("user_id", authUser.id);
-      await supabase.from("users").delete().eq("id", authUser.id);
+      const { error } = await supabase.functions.invoke("delete-account");
+      if (error) throw error;
       await signOut();
       toast.success("Account data removed. You've been signed out.");
       onClose?.();
@@ -362,7 +362,7 @@ export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
       </Card>
 
       <Card className="rounded-2xl border-border/60 shadow-sm">
-        <CardContent className="p-0">
+        <CardContent className="divide-y divide-border/60 p-0">
           <button
             type="button"
             onClick={() => goTo("/privacy-policy")}
@@ -370,6 +370,16 @@ export function SettingsPanelContent({ onClose }: { onClose?: () => void }) {
           >
             <span className="flex items-center gap-2.5">
               <ShieldCheck className="h-4 w-4 text-primary" /> Privacy policy
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo("/terms-of-service")}
+            className="flex w-full items-center justify-between px-4 py-3 text-sm hover:bg-muted"
+          >
+            <span className="flex items-center gap-2.5">
+              <ShieldCheck className="h-4 w-4 text-primary" /> Terms of service
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>

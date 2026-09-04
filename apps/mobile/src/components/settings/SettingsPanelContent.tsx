@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/use-auth";
 import { getSupabaseClient } from "@/lib/supabase/client";
-import { ensureNotificationPermission, registerForPushTokenAsync } from "@/lib/notifications";
+import { ensureNotificationPermission, registerForPushTokenAsync, savePushToken } from "@/lib/notifications";
 import { hasShownNotificationNudge, setNotificationNudgeShown } from "@/lib/device-flags";
 import { upsertProfile } from "@/lib/api/profile";
 import { EditProfileSheet } from "./EditProfileSheet";
@@ -77,7 +77,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
             const granted = await ensureNotificationPermission();
             if (!granted) return;
             const token = await registerForPushTokenAsync();
-            if (token) console.log("EvenSplit: Expo push token (not yet persisted):", token);
+            if (token && authUser) await savePushToken(authUser.id, token);
           },
         },
       ]);
@@ -210,8 +210,8 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
             if (!authUser) return;
             try {
               const supabase = getSupabaseClient();
-              await supabase.from("group_members").delete().eq("user_id", authUser.id);
-              await supabase.from("users").delete().eq("id", authUser.id);
+              const { error } = await supabase.functions.invoke("delete-account");
+              if (error) throw error;
               onClose();
               await signOut();
               router.replace("/(auth)/login");
@@ -423,7 +423,7 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
           </View>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <Pressable
             onPress={() => {
               onClose();
@@ -434,6 +434,19 @@ export function SettingsPanelContent({ onClose }: { onClose: () => void }) {
             <View className="flex-row items-center gap-2.5">
               <ShieldCheck size={17} color="#16A88F" />
               <Text className="text-neutral-900 dark:text-neutral-100">Privacy policy</Text>
+            </View>
+            <ChevronRight color="#6B7169" size={17} />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              onClose();
+              router.push("/(app)/terms-of-service");
+            }}
+            className="flex-row items-center justify-between py-1"
+          >
+            <View className="flex-row items-center gap-2.5">
+              <ShieldCheck size={17} color="#16A88F" />
+              <Text className="text-neutral-900 dark:text-neutral-100">Terms of service</Text>
             </View>
             <ChevronRight color="#6B7169" size={17} />
           </Pressable>

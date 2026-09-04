@@ -1,31 +1,22 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 /**
- * Push notifications — Phase 6 stretch, explicitly a STUB for full push
- * infrastructure. See PROJECT_PLAN.md §5.5 / §7 Phase 6.
+ * Push notifications.
  *
  * What this module does:
  * - Sets a foreground notification handler so local notifications actually
  *   show up while the app is open.
  * - Requests permission once (guarded so repeat app loads don't re-prompt)
  *   and, on a physical device, registers for an Expo push token.
+ * - Persists that token to `public.push_tokens` (`savePushToken`) so the
+ *   `notify-group-members` Edge Function + DB triggers (migration 0009) can
+ *   actually reach this device — those already exist server-side but had
+ *   nothing to read until this was wired up.
  * - Fires LOCAL notifications (immediate, `trigger: null`) on the CURRENT
- *   user's own actions (adding an expense, recording a settlement) to
- *   simulate what a real push-from-backend would eventually look like.
- *
- * What this module explicitly does NOT do (needs a separate backend
- * workstream, not built here):
- * - Deliver a notification to OTHER group members when you add an expense
- *   or settle up. Real cross-device push requires a Supabase Edge Function
- *   (or similar server-side listener) that watches for new `expenses`/
- *   `settlements` rows and calls the Expo push API with each other
- *   member's stored push token.
- * - Persist the push token anywhere. `registerForPushNotificationsAsync`
- *   returns the token so a future backend-integration pass can store it
- *   (e.g. a `push_token` column on `users`, added via its own migration —
- *   out of scope here per the task brief).
+ *   user's own actions (adding an expense, recording a settlement).
  */
 
 Notifications.setNotificationHandler({
@@ -90,6 +81,25 @@ export async function registerForPushTokenAsync(): Promise<string | null> {
   } catch (err) {
     console.warn("EvenSplit: failed to get Expo push token", err);
     return null;
+  }
+}
+
+/**
+ * Persists an Expo push token for the current device against the given
+ * user, so the `notify-group-members` Edge Function can deliver real
+ * cross-device push when another group member adds an expense or settles
+ * up. Safe to call repeatedly (unique on `user_id, expo_push_token`) —
+ * upserts rather than duplicating a row per app launch.
+ */
+export async function savePushToken(userId: string, token: string): Promise<void> {
+  try {
+    const supabase = getSupabaseClient();
+    const { error } = await supabase
+      .from("push_tokens")
+      .upsert({ user_id: userId, expo_push_token: token }, { onConflict: "user_id,expo_push_token" });
+    if (error) throw error;
+  } catch (err) {
+    console.warn("EvenSplit: failed to save push token", err);
   }
 }
 

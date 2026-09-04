@@ -7,7 +7,6 @@ import { logInSchema, type LogInInput } from "@evensplit/shared";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { BottomActionBar } from "@/components/ui/BottomActionBar";
-import { GoogleButton } from "@/components/GoogleButton";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function LoginScreen() {
@@ -81,12 +80,6 @@ export default function LoginScreen() {
         <Button onPress={handleSubmit(onSubmit)} loading={submitting} size="lg">
           Log in
         </Button>
-        <View className="flex-row items-center gap-3">
-          <View className="h-px flex-1 bg-neutral-500/20" />
-          <Text className="text-xs text-neutral-500">or</Text>
-          <View className="h-px flex-1 bg-neutral-500/20" />
-        </View>
-        <GoogleButton />
       </BottomActionBar>
     </KeyboardAvoidingView>
   );
